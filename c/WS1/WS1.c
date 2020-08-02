@@ -4,25 +4,25 @@
 
 /*function declerations*/
 
-void printHelloHex();/*WS1.EX3 - function to print string as hex number*/
-float exponential(int n);/*WS1.EX4 - function to calculate 10^n*/
-int flipInt(int num);/*WS1.EX5	- function to flip intger*/
-void swap (int *num1, int *num2);/* WS1.EX6 - function to swap to intigers*/
-int testExponential();
-int testFlipInt();
-int testSwap();
+void PrintHelloHex();/*WS1.EX3 - function to print string as hex number*/
+float Exponential(int n);/*WS1.EX4 - function to calculate 10^n*/
+int FlipInt(int num);/*WS1.EX5	- function to flip intger*/
+void Swap (int *num1, int *num2);/* WS1.EX6 - function to swap to intigers*/
+int TestExponential();
+int TestFlipInt();
+int TestSwap();
 
 
 /*function definitions*/
 
 
-void printHelloHex() 
+void PrintHelloHex() 
 {
 	const char *hex_hello = "\x48\x65\x6c\x6c\x6f\x20\x57\x6f\x72\x6c\x64\x21";
 	printf("%s\n",hex_hello);	
 }	
 
-float exponential(int n) 
+float Exponential(int n) 
 {	
 	float base;
 	float result;
@@ -49,7 +49,7 @@ float exponential(int n)
 	return result;
 }
 
-int flipInt(int num) 
+int FlipInt(int num) 
 {
 	int reminder;
 	int revers;
@@ -67,7 +67,7 @@ int flipInt(int num)
 	return revers;
 }
 
-void swap (int *num1, int *num2) 
+void Swap (int *num1, int *num2) 
 {
 	int temp;
 
@@ -96,7 +96,7 @@ int main()
 /*tests*/
 
 
-int testExponential()
+int TestExponential()
 {
 	int test1, test2, test3, test4;
 	
@@ -119,7 +119,7 @@ int testExponential()
 	}
 }
 
-int testFlipInt()
+int TestFlipInt()
 {
 	int test1, test2, test3, test4, test5;
 	
@@ -143,7 +143,7 @@ int testFlipInt()
 	}
 }
 
-int testSwap()
+int TestSwap()
 {
 	int a, b, c,d,e;
 	int test1, test2, test3;
