@@ -51,23 +51,23 @@ float Exponential(int n)
 
 int FlipInt(int num) 
 {
-	int reminder;
+	int remainder;
 	int revers;
 	
-	reminder=num%10;
+	remainder=num%10;
 	revers=0;
 
 	while (num)
 	{
-		reminder=num%10;
+		remainder=num%10;
 		revers*=10;
-		revers+=reminder;
+		revers+=remainder;
 		num/=10;
 	}
 	return revers;
 }
 
-void Swap (int *num1, int *num2) 
+void Swap(int *num1, int *num2) 
 {
 	int temp;
 
@@ -86,10 +86,10 @@ void Swap (int *num1, int *num2)
 	
 int main()
 {
-	printHelloHex();
-	testExponential();
-	testFlipInt();
-	testSwap();
+	PrintHelloHex();
+	TestExponential();
+	TestFlipInt();
+	TestSwap();
 	return 0;
 }
 
@@ -100,10 +100,10 @@ int TestExponential()
 {
 	int test1, test2, test3, test4;
 	
-	test1=(1.0==exponential(0));
-	test2=(1000.0==exponential(3));
-	test3=(0.01-exponential(-2)<0.00000001);
-	test4=(-1==exponential(50));
+	test1=(1.0==Exponential(0));
+	test2=(1000.0==Exponential(3));
+	test3=(0.01-Exponential(-2)<0.00000001);
+	test4=(-1==Exponential(50));
 	
 	
 	if (test1 && test2 && test3 && test4)
@@ -123,34 +123,34 @@ int TestFlipInt()
 {
 	int test1, test2, test3, test4, test5;
 	
-	test1=(1234==flipInt(4321));
-	test2=(1==flipInt(1000));
-	test3=(3042==flipInt(2403));
-	test4=(11111==flipInt(11111));
-	test5=((-123)==flipInt(-321));
+	test1=(1234==FlipInt(4321));
+	test2=(1==FlipInt(1000));
+	test3=(3042==FlipInt(2403));
+	test4=(11111==FlipInt(11111));
+	test5=((-123)==FlipInt(-321));
 	
 	
 	if (test1 && test2 && test3 && test4 && test5)
 	{
-		printf("the flipInt function passed the tests\n");
+		printf("the FlipInt function passed the tests\n");
 		return 0;
 	}
 
 	else
 	{
-		printf("flipInt failed!, test1=%d, test2=%d, test3=%d, test4=%d, test5=%d\n",test1,test2,test3,test4,test5);
+		printf("FlipInt failed!, test1=%d, test2=%d, test3=%d, test4=%d, test5=%d\n",test1,test2,test3,test4,test5);
 		return -1;
 	}
 }
 
 int TestSwap()
 {
-	int a, b, c,d,e;
+	int a, b, c, d, e;
 	int test1, test2, test3;
 	a=4, b=3, c=2, d=1, e=5;
-	swap(&a,&d);
-	swap(&b,&c);
-	swap(&e,NULL);
+	Swap(&a,&d);
+	Swap(&b,&c);
+	Swap(&e,NULL);
 	test1=(2==b && 3==c);
 	test2=(1==a && 4==d);
 	test3=(5==e);
