@@ -27,7 +27,7 @@ float Exponential(int n)
 	float base;
 	float result;
 	
-	if (n>=38)
+	if (38<=n)
 	{
 		printf("n is to large\n");
 		return -1;
@@ -35,13 +35,13 @@ float Exponential(int n)
 	base=10.0;
 	result=1.0;
 
-	if (n<0)
+	if (0>n)
 	{
 		base=0.1;
 		n*=-1;
 	}
 
-	while (n>0)
+	while (0<n)
 	{
 		result*=base;
 		n--;
@@ -54,7 +54,6 @@ int FlipInt(int num)
 	int remainder;
 	int revers;
 	
-	remainder=num%10;
 	revers=0;
 
 	while (num)
