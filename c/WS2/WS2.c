@@ -105,31 +105,30 @@ int SwapTwoPtr (size_t **num1, size_t **num2)
 
 size_t Strlen (const char *str)
 {
-	size_t length;
+	const char *plc=str;
 	assert(str);
-	
-	length = 0;
-	while (str[length])
+
+	while (*str)
 	{
-		length++;
+		str++;
 	}
-	return length;
+	return (str - plc);
 }
 
 int Strcmp (const char *str1,const char *str2)
 {	
-	int i = 0;
 	assert(str1 || str2);
-	i = 0;
-	while(str1[i] || str2[i])
+	
+	while(*str1 || *str2)
 	{	
-		if(str1[i] == str2[i])
+		if(*str1 == *str2)
 		{
-			i++;
+			str1++;
+			str2++;
 		}
 		else
 		{
-			return(str1[i]-str2[i]);
+			return(*str1 - *str2);
 		}
 	}
 	return SUCCESS;
