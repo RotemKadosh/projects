@@ -62,6 +62,7 @@ char *Strcpy(char *dest, const char *src)
 	char *dest_ptr = dest;
 	assert(dest);
 	assert(src);
+
 	
 	while('\0' != *src)
 	{
@@ -74,23 +75,28 @@ char *Strcpy(char *dest, const char *src)
 char *Strncpy(char *dest, const char *src, size_t n)
 {
     size_t end = n > Strlen(src) ?  Strlen(src) : n;
-    size_t i = 0;
-	
-	assert(dest);
-	assert(src);
+    char  *ptr_start = dest;
+    char const *ptr_end1 = src + end;
+    char const *ptr_end2 = src + n;
+    assert(dest);
+    assert(src);
     
-    for(i = 0; i < end ; ++i)
+    while (src != ptr_end1)
     {
-       dest[i] = src[i];
+       *dest = *src;
+       ++dest;
+       ++src;
     }
     
-    for( ; i < n ; ++i)
+    while (src != ptr_end2)
     {
-       dest[i] = '\0';
+       *dest = '\0';
+       ++dest;
+       ++src;
     }
     
-    dest[i] = '\0';
-    return dest;
+    *dest = '\0';
+    return ptr_start;
 }
 
 int Strcasecmp(const char *str1, const char *str2)
@@ -147,16 +153,15 @@ char *Strdup(const char *str)
 }
 
 char *Strcat(char *dest, const char *src)
-{	
-	char *tmp;
-	assert(dest);
-	assert(src);
+{   
+    char *tmp=dest;
+    assert(dest);
+    assert(src);
 
-	while('\0' != *tmp++){}
-	
-	strcpy(tmp,src);
-	
-	return(dest);
+    while('\0' != *tmp++){}
+    --tmp;
+    strcpy(tmp,src);
+    return(dest);
 }
 
 char *Strncat(char *dest, const char *src, size_t n)
@@ -166,7 +171,7 @@ char *Strncat(char *dest, const char *src, size_t n)
 	assert(src);
 	
 	while('\0' != *tmp++){}
-	
+	--tmp;
 	strncpy(tmp,src,n);
 	
 	return(dest);
@@ -174,22 +179,28 @@ char *Strncat(char *dest, const char *src, size_t n)
 char *Strstr(const char *haystack, const char *needle)
 {	
 	size_t need_len = Strlen(needle);
+
 	size_t i=0;
+	const char * hy_plc = haystack;
+	const char * ndl_plc = needle;
 	 
 	while('\0' != *haystack)
 	{
 		if(*haystack == *needle)
 		{
-			for(i = 1; i < need_len ; ++i)
+			hy_plc = haystack;
+			ndl_plc = needle;
+			while(ndl_plc != (needle + need_len))
 			{
-				if(haystack[i] != needle[i])
+				if(*ndl_plc != *ndl_plc)
 				{
 					break;
 				}
+				++ndl_plc;
 			}
-			if(i == need_len-1)
+			if(ndl_plc == needle + need_len)
 			{
-				return haystack;
+				return (const char *)ndl_plc;
 			}
 		}
 		++haystack;
@@ -301,76 +312,6 @@ int main ()
 /* tests needs to be mooved to different file- */
 
 
-
-void StrcpyTest()
-{
-    int test1 = 0, test2 = 0, test3 = 0, test4 = 0; 
-    const char *src1 = "copy this string";
-    char *dest1 =(char *)malloc(Strlen(src1)+1);
-
-    const char *src2 = "ore    klm";
-    char *dest2 =(char *)malloc(Strlen(src2)+1);
-
-    const char *src3 = "";
-    char *dest3 =(char *)malloc(Strlen(src3)+1);
-
-    const char *src4 = "hello";
-    char *dest4 ="im already here";
-        
-    test1 = (0==Strcmp(src1,Strcpy(dest1,src1)));
-	test2 = (0==Strcmp(src2,Strcpy(dest2,src2)));
-	test3 = (0==Strcmp(src3,Strcpy(dest3,src3)));
-	test4 = (0==Strcmp(src4,Strcpy(dest4,src4)));
-	
-	
-	if (test1 && test2 && test3 && test4 )
-	{
-		printf("the Strcpy function passed the tests\n");
-	}
-	else
-	{
-		printf("Strcpy failed!, test1=%d, test2=%d, test3=%d, test4=%d \n",test1,test2,test3,test4);
-		
-	}
-}
- /*   
-void StrncpyTest()
-{
-    int test1 = 0, test2 = 0, test3 = 0, test4 = 0; 
-    const char *src1 = "copy this string";
-    char *dest1 =(char *)malloc(Strlen(src1)+1);
-
-    const char *src2 = "ore    klm";
-    char *dest2 =(char *)malloc(Strlen(src2)+1);
-
-    const char *src3 = "";
-    char *dest3 =(char *)malloc(Strlen(src3)+1);
-
-    const char *src4 = "hello";
-    char *dest4 ="im already here";
-        
-    test1 = (0==Strcmp(Strncpy(dest1,src1,3),strncpy(dest1,src1,3)));
-	test2 = (0==Strcmp(Strncpy(dest2,src2,6),strncpy(dest2,src2,6)));
-	test3 = (0==Strcmp(Strncpy(dest3,src3,0),strncpy(dest3,src3,0)));
-	test4 = (0==Strcmp(Strncpy(dest4,src4,6),strncpy(dest4,src4,6)));
-	
-	
-	if (test1 && test2 && test3 && test4 )
-	{
-		printf("the Strncpy function passed the tests\n");
-	}
-	else
-	{
-		printf("Strncpy failed!, test1=%d, test2=%d, test3=%d, test4=%d \n",test1,test2,test3,test4);
-		
-	}
-
-}    
-    
-  */  
-    
-    
-    
 
 
 

@@ -4,7 +4,7 @@
 #include <stddef.h> /* size_t */
 
 
-/* version 1.2
+/* version 1.2*/
 
 /*DESCRIPTION: 
 *Copies the string pointed to by src, including the terminating null byte ('\0'), to the buffer  pointed  to  by  dest.
@@ -130,7 +130,11 @@ size_t Strspn(const char *str1, const char *str2);
 
 /* DESCRIPTION:
  * Breaks String str1 into a series of tokens using the delimiter delim
- * The first call to strtok() returns a pointer to the first token in the string  pointed to by str1. Subsequent calls to strtok() must pass a NULL pointer as the first argument, in order to get the next token in the string. The set of delimiters used in each of these calls to strtok() can be different from one call to the next. The function will modify the user's data.
+ * The first call to strtok() returns a pointer to the first token in the string  pointed to by str1. 
+ 	Subsequent calls to strtok() must pass a NULL pointer as the first argument, 
+ 	in order to get the next token in the string. The set of delimiters used in 
+ 	each of these calls to strtok() can be different from one call to the next.
+ 	 The function will modify the user's data.
  * @param:
  * str: or NULL, or the string that you want to break into tokens
  * delim: A set of the characters that separate the tokens.
