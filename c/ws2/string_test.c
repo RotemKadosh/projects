@@ -1,10 +1,10 @@
-#include "String.h" 
 #include <stdio.h> /*printf*/
 #include <assert.h> /*for assert*/
 #include <stddef.h> /* size_t */
 #include <ctype.h>  /*for tolower*/
 #include <stdlib.h> /*fot malloc*/
 #include <string.h> /*for testing -should be moved*/
+#include "String.h" 
 
 #define SUCCESS 0
 #define FAIL 1
@@ -12,179 +12,37 @@
 #define TRUE 1
 #define FALSE 0
 
-
 char *strdup(const char *s);
-int strcasecmp(const char *, const char *);
+int strcasecmp(const char *str1, const char *str2);
+
 void StrcpyTest();
 void StrncpyTest();
-void StrncpyTest();
-void PilandromTest();
-size_t Strlen (const char *str);
-int Strcmp (const char *str1,const char *str2);
-void TestStrcpy(void);
 void StrcasecmpTest();
 void StrchrTest();
 void StrdupTest();
 void StrcatTest();
 void StrncatTest();
 void StrstrTest();
-
-char *Strcpy(char *dest, const char *src);
-char *Strncpy(char *dest, const char *src, size_t n);
-
-
-
-char *Strstr(const char *haystack, const char *needle)
-{   
-    size_t need_len = Strlen(needle);
-
-    size_t i=0;
-    const char * hy_plc = haystack;
-    const char * ndl_plc = needle;
-     
-    while('\0' != *haystack)
-    {
-        if(*haystack == *needle)
-        {
-            hy_plc = haystack;
-            ndl_plc = needle;
-            while(ndl_plc != (needle + need_len))
-            {
-                if(*ndl_plc != *ndl_plc)
-                {
-                    break;
-                }
-                ++ndl_plc;
-            }
-            if(ndl_plc == needle + need_len)
-            {
-                return (char *)ndl_plc;
-            }
-        }
-        ++haystack;
-    }
-    return NULL;
-}
+void StrspnTest();
+void PilandromTest();
 
 int main(int argc, char *argv[])
 {
+    StrcpyTest();
+    StrncpyTest();
+    StrcasecmpTest();
+    StrchrTest();
+    StrdupTest();
+    StrcatTest();
+    StrncatTest();
     StrstrTest();
+    StrspnTest();
+    PilandromTest();
+    SevenBoom(0 , 21);
+    SevenBoom(6 , 47);
     return 0;
 }
 
-/* Why is it like this? */
-
-void StrstrTest()
-{
-    
-    const char *src1 = "hello cat erer";
-    const char *dest1 = "cat";
-    const char *dest2 = "cat  ";
-    const char *src2 = " my name is Rotem";
-    const char *dest3 = "cat check two";
-    const char *dest4 = "cat check two";
-    const char *src3 = "shorter then nS";
-    const char *dest5 = "Short";
-    const char *dest6 = "Short";
-
-    int test1 = 0, test2 = 0, test3 = 0;    
-
-    Strstr(dest1, src1);
-    strstr(dest2, src1);
-    
-    Strstr(dest3, src2);
-    strstr(dest4, src2);
-
-    Strstr(dest5, src3);
-    strstr(dest6, src3);
-
-    test1 = ( !strcmp( dest1, dest2));
-    test2 = ( !strcmp( dest3, dest4));
-    test3 = ( !strcmp( dest5, dest6));
-
-    if (test1 && test2 && test3)
-    { 
-        printf("function Strstr passed\n");
-    }
-    else
-    {
-        printf("Strstr failed, test1: %d, test2: %d, test3: %d\n", test1, test2, test3);
-    } 
-
-}  
-
-
-size_t Strlen (const char *str)
-{
-    const char *plc=str;
-    assert(str);
-
-    while (*str)
-    {
-        ++str;
-    }
-    return (str - plc);
-}
-
-int Strcmp (const char *str1,const char *str2)
-{   
-    assert(str1 || str2);
-    
-    while(*str1 || *str2)
-    {   
-        if(*str1 == *str2)
-        {
-            ++str1;
-            ++str2;
-        }
-        else
-        {
-            return(*str1 - *str2);
-        }
-    }
-    return SUCCESS;
-}
-char *Strcpy(char *dest, const char *src)
-{
-    char *dest_ptr = dest;
-    assert(dest);
-    assert(src);
-
-    
-    while('\0' != *src)
-    {
-        *dest++ = *src++;   
-    }
-    *dest = '\0';
-    return dest_ptr;
-}
-char *Strncpy(char *dest, const char *src, size_t n)
-{
-    size_t end = n > Strlen(src) ?  Strlen(src) : n;
-    char  *ptr_start = dest;
-    char const *ptr_end1 = src + end;
-    char const *ptr_end2 = src + n;
-    assert(dest);
-    assert(src);
-    
-    while (src != ptr_end1)
-    {
-       *dest = *src;
-       ++dest;
-       ++src;
-    }
-    
-    while (src != ptr_end2)
-    {
-       *dest = '\0';
-       ++dest;
-       ++src;
-    }
-    
-    *dest = '\0';
-    return ptr_start;
-}
- /*
 void StrcpyTest()
 {
     const char *src1 = "hello world";
@@ -253,7 +111,6 @@ void StrncpyTest()
     free(dest5);
     free(dest6);
 
-
     if (test1 && test2 && test3)
     { 
         printf("function Strncpy passed\n");
@@ -295,8 +152,6 @@ void StrcasecmpTest()
     test2 = (strcmp(dest3, src2) == strcmp(dest4, src2));
     test3 = (strcmp(dest5, src2) == strcmp(dest6, src2));
 
-
-
     if (test1 && test2 && test3)
     { 
         printf("function Strcasecmp passed\n");
@@ -319,7 +174,7 @@ void StrchrTest()
     int c3 = 'o';
     int c4 = 'o';
 
-    const char *src3= "shorter then n";
+    const char *src3 = "shorter then n";
     int c5 = 'q';
     int c6 = 'q';
     
@@ -338,8 +193,6 @@ void StrchrTest()
     test2 = (ptr3 == ptr4);
     test3 = (ptr5 == ptr6);
 
-
-
     if (test1 && test2 && test3)
     { 
         printf("function StrchrTest passed\n");
@@ -350,6 +203,7 @@ void StrchrTest()
     } 
 
 } 
+
 void StrdupTest()
 {
     char *ptr1 = NULL, *ptr2 = NULL, *ptr3 = NULL, *ptr4 = NULL, *ptr5 = NULL, *ptr6 = NULL;
@@ -379,6 +233,12 @@ void StrdupTest()
     free(ptr5);
     free(ptr6);
 
+    ptr1 = NULL;
+    ptr2 = NULL; 
+    ptr3 = NULL;
+    ptr4 = NULL; 
+    ptr5 = NULL; 
+    ptr6 = NULL;
 
     if (test1 && test2 && test3)
     { 
@@ -393,7 +253,6 @@ void StrdupTest()
 
 void StrcatTest()
 {
-    
     const char *src1 = "hello world";
     char dest1[50] = "cat check one";
     char dest2[50] = "cat check one";
@@ -427,8 +286,8 @@ void StrcatTest()
     {
         printf("Strcat failed, test1: %d, test2: %d, test3: %d\n", test1, test2, test3);
     } 
-
 }
+
 void StrncatTest()
 {
     size_t n1 = 5, n2 = 0, n3 = 17;
@@ -465,9 +324,84 @@ void StrncatTest()
     {
         printf("Strncat failed, test1: %d, test2: %d, test3: %d\n", test1, test2, test3);
     } 
-
 }  
 
+void StrstrTest()
+{
+    char *ptr1 = NULL, *ptr2 = NULL, *ptr3 = NULL, *ptr4 = NULL, *ptr5 = NULL, *ptr6 = NULL;
+    const char *src1 = "hello cat erer";
+    const char *dest1 = "cat";
+    const char *dest2 = "cat";
+    const char *src2 = " my name is Rotem";
+    const char *dest3 = "cat check two";
+    const char *dest4 = "cat check two";
+    const char *src3 = "shorter then nS";
+    const char *dest5 = "Short";
+    const char *dest6 = "Short";
+
+    int test1 = 0, test2 = 0, test3 = 0;    
+
+    ptr1 = Strstr(src1 , dest1);
+    ptr2 = strstr(src1 , dest2);
+    
+    ptr3 = Strstr(src2 , dest3);
+    ptr4 = strstr(src2 , dest4);
+
+    ptr5 = Strstr(src3 , dest5);
+    ptr6 = strstr(src3 , dest6);
+
+    test1 = ( ptr1 == ptr2 );
+    test2 = ( ptr3 == ptr4 );
+    test3 = ( ptr5 == ptr6 );
+
+    if (test1 && test2 && test3)
+    { 
+        printf("function Strstr passed\n");
+    }
+    else
+    {
+        printf("Strstr failed, test1: %d, test2: %d, test3: %d\n", test1, test2, test3);
+    } 
+
+} 
+void StrspnTest()
+{
+    size_t seg1 = 0, seg2 = 0, seg3 = 0, seg4 = 0, seg5 = 0, seg6 = 0;
+    const char *src1 = "hello cgcdbat erer";
+    const char *dest1 = "helocer ";
+    const char *dest2 = "helocer ";
+    const char *src2 = " my name is Rotem";
+    const char *dest3 = "L";
+    const char *dest4 = "L";
+    const char *src3 = "shorter then nS";
+    const char *dest5 = "shorteS ";
+    const char *dest6 = "shorteS ";
+
+    int test1 = 0, test2 = 0, test3 = 0;    
+
+    seg1 = Strspn(src1 , dest1);
+    seg2 = strspn(src1 , dest2);
+    
+    seg3 = Strspn(src2 , dest3);
+    seg4 = strspn(src2 , dest4);
+
+    seg5 = Strspn(src3 , dest5);
+    seg6 = strspn(src3 , dest6);
+
+    test1 = ( seg1 == seg2 );
+    test2 = ( seg3 == seg4 );
+    test3 = ( seg5 == seg6 );
+
+    if (test1 && test2 && test3)
+    { 
+        printf("function Strspn passed\n");
+    }
+    else
+    {
+        printf("Strspn failed, test1: %d, test2: %d, test3: %d\n", test1, test2, test3);
+    } 
+
+}  
 
 void PilandromTest()
 {
@@ -480,28 +414,26 @@ void PilandromTest()
     char *str5 = "ma ma";
     
     
-    test1 ==(SUCCESS == IsPilandrom( str1 ));
-    test2 ==(FAIL == IsPilandrom( str2 ));
-    test3 ==(SUCCESS == IsPilandrom( str3 ));
-    test4 ==(FAIL == IsPilandrom( str4 ));
-    test5 ==(FAIL == IsPilandrom( str5 ));
+    test1 = (TRUE == IsPalindrom( str1 ));
+    test2 = (FALSE == IsPalindrom( str2 ));
+    test3 = (TRUE == IsPalindrom( str3 ));
+    test4 = (TRUE == IsPalindrom( str4 ));
+    test5 = (FALSE == IsPalindrom( str5 ));
     
     
-    if(!test1 && !test2 && !test3 && !test4 && !test5)
+    if(test1 && test2 && test3 && test4 && test5)
     {
-        printf("the IsPilandrom function passed the tests\n");  
+        printf("the IsPalindrom function passed the tests\n");  
     
     }
     else
     {
-        printf("IsPilandrom failed!, test1=%d, test2=%d, test3=%d, test4=%d, test5=%d \n",test1,test2,test3,test4,test5);
-    
+        printf("IsPalindrom failed!, test1=%d, test2=%d, test3=%d, test4=%d, test5=%d \n", test1, test2, test3, test4, test5);
     }
 }
- */   
+   
     
-    
-
+ 
 
 
     
