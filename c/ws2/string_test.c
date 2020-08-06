@@ -14,6 +14,7 @@
 
 char *strdup(const char *s);
 int strcasecmp(const char *str1, const char *str2);
+char *strtok(char *str, const char *delim);
 
 void StrcpyTest();
 void StrncpyTest();
@@ -25,6 +26,7 @@ void StrncatTest();
 void StrstrTest();
 void StrspnTest();
 void PilandromTest();
+void StrtokTest();
 
 int main(int argc, char *argv[])
 {
@@ -40,6 +42,10 @@ int main(int argc, char *argv[])
     PilandromTest();
     SevenBoom(0 , 21);
     SevenBoom(6 , 47);
+    StrtokTest();
+
+
+
     return 0;
 }
 
@@ -225,20 +231,7 @@ void StrdupTest()
     test1 = (strcmp(ptr1, src1) == strcmp(ptr2, src1));
     test2 = (strcmp(ptr3, src2) == strcmp(ptr4, src2));
     test3 = (strcmp(ptr5, src3) == strcmp(ptr6, src3));
-    
-    free(ptr1);
-    free(ptr2);
-    free(ptr3);
-    free(ptr4);
-    free(ptr5);
-    free(ptr6);
 
-    ptr1 = NULL;
-    ptr2 = NULL; 
-    ptr3 = NULL;
-    ptr4 = NULL; 
-    ptr5 = NULL; 
-    ptr6 = NULL;
 
     if (test1 && test2 && test3)
     { 
@@ -274,9 +267,9 @@ void StrcatTest()
     Strcat(dest5, src3);
     strcat(dest6, src3);
 
-    test1 = (!strcmp(dest1,dest2));
-    test2 = (!strcmp(dest3,dest4));
-    test3 = (!strcmp(dest5,dest6));
+    test1 = (!strcmp(dest1, dest2));
+    test2 = (!strcmp(dest3, dest4));
+    test3 = (!strcmp(dest5, dest6));
 
     if (test1 && test2 && test3)
     { 
@@ -312,9 +305,9 @@ void StrncatTest()
     Strncat(dest5, src3, n3);
     strncat(dest6, src3, n3);
 
-    test1 = (!strcmp(dest1,dest2));
-    test2 = (!strcmp(dest3,dest4));
-    test3 = (!strcmp(dest5,dest6));
+    test1 = (!strcmp(dest1, dest2));
+    test2 = (!strcmp(dest3, dest4));
+    test3 = (!strcmp(dest5, dest6));
 
     if (test1 && test2 && test3)
     { 
@@ -430,6 +423,79 @@ void PilandromTest()
     {
         printf("IsPalindrom failed!, test1=%d, test2=%d, test3=%d, test4=%d, test5=%d \n", test1, test2, test3, test4, test5);
     }
+}
+void StrtokTest()
+{
+    int failed=0;
+    char str1[] = "-this - string - needs - to - be - broken";
+    char *str2[] = "also this one";
+    char *str3[] = "and /also /this /one";
+   
+    char *delim1 = "-";
+    char *delim2 = " ";
+    char *delim3 = "/";
+    
+
+    char *my_ptr, *str_ptr;
+    my_ptr  = Strtok(str1D, delim1);
+    str_ptr = strtok(str1D, delim1);
+
+    while(NULL != str_ptr)
+    {
+        printf("%s\n",*str_ptr);
+        str_ptr = strtok(NULL , delim1);
+    }
+
+    /*
+    while ((NULL != my_ptr || NULL != str_ptr) && 0 == failed )
+    {
+        if(my_ptr != str_ptr)
+        {
+            failed=1;
+        }
+        else
+        {
+            my_ptr  = Strtok(NULL, delim1);
+            str_ptr = strtok(NULL, delim1);
+        }
+    }
+    my_ptr  = Strtok(str2D, delim2);
+    str_ptr = strtok(str2D, delim2);
+    while ((NULL != my_ptr || NULL != str_ptr ) && 0 == failed )
+    {
+        if(my_ptr != str_ptr)
+        {
+            failed=2;
+        }
+        else
+        {
+            my_ptr  = Strtok(NULL, delim2);
+            str_ptr = strtok(NULL, delim2);
+        }
+    }
+    my_ptr  = Strtok(str3D, delim3);
+    str_ptr = strtok(str3D, delim3);
+    while ((NULL != my_ptr || NULL != str_ptr) && 0 == failed )
+    {
+        if(my_ptr != str_ptr)
+        {
+            failed=3;
+        }
+        else
+        {
+            my_ptr  = Strtok(NULL, delim3);
+            str_ptr = strtok(NULL, delim3);
+        }
+    }
+    if(0 == failed)
+    {
+        printf("Strtok passed the test\n");
+    }
+    else
+    {
+        printf("Strtok failed in test: %d\n", failed);
+    }
+*/
 }
    
     

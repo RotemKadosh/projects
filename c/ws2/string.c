@@ -140,6 +140,9 @@ char *Strchr(const char *str, int c)
         }
         str++;
     }
+    if('\0' == c){
+        return (char *)str;
+    }
     return NULL;
 }
 
@@ -236,7 +239,7 @@ size_t Strspn(const char *str1, const char *str2)
 char *Strtok(char *str, const char *delim)
 {
     static char *start;
-    assert(NULL == delim);
+    assert(NULL != delim);
 
     if(NULL != str)
     {
@@ -245,7 +248,19 @@ char *Strtok(char *str, const char *delim)
             start = str;
         }
     }
-
+    while( *start == *delim)
+    {
+        ++start;
+    }
+    while(*delim != *start  && '\0' != *start)
+    {
+        ++start;
+    }
+    if('\0' == *start)
+    {
+        return NULL;
+    }
+    return start;
 
 }
 
