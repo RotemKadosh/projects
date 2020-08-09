@@ -1,12 +1,12 @@
 #include <stdio.h> /*printf*/
 
-int *IntToLong(int arr [], size_t size);
+void IntToLong(int arr [], size_t size);
 int CheckArr(int arr1[], int arr2 [] , size_t size);
 void Test ();
 
 
 
-int *IntToLong(int arr [], size_t size)
+void IntToLong(int arr [], size_t size)
 {
 	 unsigned int i = 0;
 	for(i = 0 ; i < size; i += 2 )
@@ -14,12 +14,11 @@ int *IntToLong(int arr [], size_t size)
 		arr[i] += arr[i + 1];
 		arr[i + 1] = 0;
 	}
-	return arr;
 }
 int CheckArr(int arr1[], int arr2 [] , size_t size)
 {
 	unsigned int i = 0;
-	for (i=0 ; i < size; ++)
+	for (i=0 ; i < size; i++)
 	{
 		if(arr1[i] != arr2[i])
 		{
@@ -40,7 +39,7 @@ void Test ()
 	size_t s1 = 0, s2 = 0, s3 = 0, s4 = 0, s5 = 0;
 	int test1 = 0, test2 = 0, test3 = 0, test4 = 0, test5 = 0;
 
-	int * arr1 = {1 ,3 ,6 ,7, 8, 5};
+	int  arr1[6] = {1 ,3 ,6 ,7, 8, 5};
 	int check1[6] = {4, 0, 13, 0 ,13, 0};
 	int arr2[4] = {5, 7, 3, 0 };
 	int check2[4] = {12, 0, 3, 0};
@@ -57,11 +56,11 @@ void Test ()
 	s4= sizeof(arr4) / sizeof(arr4[0]);
 	s5= sizeof(arr5) / sizeof(arr5[0]);
 
-	arr1 = IntToLong(arr1, s1);
-	arr2 = IntToLong(arr2,  s2);
-	arr3 = IntToLong(arr3,  s3);
-	arr4 = IntToLong(arr4,  s4);
-	arr5 = IntToLong(arr5,  s5);
+	IntToLong(arr1, s1);
+	IntToLong(arr2,  s2);
+	IntToLong(arr3,  s3);
+	IntToLong(arr4,  s4);
+	IntToLong(arr5,  s5);
 
 
 	test1 = CheckArr(arr1 ,check1 ,s1);
