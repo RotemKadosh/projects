@@ -324,6 +324,61 @@ void SevenBoom(int num1, int num2)
     printf("\n");
 }
 
+char *RemoveEdges(char *str, char *ans, size_t len)
+{
+    char *begin = str, char *end = str+len;
+
+   while('\0' != begin && isspace((int) *begin))
+   {
+        ++begin;
+   }
+    while(end >= begin && isspace((int) *end))
+   {
+        --end;
+   }
+   ans = memmove(ans , begin , (end - begin));
+   *(ans + end - begin + 1)='\0';
+   return ans;
+}
+char *RemoveDouble(char *str)
+{
+`  size_t len = 0;
+   int counter = 0; 
+   char * tmp = str;
+   while('\0' != *tmp)
+   {
+    if( isspace(*tmp))
+    {
+        if(counter>0)
+        {
+            len = Strlen(tmp)-1;
+            tmp = memmove(tmp, tmp+1 ,len )
+        }
+        else
+        {
+            ++tmp;
+        }
+    }
+    else
+    {
+        counter = 0;
+        ++tmp;
+    }
+   }
+}
+
+char * RemoveExtraWS(char *str)
+{   
+    int counter = 0;
+    size_t len= Strlen(*str);
+    char *ans = (char *)malloc(len);
+    assert(str);
+    ans = RemoveEdges(str, ans, len);
+    ans = RemoveDouble(ans)
+    return ans;
+
+
+}
 
 /*-------------------main----------------------------------------*/
 

@@ -54,7 +54,8 @@ int Strcasecmp(const char *str1, const char *str2);
  * char:          The searched character
  *         
  * @return:
- * Returns pointer of the first occurrence of the character c in the string   str, and NULL in case c doesn’t exist.
+ * Returns pointer of the first occurrence of the character c in the string  
+  str, and NULL in case c doesn’t exist.
  */
 char *Strchr(const char *str, int c);
 
@@ -173,8 +174,11 @@ int IsPalindrom(const char *str);
 void SevenBoom(int num1, int num2);
 
 /*DESCRIPTION:
-*the function receives a string and deletes white spaces ('tab' and 'space') from the end and beginning of the string;
-*deletes duplicates white spaces within the string (replaces sequences of multiple white space with the first white space in sequence)
+*the function receives a string and deletes white spaces
+('tab' and 'space') from the end and beginning of the string;
+*deletes duplicates white spaces within the string 
+(replaces sequences of multiple white space with the 
+first white space in sequence)
 
 
 *@param
