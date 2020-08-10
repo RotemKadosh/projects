@@ -17,10 +17,7 @@ void PrintEnv( char *envp[], size_t size);
 void FreeMem(char *envp[], size_t size);
 char *strdup(const char *s);
 void PrintEnv( char *envp[], size_t size);
-int MoreThenOne(int army[], size_t size);
 void killNext( int army[] ,size_t solider);
-size_t MoveSowred(int army [],size_t size ,size_t solider);
-int OneAlive(int army[], size_t size);
 void InitArmy(int *army, size_t size);
 size_t Josephus(size_t num_of_soldiers);
 void PrintTypeSizes();
@@ -142,11 +139,11 @@ void InitArmy(int *army, size_t size)
 {
 	size_t i = 0;
 	assert(army);
-	for(i = 0; i < size-1 ; ++i)
+	for(i = 0; i < size - 1 ; ++i)
 	{
 		army[i] = i + 1;
 	}
-	army[size-1] = 0;
+	army[size - 1] = 0;
 }
 
 void killNext( int army[] ,size_t solider)
@@ -161,7 +158,7 @@ size_t Josephus(size_t num_of_soldiers)
 	int *army = NULL;
 	assert(num_of_soldiers);
 	army =(int *)malloc(num_of_soldiers*sizeof(int));
-	
+
 	if( NULL == army)
 	{
 		return 0;
