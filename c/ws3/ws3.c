@@ -109,12 +109,6 @@ int PrintLowerEnv(char *envp[])
 	return 0;
 }
 
-
-
-
-
-
-
 int MoreThenOne(int army[], size_t size)
 {
 	size_t counter = 0;
@@ -195,12 +189,17 @@ void InitArmy(int *army, size_t size)
 		*(army + i) = 1;
 	}
 }
+
 size_t Josephus(size_t num_of_soldiers)
 {
 	size_t solider = 0;
-	int *army =(int *)malloc(num_of_soldiers*sizeof(int));
-	InitArmy(army , num_of_soldiers);
 	assert(num_of_soldiers);
+	int *army =(int *)malloc(num_of_soldiers*sizeof(int));
+	if( NULL == army)
+	{
+		return 0;
+	}
+	InitArmy(army , num_of_soldiers);
 	while(MoreThenOne(army, num_of_soldiers))
 	{
 		killNext(army, num_of_soldiers, solider);
@@ -208,7 +207,7 @@ size_t Josephus(size_t num_of_soldiers)
 	}
 	solider = OneAlive(army,num_of_soldiers);
 	free(army);
-	return solider;
+	return solider+1;
 }
 
 void PrintTypeSizes() 

@@ -214,6 +214,23 @@ char *Strstr(const char *haystack, const char *needle)
     return NULL;
 }
 
+char *Strstr(const char *haystack, const char *needle)
+{   
+    size_t need_len = Strlen(needle);
+    const char *hy_plc = haystack;
+    const char *ndl_plc = needle;
+     
+    while('\0' != *haystack)
+    {
+        if( 0 == strncmp(haystack, needle, need_len))
+        {
+            return (char *)haystack;
+        }
+        ++haystack;
+    }
+    return NULL;
+}
+
 
 size_t Strspn(const char *str1, const char *str2)
 {
@@ -260,11 +277,6 @@ char *Strtok(char *str, const char *delim)
     return start;
 
 }
-
-
-
-
-
 
 
 /*-------------------Advance-function definitions------------------*/
