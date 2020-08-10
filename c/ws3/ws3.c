@@ -21,6 +21,7 @@ void killNext( int army[] ,size_t solider);
 void InitArmy(int *army, size_t size);
 size_t Josephus(size_t num_of_soldiers);
 void PrintTypeSizes();
+char *CopyToLower(char *dest, const char *src);
 /*definitions*/
 
 size_t CalcLength(char *envp[])
@@ -58,16 +59,29 @@ char **EnvDupToLower(char *envp[] ,char *new_env[] )
 	size_t i = 0;
 	for(i = 0 ;NULL != *envp; i++ )
 	{
-		*(new_env) = strdup(*envp);
+		*(new_env) = (char *)malloc(strlen(*envp) + 1);;
 		if(NULL == *(new_env))
 		{
 			FreeMem(envp, i);
 		}
-		to_lower(*new_env);
+		CopyToLower(*new_env,*envp);
 		++envp;
 		++new_env;
 	}
 	return new_start;
+}
+
+char *CopyToLower(char *dest, const char *src)
+{
+	char *dest_ptr = dest;
+	assert(dest);
+	assert(src);
+    do
+    {
+       *dest++ = (char)tolower((int)*src );
+    }
+	while('\0' != *src++);
+	return dest_ptr;
 }
 
 void PrintEnv( char *envp[], size_t size)
