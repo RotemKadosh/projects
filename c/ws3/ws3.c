@@ -26,7 +26,7 @@ void PrintTypeSizes();
 size_t CalcLength(char *envp[])
 {	
 	size_t i = 0;
-	for (i = 0 ; 0 != *envp++ ; ++i)
+	for (i = 0 ; NULL != *envp++ ; ++i)
 	{ }
 	return i;  
 }
@@ -56,7 +56,7 @@ char **EnvDupToLower(char *envp[] ,char *new_env[] )
 {
 	char **new_start = new_env;
 	size_t i = 0;
-	for(i = 0 ;0 != *envp; i++ )
+	for(i = 0 ;NULL != *envp; i++ )
 	{
 		*(new_env) = strdup(*envp);
 		if(NULL == *(new_env))
@@ -121,17 +121,17 @@ void PrintTypeSizes()
     unsigned long un_long_type;
     long double long_double_type;
 
-    printf("Size of int: %ld bytes\n", sizeof(int_type));
-    printf("Size of unsigned int: %ld bytes\n", sizeof(un_int_type));
-    printf("Size of float: %ld bytes\n", sizeof(float_type));
-    printf("Size of double: %ld bytes\n", sizeof(double_type));
-    printf("Size of char: %ld byte\n", sizeof(char_type));
-    printf("Size of unsigned char: %ld byte\n", sizeof(un_char_type));
-    printf("Size of unsigned short: %ld byte\n", sizeof(un_short_type));
-    printf("Size of short: %ld byte\n", sizeof(short_type));
-    printf("Size of long: %ld byte\n", sizeof(long_type));
-   	printf("Size of unsigned long: %ld byte\n", sizeof(un_long_type));
-   	printf("Size of long double: %ld byte\n", sizeof(long_double_type));
+    printf("Size of int:                   %ld bytes\n", sizeof(int_type));
+    printf("Size of unsigned int:          %ld bytes\n", sizeof(un_int_type));
+    printf("Size of float:                 %ld bytes\n", sizeof(float_type));
+    printf("Size of double:                %ld bytes\n", sizeof(double_type));
+    printf("Size of char:                  %ld byte\n", sizeof(char_type));
+    printf("Size of unsigned char:         %ld byte\n", sizeof(un_char_type));
+    printf("Size of unsigned short:        %ld byte\n", sizeof(un_short_type));
+    printf("Size of short:                 %ld byte\n", sizeof(short_type));
+    printf("Size of long:                  %ld byte\n", sizeof(long_type));
+   	printf("Size of unsigned long:         %ld byte\n", sizeof(un_long_type));
+   	printf("Size of long double:           %ld byte\n", sizeof(long_double_type));
 }
 
 
@@ -156,17 +156,17 @@ size_t Josephus(size_t num_of_soldiers)
 {
 	size_t solider = 0;
 	int *army = NULL;
-	assert(num_of_soldiers);
-	army =(int *)malloc(num_of_soldiers*sizeof(int));
+	assert(num_of_soldiers > 0);
+	army = (int *)malloc(num_of_soldiers * sizeof(int));
 
 	if( NULL == army)
 	{
 		return 0;
 	}
-	InitArmy(army , num_of_soldiers);
-	while(army[solider] != solider) 
+	InitArmy( army , num_of_soldiers );
+	while( army[solider] != (int)solider ) 
 	{
-		killNext(army, solider);
+		killNext( army, solider );
 		solider = army[solider];
 	}
 	free(army);
