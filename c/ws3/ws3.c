@@ -18,7 +18,7 @@ void FreeMem(char *envp[], size_t size);
 char *strdup(const char *s);
 void PrintEnv( char *envp[], size_t size);
 int MoreThenOne(int army[], size_t size);
-void killNext( int army[] ,size_t size ,size_t solider);
+void killNext( int army[] ,size_t solider);
 size_t MoveSowred(int army [],size_t size ,size_t solider);
 int OneAlive(int army[], size_t size);
 void InitArmy(int *army, size_t size);
@@ -109,106 +109,6 @@ int PrintLowerEnv(char *envp[])
 	return 0;
 }
 
-int MoreThenOne(int army[], size_t size)
-{
-	size_t counter = 0;
-	size_t i =0;
-	for(i = 0; i < size; ++i )
-	{
-		if(1 == army[i])
-		{
-			++counter;
-		}
-		if(2 <=counter)
-		{
-			return TRUE;
-		}
-	}
-	return FALSE;
-}
-
-void killNext( int army[] ,size_t size ,size_t solider)
-{	
-	size_t place = solider + 1;
-	for ( ;place < size; ++place)
-	{
-		if(1 == army[place])
-		{
-			army[place] = 0;
-			return;
-		}
-	}
-	for(place = 0; place <= solider ; ++place)
-	{
-			if(1 == army[place])
-		{
-			army[place] = 0;
-			return;
-		}
-	}
-}
-
-size_t MoveSowred(int army [],size_t size ,size_t solider)
-{
-	size_t place = solider + 1;
-	for ( ;place < size; ++place)
-	{
-		if(1 == army[place])
-		{
-			return place;
-		}
-	}
-	for(place = 0; place <= solider ; ++place)
-	{
-			if(1 == army[place])
-		{
-			return place;
-		}
-	}
-	return place;
-}
-
-int OneAlive(int army[], size_t size)
-{
-	size_t i = 0;
-	for( ; i < size ; ++i)
-	{
-		if(1 == army[i])
-		{
-			return i;
-		}
-	}
-	return -1;
-}
-
-void InitArmy(int *army, size_t size)
-{
-	size_t i = 0;
-	for( ; i < size; ++i)
-	{
-		*(army + i) = 1;
-	}
-}
-
-size_t Josephus(size_t num_of_soldiers)
-{
-	size_t solider = 0;
-	assert(num_of_soldiers);
-	int *army =(int *)malloc(num_of_soldiers*sizeof(int));
-	if( NULL == army)
-	{
-		return 0;
-	}
-	InitArmy(army , num_of_soldiers);
-	while(MoreThenOne(army, num_of_soldiers))
-	{
-		killNext(army, num_of_soldiers, solider);
-		solider = MoveSowred(army,num_of_soldiers ,solider);
-	}
-	solider = OneAlive(army,num_of_soldiers);
-	free(army);
-	return solider+1;
-}
 
 void PrintTypeSizes() 
 {
@@ -235,6 +135,45 @@ void PrintTypeSizes()
     printf("Size of long: %ld byte\n", sizeof(long_type));
    	printf("Size of unsigned long: %ld byte\n", sizeof(un_long_type));
    	printf("Size of long double: %ld byte\n", sizeof(long_double_type));
+}
+
+
+void InitArmy(int *army, size_t size)
+{
+	size_t i = 0;
+	assert(army);
+	for(i = 0; i < size-1 ; ++i)
+	{
+		army[i] = i + 1;
+	}
+	army[size-1] = 0;
+}
+
+void killNext( int army[] ,size_t solider)
+{
+	int next = army[solider];
+	army[solider] = army[next];
+}
+
+size_t Josephus(size_t num_of_soldiers)
+{
+	size_t solider = 0;
+	int *army = NULL;
+	assert(num_of_soldiers);
+	army =(int *)malloc(num_of_soldiers*sizeof(int));
+	
+	if( NULL == army)
+	{
+		return 0;
+	}
+	InitArmy(army , num_of_soldiers);
+	while(army[solider] != solider) 
+	{
+		killNext(army, solider);
+		solider = army[solider];
+	}
+	free(army);
+	return solider+1;
 }
 
 
