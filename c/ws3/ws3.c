@@ -10,13 +10,13 @@
 
 /*declerations */
 size_t CalcLength(char *envp[]);
-char **CreateBuffer(char *envp[]);
+char **CreateBuffer( size_t length);
 void to_lower(char *s);
 char **EnvDupToLower(char *envp[] ,char *new_env[] );
-void PrintEnv( char *envp[]);
+void PrintEnv( char *envp[], size_t size);
 void FreeMem(char *envp[], size_t size);
 char *strdup(const char *s);
-int PrintLowerEnv(char *envp[]);
+void PrintEnv( char *envp[], size_t size);
 int MoreThenOne(int army[], size_t size);
 void killNext( int army[] ,size_t size ,size_t solider);
 size_t MoveSowred(int army [],size_t size ,size_t solider);
@@ -34,9 +34,9 @@ size_t CalcLength(char *envp[])
 	return i;  
 }
 
-char **CreateBuffer(char *envp[])
+char **CreateBuffer( size_t length)
 {	
-	size_t length = CalcLength(envp);
+	
 	char **buffer = (char **)malloc(length * sizeof(char *));
 	if(NULL == buffer)
 	{
@@ -73,39 +73,39 @@ char **EnvDupToLower(char *envp[] ,char *new_env[] )
 	return new_start;
 }
 
-void PrintEnv( char *envp[])
+void PrintEnv( char *envp[], size_t size)
 {	
-	char **env_plc = envp;
-	while( NULL != *env_plc)
-	{
-		printf("%s\n", *env_plc);  
-		++env_plc;
+	size_t i = 0;
+	for(i = 0; i < size; i++){
+		printf("%s\n", *(envp+i));
 	}
-	printf("\n");
+
 }
 
 void FreeMem(char *env[], size_t size)
 {
-	unsigned int i = 0;
-	for (i = 0; i <= size; ++i)
+	size_t i = 0;
+	for (i = 0; i < size; ++i)
 	{
-		free((void*) *(env+i));    
+		free(*(env+i));    
 	}
-	free((void*)env);
+	free(env);
 }
 
 int PrintLowerEnv(char *envp[])
 {
+	size_t length = 0;
 	char **new_env = NULL;
 	assert(envp);
-	new_env = CreateBuffer(envp);
+	length = CalcLength(envp);
+	new_env = CreateBuffer(length);
 	if(NULL == new_env)
 	{
 		return 1;
 	}
 	new_env = EnvDupToLower(envp, new_env);
-	PrintEnv(new_env);
-	FreeMem(new_env, CalcLength (new_env));  
+	PrintEnv(new_env, length);
+	FreeMem(new_env, length);  
 	return 0;
 }
 
@@ -156,7 +156,7 @@ void killNext( int army[] ,size_t size ,size_t solider)
 
 size_t MoveSowred(int army [],size_t size ,size_t solider)
 {
-	size_t place = solider +1;
+	size_t place = solider + 1;
 	for ( ;place < size; ++place)
 	{
 		if(1 == army[place])
@@ -207,6 +207,7 @@ size_t Josephus(size_t num_of_soldiers)
 		solider = MoveSowred(army,num_of_soldiers ,solider);
 	}
 	solider = OneAlive(army,num_of_soldiers);
+	free(army);
 	return solider;
 }
 

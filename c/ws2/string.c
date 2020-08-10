@@ -70,12 +70,11 @@ char *Strcpy(char *dest, const char *src)
 	char *dest_ptr = dest;
 	assert(dest);
 	assert(src);
-
-	while('\0' != *src)
-	{
-		*dest++ = *src++;	
-	}
-	*dest = '\0';
+    do
+    {
+       *dest++ = *src 
+    }
+	while('\0' != *src++)
 	return dest_ptr;
 }
 
@@ -132,17 +131,15 @@ int Strcasecmp(const char *str1, const char *str2)
 char *Strchr(const char *str, int c)
 {   
     assert(str);
-    while('\0' != *str)
+    do
     {
         if(*str == c)
         {
             return (char *)str;
         }
-        str++;
+       
     }
-    if('\0' == c){
-        return (char *)str;
-    }
+    while('\0' != *str++)
     return NULL;
 }
 
