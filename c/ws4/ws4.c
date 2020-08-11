@@ -1,12 +1,12 @@
 #include <stdio.h>/*printf, scanf*/
-#define _EXIT 0
-#define _ESC 27
-#define IF_ELSE 1
-#define SWITCH_CASE 2
-#define LUT 3
-#define _A 65
-#define _T 84
-#define TRUE 1
+#define _EXIT (0)
+#define _ESC (27)
+#define IF_ELSE (1)
+#define SWITCH_CASE (2)
+#define LUT (3)
+#define _A (65)
+#define _T (84)
+#define TRUE (1)
 
 void IfElse();
 void SwitchCase();
@@ -88,7 +88,7 @@ void SwitchCase()
 			printf("A was pressed\n");
 			break;
 		case _ESC:
-			printf("goodby\n");
+			printf("goodbey\n");
 			break;
 		default:
 			printf("not an option for SwitchCase, try again...\n");
