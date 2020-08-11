@@ -1,10 +1,48 @@
 #include <stdio.h>/*printf, scanf*/
+#define _EXIT 0
 #define _ESC 27
 #define IF_ELSE 1
 #define SWITCH_CASE 2
 #define LUT 3
 #define _A 65
 #define _T 84
+#define TRUE 1
+
+void IfElse();
+void SwitchCase();
+void A();
+void T();
+void Esc();
+void Lut();
+
+int main()
+{
+	int choise = 0;
+	while(TRUE)
+	{
+		printf("for if else press 1\nfor switch case press 2\nfor LUT press 3\nfor exit press 0\n");
+
+		scanf(" %d" , &choise);
+		switch(choise)
+		{
+		case IF_ELSE:
+			IfElse();
+			break;
+		case SWITCH_CASE:
+			SwitchCase();
+			break;
+		case LUT:
+			Lut();
+			break;
+		case _EXIT:
+			printf("goodbey!\n");
+			return 0;
+		default:
+			printf("not an option\n");
+		}
+	}
+	return 0;
+}
 
 void IfElse()
 {
@@ -13,7 +51,6 @@ void IfElse()
 	{
 		printf("press a key:\n");
 		scanf(" %c", &key);
-
 		if( _T == (int)key )
 		{
 			printf("T was pressed\n");
@@ -29,21 +66,20 @@ void IfElse()
 		}
 		else
 		{
-			printf("NOT COOL\n");
-			return;
+			printf("not an option for IfElse, try again...\n");
+			
 		}	
 	}
-
 }
 
 void SwitchCase()
 {
 	char key = 0;
-	while(key != _ESC)
+	while(_ESC != (int)key)
 	{
 		printf("press a key:\n");
 		scanf(" %c", &key);
-		switch (key)
+		switch ((int)key)
 		{
 		case _T:
 			printf("T was pressed\n");
@@ -55,11 +91,9 @@ void SwitchCase()
 			printf("goodby\n");
 			break;
 		default:
-			printf("NOT COOL\n");
-			return;
+			printf("not an option for SwitchCase, try again...\n");
 		}	
-	}
-		
+	}		
 }
 
 void A()
@@ -74,6 +108,7 @@ void T()
 
 void Esc()
 {
+
 	return;
 }
 
@@ -85,7 +120,7 @@ void Lut()
 	fun_ptr_arr[ _A ] = A;
 	fun_ptr_arr[ _T ] = T;
 	fun_ptr_arr[ _ESC ] = Esc;
-	while(key != _ESC)
+	while( _ESC != (int)key)
 	{
 		printf("press a key:\n");
 		scanf(" %c", &key);
@@ -100,25 +135,4 @@ void Lut()
 	}	
 }
 
-int main()
-{
-	int choise = 0;
-	printf("for if else press 1\nfor switch case press 2\nfor LUT press 3\n");
-	scanf(" %d" , &choise);
-	switch(choise)
-	{
-		case IF_ELSE:
-			IfElse();
-			break;
-		case SWITCH_CASE:
-			SwitchCase();
-			break;
-		case LUT:
-			Lut();
-			break;
-		default:
-			printf("not an option\n");
-			return 1;
-	}
-	return 0;
-}
+
