@@ -5,6 +5,21 @@
 #define DEFAULT (4)
 #define MAX_LINE_SIZE (100)
 #define TRUE (1)
+#define FALSE (0)
+#define NUM_OF_ACT (5)
+
+int Strcmp(const char *str1, const char *str2);
+int StrOnecmp(const char *str1, const char *str2);
+int RemoveFile(const char *filename, int *flag_exit, char *line);
+int CountLines (const char *filename, int *flag_exit, char *line);
+int AppendFirst (const char * filename,int *flag_exit, char *line);
+int WriteLine(const char * filename,int *flag_exit, char *line);
+int Exit(const char *filename, int *flag_exit, char *line);
+void InitLogActions();
+void Logger(const char *filename);
+void Print(int member);
+void Ex1();
+void UnUsed(const char *filename, int *flag_exit, char *line);
 
 typedef struct print_me
 {
@@ -17,20 +32,15 @@ typedef struct oper
 {
 	char *name;
 	int (*Compare)(const char *str1 , const char *str2);
-	int (*operation)(const char *filename);
+	int (*operation)(const char *filename, int *flag_exit , char *line);
 } oper;
 
-/*enum status {ERROR = -1 , SUCCESS = 0, _EOF = EOF ,NULL_PTR = NULL};*/
-
-char line[MAX_LINE_SIZE];
-oper actions[5];
-int flag_exit;
+typedef enum status {SUCESS, FOPEN_ERR , FCLOSE_ERR, FGETS_ERR , FGETC_ERR, FPUTS_ERR, REMOVE_ERR, RENAME_ERR, EXIT_SUCESS} status_t;
 
 int Strcmp(const char *str1, const char *str2)
 {	
 	assert(str1); 
     assert(str2);
-	
 	while('\0' != *str1 ||'\0' != *str2)
 	{	
 		if(*str1 == *str2)
@@ -53,21 +63,28 @@ int StrOnecmp(const char *str1, const char *str2)
 }
 
 
-int RemoveFile(const char *filename)
+status_t RemoveFile(const char *filename, int *flag_exit, char *line)
 {
-	
-	return remove(filename);
+	UnUsed(filename, flag_exit, line);
+	if(-1 == remove(filename))
+	{
+		return REMOVE_ERR;
+	}
+
+	return SUCESS;
+
 }
 
-int CountLines (const char *filename)
+status_t CountLines (const char *filename , int *flag_exit, char *line)
 {
 	FILE *fp = NULL	;
 	int count = 0;
 	char c;
-	fp = fopen(filename, "r");
+	fp = fopen( filename, "r" );
+	UnUsed( filename, flag_exit, line );
 	if (NULL == fp)
 	{
-		return -1;
+		return FOPEN_ERR;
 	}
 	c = getc(fp);
 	while( c != EOF)
@@ -78,61 +95,91 @@ int CountLines (const char *filename)
         }
         c = getc(fp);
 	}
-    fclose(fp); 
+	if(EOF == fclose(fp))
+	{
+		return FCLOSE_ERR;
+	} 
     printf("the number of lines in %s file is: %d\n", filename, count);
-    return 0;
+    return SUCESS;
 }
 
-int AppendFirst (const char * filename)
+status_t AppendFirst (const char * filename, int *flag_exit, char *line)
 {
 	char *new_name;
 	FILE *fp_origin = NULL	;
 	FILE *fp_new = NULL	;
 	fp_origin = fopen(filename , "r+");
+	UnUsed(filename, flag_exit, line);
 	if (NULL == fp_origin)
 	{
-		return -1;
+		return FOPEN_ERR;
 	}
 	new_name = "new_name";
 	fp_new = fopen(new_name, "a+");
 	if (NULL == fp_new)
 	{
-		return -1;
+		return FOPEN_ERR;
 	}
-	fputs( line + 1 , fp_new);
+	if(EOF == fputs( line + 1 , fp_new))
+	{
+		return FPUTS_ERR;
+	}
 	while(NULL != fgets(line, MAX_LINE_SIZE, fp_origin))
 	{
-		fputs(line , fp_new);
+		if(EOF == fputs(line , fp_new))
+		{
+			return FPUTS_ERR;
+		}
 	}
-	fclose(fp_origin);
-	remove(filename);
-	rename(new_name, filename);
-	fclose(fp_new);
-	return 0;
+	if(EOF == fclose(fp_origin))
+	{
+		return FCLOSE_ERR;
+	}
+	if(-1 == remove(filename))
+	{
+		return REMOVE_ERR;
+	}
+	if(-1 == rename(new_name, filename))
+	{
+		return RENAME_ERR;
+	}
+	if(EOF == fclose(fp_new))
+	{
+		return FCLOSE_ERR;
+	}
+	return SUCESS;
 }
 
-int WriteLine(const char * filename)
+status_t WriteLine(const char *filename, int *flag_exit, char *line)
 {
 	FILE *fp = NULL	;
 	fp = fopen(filename , "a+");
+	UnUsed(filename, flag_exit, line);
 	if (NULL == fp)
 	{
-		return 	-1;
+		return 	FOPEN_ERR;
 	}
-	fputs(line, fp);
-	fclose(fp);
-	printf("line been weiten\n");
-	return 0;
+	if(EOF == fputs(line, fp))
+	{
+		return FCLOSE_ERR;
+	}
+	if(EOF == fclose(fp))
+	{
+		return FCLOSE_ERR;
+	}
+	return SUCESS;
 }
-int Exit(const char *filename)
+status_t Exit(const char *filename, int *flag_exit, char *line)
 {
+
 	const char *p = filename;
+	UnUsed(filename, flag_exit, line);
 	++p;
-	flag_exit = 1;
-	return 0;
+	*flag_exit = 1;
+	return EXIT_SUCESS;
 }
 
-void InitLogActions()
+void InitLogActions(oper actions[])
 {
 	oper remove = {"-remove\n" , Strcmp , RemoveFile};
 	oper write = {"write", Strcmp , WriteLine };
@@ -145,33 +192,39 @@ void InitLogActions()
 	actions[3] = append_first;
 	actions[4] = write;
 }
+void UnUsed(const char *filename, int *flag_exit, char *line)
+{
+	++filename;
+	++flag_exit;
+	++line;
+}
 void Logger(const char *filename)
 {
-	
-	int num_of_actions = sizeof(actions)/sizeof(actions[0]);
+	char line[MAX_LINE_SIZE];
+	oper actions[NUM_OF_ACT];
+	int flag_exit = 0;
 	int i = 0;
 	oper op;
 	flag_exit = 0;
-	InitLogActions();
-	while(TRUE != flag_exit)
+	InitLogActions(actions);
+	while(SUCESS == flag_exit )
 	{
 		fgets(line, 100, stdin);
-		for( i = 0; i < num_of_actions ; ++i)
+		for( i = 0; i < NUM_OF_ACT ; ++i)
 		{
-		op = actions[i];
-		if(0 == op.Compare(line , op.name))
-		{
-			op.operation(filename);
-			break;
+			op = actions[i];
+			if(DEFAULT == i)
+			{
+				flag_exit = op.operation(filename, &flag_exit, line);
+				break;
+			}
+			if(0 == op.Compare(line , op.name))
+			{
+				flag_exit = op.operation(filename, &flag_exit, line);
+				break;
+			}
+			
 		}
-		if(DEFAULT == i)
-		{
-			printf("writeline been called\n");
-			op.operation(filename);
-			printf("writeline return\n");
-			break;
-		}
-	}
 	}
 }
 
@@ -181,15 +234,6 @@ int main()
 	Logger("text.txt");
 	return 0;
 }
-
-
-
-
-
-
-
-
-
 
 void Print(int member)
 {
