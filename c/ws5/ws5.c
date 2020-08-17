@@ -62,7 +62,12 @@ int StrOnecmp(const char *str1, const char *str2)
     assert(str2);
 	return(*str1 - *str2);	
 }
-
+int WriteCmp(const char *str1, const char *str2)
+{
+	assert(str1);
+	assert(str2);
+	return 0;
+}
 status RemoveFile(const char *filename, int *flag_exit, char *line)
 {
 	UnUsed(filename, flag_exit, line);
@@ -75,10 +80,10 @@ status RemoveFile(const char *filename, int *flag_exit, char *line)
 
 status CountLines (const char *filename , int *flag_exit, char *line)
 {
-	FILE *fp = NULL	;
+	FILE *fp = NULL;
 	int count = 0;
 	char c;
-	fp = fopen( filename, "r" );
+	fp = fopen( filename, "a+" );
 	UnUsed( filename, flag_exit, line );
 	if (NULL == fp)
 	{
@@ -104,8 +109,8 @@ status CountLines (const char *filename , int *flag_exit, char *line)
 status AppendFirst (const char * filename, int *flag_exit, char *line)
 {
 	char *new_name;
-	FILE *fp_origin = NULL	;
-	FILE *fp_new = NULL	;
+	FILE *fp_origin = NULL;
+	FILE *fp_new = NULL;
 	fp_origin = fopen(filename , "r+");
 	UnUsed(filename, flag_exit, line);
 	if (NULL == fp_origin)
@@ -150,7 +155,7 @@ status AppendFirst (const char * filename, int *flag_exit, char *line)
 
 status WriteLine(const char *filename, int *flag_exit, char *line)
 {
-	FILE *fp = NULL	;
+	FILE *fp = NULL;
 	fp = fopen(filename , "a+");
 	UnUsed(filename, flag_exit, line);
 	if (NULL == fp)
@@ -181,7 +186,7 @@ status Exit(const char *filename, int *flag_exit, char *line)
 void InitLogActions(oper actions[])
 {
 	oper remove = {"-remove\n" , Strcmp , RemoveFile};
-	oper write = {"write", Strcmp , WriteLine };
+	oper write = {"write", WriteCmp , WriteLine };
 	oper count = {"-count\n", Strcmp ,CountLines};
 	oper exit = {"-exit\n" , Strcmp, Exit};
 	oper append_first = { "<", StrOnecmp , AppendFirst};
@@ -208,17 +213,13 @@ void Logger(const char *filename)
 	oper op;
 	flag_exit = 0;
 	InitLogActions(actions);
-	while(SUCESS == flag_exit )
+	while(SUCESS == flag_exit)
 	{
 		fgets(line, 100, stdin);
 		for( i = 0; i < NUM_OF_ACT ; ++i)
 		{
 			op = actions[i];
-			if(DEFAULT == i)
-			{
-				flag_exit = op.operation(filename, &flag_exit, line);
-				break;
-			}
+
 			if(0 == op.Compare(line , op.name))
 			{
 				flag_exit = op.operation(filename, &flag_exit, line);
