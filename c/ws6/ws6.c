@@ -15,18 +15,16 @@
 #define EIGHT_BIT ( 1 << 7 )
 #define CLEAR_FIRST_NIBLLE ( -1 << 4 )
 
-unsigned int Is3SetBits(int n); 
+static unsigned int Is3SetBits(int n); 
 
 long Pow2(unsigned int x ,unsigned int y)
 {
 	return x << y;
 }
-
 int IsPow(unsigned int n)
 {
-	return n && (!(n&(n-1)));
+	return n && (!(n & ( n - 1)));
 }
-
 int IsPowLoop(unsigned int n)
 {
 	if (0 == n)
@@ -35,7 +33,7 @@ int IsPowLoop(unsigned int n)
 	}
 	while (FIRST_BIT != n)
 	{
-		if (0 != (n &  FIRST_BIT))
+		if (0 != (n & FIRST_BIT))
 		{
 			return FALSE;
 		}
@@ -85,7 +83,7 @@ void Print3BitsOn(unsigned int *arr, size_t size)
 	{
 		if (TRUE == Is3SetBits(arr[i]))
 		{
-			printf("%d, " , arr[i]);
+			printf("%d, " ,arr[i]);
 		}
 	}
 	printf("\n");
@@ -116,14 +114,14 @@ int Is2And6BitsOn(unsigned char byte)
 {
 	return (SECOND_BIT == (byte & SECOND_BIT)) && (SIX_BIT == (byte & SIX_BIT));
 }
-
 int Is2Or6BitsOn(unsigned char byte)
 {
 	return (SECOND_BIT == (byte & SECOND_BIT)) || (SIX_BIT == (byte & SIX_BIT));
 }
 unsigned char Swap3And5Bits(unsigned char byte)
 {
-	if (THIRD_BIT == (byte & THIRD_BIT)  && FIFTH_BIT == (byte & FIFTH_BIT))
+	if ((THIRD_BIT == (byte & THIRD_BIT)  && FIFTH_BIT == (byte & FIFTH_BIT)) ||
+		(0 == (byte & THIRD_BIT)  && 0 == (byte & FIFTH_BIT)))
 	{
 		return byte;
 	}
@@ -131,10 +129,9 @@ unsigned char Swap3And5Bits(unsigned char byte)
 	byte ^= FIFTH_BIT;
 	return byte;
 }
-
 unsigned int FindClosestDivisibleBy16(unsigned int num)
 {
-	return num & (-1 << 4);
+	return num & CLEAR_FIRST_NIBLLE;
 }
 void SwapWithOnly2Var(int *num1, int *num2)
 {
@@ -144,43 +141,64 @@ void SwapWithOnly2Var(int *num1, int *num2)
 }
 int CountSetBits(int num)
 {
-	unsigned char n = (unsigned char) num;
 	unsigned int count = 0;
-	count =( ((n >> 7) & 1) + ((n >> 6) & 1) 
-			+ ((n >> 5) & 1) + ((n >> 4) & 1)
-			+ ((n >> 3) & 1) +((n >> 2) & 1)
-			+ ((n >> 1) & 1) +(n & 1));
+	int set_bits_in_nibble[] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4};
+
+   	count += set_bits_in_nibble[(num & 0x0F)];
+	num >>= 4;
+	count += set_bits_in_nibble[(num & 0x0F)];
+	num >>= 4;
+	count += set_bits_in_nibble[(num & 0x0F)];
+	num >>= 4;
+	count += set_bits_in_nibble[(num & 0x0F)];
+	num >>= 4;
+	count += set_bits_in_nibble[(num & 0x0F)];
+	num >>= 4;
+	count += set_bits_in_nibble[(num & 0x0F)];
+	num >>= 4;
+	count += set_bits_in_nibble[(num & 0x0F)];
+	num >>= 4;
+	count += set_bits_in_nibble[(num & 0x0F)];
+	num >>= 4;
 	return count;
 }
-
 int CountSetBitsLoop(int num)
 {	
-	unsigned char n = (unsigned char) num;
+	/*unsigned char n = (unsigned char) num;*/
 	unsigned int count = 0;
-	while (0 != n)
+	size_t size = sizeof(int) << 3;
+	size_t i = 0;
+	while (size > 0)
 	{
-		count += (n & 1);
-		n >>= 1;
+		count += ((num >> i) & 1);
+		++i;
+		--size;
 	}
 	return count;
 }
 void FloatAnalize(float num)
 {
-	size_t i = 0;
-	int count = 0;
-	printf("msb -> ");
-	for (i = 1 << 31; i > 0; i >>= 2, ++count )
-	{
-		if(4 == count)
-		{
-			printf(" ");
-			count = 0;
-		}
-
-		((size_t)num & i) ? printf("1") : printf("0");
-
-	}
-	printf(" <- lsb");
-	printf("\n");
-
+    unsigned int *float_as_int = (unsigned int *)&num;
+    int i = 0;
+    int count = 0;
+    int fpoint = 9;
+    printf("sign bit-> ");
+    for (i = 31; i >= 0; --i, ++count, --fpoint)
+    {
+    	if(30 == i )
+    	{
+    		printf(" exponent->");
+    		count = 0;
+    	}
+    	if(4 == count){
+    		printf(" ");
+    		count = 0;
+    	}
+    	if (0 == fpoint)
+    	{
+    		printf("mantisa -> 1.");
+    	}
+        printf("%d",((*float_as_int >> i) & 1));
+    }
+    printf("\n");
 }

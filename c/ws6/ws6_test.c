@@ -51,7 +51,7 @@ void TestPow2()
 	test3 = (0 == Pow2(0, 0));
 	test4 = (200 == Pow2(100, 1));
 
-	if(test1 && test2 && test3 && test4)
+	if (test1 && test2 && test3 && test4)
 	{
 		printf("Pow2 passed\n");
 	}
@@ -68,7 +68,7 @@ void TestIsPow()
 	test3 = (FALSE == IsPow(7));
 	test4 = (FALSE == IsPow(0));
 
-	if(test1 && test2 && test3 && test4)
+	if (test1 && test2 && test3 && test4)
 	{
 		printf("IsPow passed\n");
 	}
@@ -85,7 +85,7 @@ void TestIsPowLoop()
 	test3 = (FALSE == IsPowLoop(7));
 	test4 = (FALSE == IsPowLoop(0));
 
-	if(test1 && test2 && test3 && test4)
+	if (test1 && test2 && test3 && test4)
 	{
 		printf("IsPowLoop passed\n");
 	}
@@ -102,7 +102,7 @@ void TestAddOne()
 	test3 = (-6 == AddOne(-7));
 	test4 = (1 == AddOne(0));
 
-	if(test1 && test2 && test3 && test4)
+	if (test1 && test2 && test3 && test4)
 	{
 		printf("AddOne passed\n");
 	}
@@ -119,7 +119,7 @@ void TestAddOneLoop()
 	test3 = (-6 == AddOneLoop(-7));
 	test4 = (1 == AddOneLoop(0));
 
-	if(test1 && test2 && test3 && test4)
+	if (test1 && test2 && test3 && test4)
 	{
 		printf("AddOneLoop passed\n");
 	}
@@ -140,7 +140,7 @@ void TestByteMirror()
 	test2 = (130 == (int)ByteMirror(((unsigned char)'A')));
 	test3 = (172 == (int)ByteMirror(((unsigned char)'5')));
 	test4 = (4   == (int)ByteMirror(((unsigned char)' ')));
-	if(test1 && test2 && test3 && test4)
+	if (test1 && test2 && test3 && test4)
 	{
 		printf("ByteMirror passed\n");
 	}
@@ -157,7 +157,7 @@ void TestByteMirrorLoop()
 	test3 = (172 == (int)ByteMirrorLoop((unsigned char)'5'));
 	test4 = (4 == (int)ByteMirrorLoop((unsigned char)' '));
 
-	if(test1 && test2 && test3 && test4)
+	if (test1 && test2 && test3 && test4)
 	{
 		printf("ByteMirrorLoop passed\n");
 	}
@@ -174,7 +174,7 @@ void TestIs2And6BitsOn()
 	test3 = (FALSE == Is2And6BitsOn(7));
 	test4 = (FALSE == Is2And6BitsOn(0));
 
-	if(test1 && test2 && test3 && test4)
+	if (test1 && test2 && test3 && test4)
 	{
 		printf("Is2And6BitsOn passed\n");
 	}
@@ -191,7 +191,7 @@ void TestIs2Or6BitsOn()
 	test3 = (FALSE == Is2Or6BitsOn(5));
 	test4 = (FALSE == Is2Or6BitsOn(0));
 
-	if(test1 && test2 && test3 && test4)
+	if (test1 && test2 && test3 && test4)
 	{
 		printf("Is2Or6BitsOn passed\n");
 	}
@@ -203,12 +203,12 @@ void TestIs2Or6BitsOn()
 void TestSwap3And5Bits()
 {
 	int test1 = 0, test2 = 0, test3 = 0, test4 = 0;
-	test1 = (52 == (int)Swap3And5Bits((unsigned char)'4'));
+	test1 = (235 == (int)Swap3And5Bits((unsigned char)235));
 	test2 = (56 == (int)Swap3And5Bits((unsigned char)','));
 	test3 = (91 == (int)Swap3And5Bits((unsigned char)'O'));
 	test4 = (78 == (int)Swap3And5Bits((unsigned char)'Z'));
 
-	if(test1 && test2 && test3 && test4)
+	if (test1 && test2 && test3 && test4)
 	{
 		printf("Swap3And5Bits passed\n");
 	}
@@ -225,7 +225,7 @@ void TestFindClosestDivisibleBy16()
 	test3 = (16 == (int)FindClosestDivisibleBy16(17));
 	test4 = (9600 == (int)FindClosestDivisibleBy16(9601));
 
-	if(test1 && test2 && test3 && test4)
+	if (test1 && test2 && test3 && test4)
 	{
 		printf("FindClosestDivisibleBy16 passed\n");
 	}
@@ -233,8 +233,7 @@ void TestFindClosestDivisibleBy16()
 	{
 		printf("FindClosestDivisibleBy16 failed, test1: %d, test2: %d, test3: %d, test4: %d\n",test1 ,test2 ,test3 ,test4 );
 	}
-}
-
+} 
 void TestSwapWithOnly2Var()
 {
 	int a, b, c, d, e, f;
@@ -260,10 +259,10 @@ void TestCountSetBits()
 	int test1 = 0, test2 = 0, test3 = 0, test4 = 0;
 	test1 = (2 == CountSetBits(36));
 	test2 = (1 == CountSetBits(2));
-	test3 = (6 == CountSetBits(-7));
-	test4 = (5 == CountSetBits(-8));
+	test3 = (32 == CountSetBits(-1));
+	test4 = (31 == CountSetBits(-2));
 
-	if(test1 && test2 && test3 && test4)
+	if (test1 && test2 && test3 && test4)
 	{
 		printf("CountSetBits passed\n");
 	}
@@ -277,10 +276,10 @@ void TestCountSetBitsLoop()
 	int test1 = 0, test2 = 0, test3 = 0, test4 = 0;
 	test1 = (2 == CountSetBitsLoop(36));
 	test2 = (1 == CountSetBitsLoop(2));
-	test3 = (6 == CountSetBitsLoop(-7));
-	test4 = (5 == CountSetBitsLoop(-8));
+	test3 = (32 == CountSetBitsLoop(-1));
+	test4 = (31 == CountSetBitsLoop(-2));
 
-	if(test1 && test2 && test3 && test4)
+	if (test1 && test2 && test3 && test4)
 	{
 		printf("CountSetBitsLoop passed\n");
 	}
@@ -291,6 +290,6 @@ void TestCountSetBitsLoop()
 }
 void PrintFloatAnalize()
 {
-	float f = 1726.6;
+	float f = 23.625;
 	FloatAnalize(f);
 }
