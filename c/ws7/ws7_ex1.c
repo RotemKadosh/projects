@@ -29,6 +29,16 @@ static void CleanArray(element_t *array_of_elements);
 static int Events();
 char *strdup(const char * str);
 
+
+int main()
+{
+	if(0 != Events())
+	{
+		return -1;
+	}
+	return 0;
+}
+
 struct element
 {
 	void *value;
@@ -48,35 +58,35 @@ static element_functions_t string_functions_g = {PrintString, AddStr , FreeStrin
 
 static void PrintInt(const element_t *element)
 {
-	assert(element);
+	assert(NULL != element);
 	printf("%d\n", CAST(int, element));
 }
 static void PrintFloat(const element_t *element)
 {
-	assert(element);
+	assert(NULL != element);
 	printf("%f\n", CAST(float, element));
 }
 static void PrintString(const element_t *element)
 {
-	assert(element);
+	assert(NULL != element);
 	printf("%s\n", (char *)element->value);
 }
 static int AddInt(element_t *element , int to_add)
 {
-	assert(element); 
-	*(int *)&element->value += to_add;
+	assert(NULL != element); 
+	CAST(int, element) += to_add;
 	return 0;
 }
 static int Addfloat(element_t *element , int to_add)
 {
-	assert(element);
+	assert(NULL != element);
 	*(float *)&element->value += (float)to_add;
 	return 0;
 }
 static int AddStr(element_t *element , int to_add)
 {
 	size_t size = 0;
-	assert(element);
+	assert(NULL != element);
 	size = strlen((char *)element->value) + (size_t)NULL_CHAR + NumOfDigits(to_add);
 	element->value = realloc(element->value, size);
 	if (NULL == element->value )
@@ -90,23 +100,25 @@ static int AddStr(element_t *element , int to_add)
 
 	return 0;
 }
+
 static void FreeString(element_t *element)
 {
-	assert(element);
+	assert(NULL != element);
 	free((char *)element->value);
 }
+
 static void FreeIntFloat(element_t *element)
 {
-	assert(element);
+	assert(NULL != element);
 }
 static void InitInt(element_t *element, const int input)
 {
-	*(int *)&element->value = input;
+	CAST(int, element) = input;
 	element->func_elem = &int_functions_g;
 }
 static void InitFloat(element_t *element, const float input)
 {
-	*(float *)&element->value = input;
+	CAST(float, element)= input;
 	element->func_elem = &float_functions_g;
 }
 static int InitString(element_t *element, char *input)
@@ -122,20 +134,15 @@ static int InitString(element_t *element, char *input)
 
 static int InitArray(element_t *array_of_elements)
 {
-
-
-	char *str1 = "hello";
-	char *str2 = "hellohello";
-
 	InitInt(&array_of_elements[0],5);
 	InitInt(&array_of_elements[1],10);
 	InitFloat(&array_of_elements[2],12.5);
 	InitFloat(&array_of_elements[3],1.2);
-	if (0 != InitString(&array_of_elements[4],str1))
+	if (0 != InitString(&array_of_elements[4],"hello"))
 	{
 		return -1;
 	}
-	if (0 != InitString(&array_of_elements[5],str2))
+	if (0 != InitString(&array_of_elements[5],"hellohello"))
 	{
 		return -1;
 	}
@@ -146,11 +153,11 @@ static int InitArray(element_t *array_of_elements)
 static size_t NumOfDigits(int num)
 {
 	size_t dig = 0;
-	while(num > 0)
+	do
 	{
 		++dig;
 		num /=10;
-	}
+	}while(num > 0);
 	return dig;
 }
 
@@ -205,12 +212,5 @@ static int Events()
 	return 0;
 }
 
-int main()
-{
-	if(0 != Events())
-	{
-		return -1;
-	}
-	return 0;
-}
+
 
