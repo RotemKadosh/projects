@@ -9,34 +9,35 @@
 
 typedef struct element element_t;
 typedef struct element_functions element_functions_t;
+typedef enum status {FAIL = -1, SUCCESS = 0} status_t;
 
 static void PrintInt(const element_t *element);
 static void PrintFloat(const element_t *element);
 static void PrintString(const element_t *element);
 
-static int AddInt(element_t *element , int to_add);
-static int Addfloat(element_t *element , int to_add);
-static int AddStr(element_t *element , int to_add);
+static status_t AddInt(element_t *element , int to_add);
+static status_t Addfloat(element_t *element , int to_add);
+static status_t AddStr(element_t *element , int to_add);
 
 static void FreeString(element_t *element);
 static void FreeIntFloat(element_t *element);
 
-static int InitArray(element_t *array_of_elements);
+static status_t InitArray(element_t *array_of_elements);
 static size_t NumOfDigits(int num);
 static void PrintArray(element_t *array_of_elements);
-static int AddToArray(element_t *array_of_elements, int to_add);
+static status_t AddToArray(element_t *array_of_elements, int to_add);
 static void CleanArray(element_t *array_of_elements);
-static int Events();
+static status_t Events();
 char *strdup(const char * str);
 
 
 int main()
 {
-	if(0 != Events())
+	if(SUCCESS != Events())
 	{
-		return -1;
+		return FAIL;
 	}
-	return 0;
+	return SUCCESS;
 }
 
 struct element
@@ -71,19 +72,19 @@ static void PrintString(const element_t *element)
 	assert(NULL != element);
 	printf("%s\n", (char *)element->value);
 }
-static int AddInt(element_t *element , int to_add)
+static status_t AddInt(element_t *element , int to_add)
 {
 	assert(NULL != element); 
 	CAST(int, element) += to_add;
-	return 0;
+	return SUCCESS;
 }
-static int Addfloat(element_t *element , int to_add)
+static status_t Addfloat(element_t *element , int to_add)
 {
 	assert(NULL != element);
 	*(float *)&element->value += (float)to_add;
-	return 0;
+	return SUCCESS;
 }
-static int AddStr(element_t *element , int to_add)
+static status_t AddStr(element_t *element , int to_add)
 {
 	size_t size = 0;
 	assert(NULL != element);
@@ -91,14 +92,14 @@ static int AddStr(element_t *element , int to_add)
 	element->value = realloc(element->value, size);
 	if (NULL == element->value )
 	{
-		return -1;
+		return FAIL;
 	}
 	if(0 > sprintf(element->value  , "%s%d",(char *) element->value , to_add))
 	{
-		return -1;
+		return FAIL;
 	}
 
-	return 0;
+	return SUCCESS;
 }
 
 static void FreeString(element_t *element)
@@ -121,33 +122,33 @@ static void InitFloat(element_t *element, const float input)
 	CAST(float, element)= input;
 	element->func_elem = &float_functions_g;
 }
-static int InitString(element_t *element, char *input)
+static status_t InitString(element_t *element, char *input)
 {
 	element->value = (void *)strdup(input);
 	if(NULL == element->value)
 	{
-		return -1;
+		return FAIL;
 	}
 	element->func_elem = &string_functions_g;
-	return 0;
+	return SUCCESS;
 }
 
-static int InitArray(element_t *array_of_elements)
+static status_t InitArray(element_t *array_of_elements)
 {
 	InitInt(&array_of_elements[0],5);
 	InitInt(&array_of_elements[1],10);
 	InitFloat(&array_of_elements[2],12.5);
 	InitFloat(&array_of_elements[3],1.2);
-	if (0 != InitString(&array_of_elements[4],"hello"))
+	if (SUCCESS != InitString(&array_of_elements[4],"hello"))
 	{
-		return -1;
+		return FAIL;
 	}
-	if (0 != InitString(&array_of_elements[5],"hellohello"))
+	if (SUCCESS != InitString(&array_of_elements[5],"hellohello"))
 	{
-		return -1;
+		return FAIL;
 	}
 
-	return 0;
+	return SUCCESS;
 }
 
 static size_t NumOfDigits(int num)
@@ -171,17 +172,17 @@ static void PrintArray(element_t *array_of_elements)
 	}
 }
 
-static int AddToArray(element_t *array_of_elements, int to_add)
+static status_t AddToArray(element_t *array_of_elements, int to_add)
 {
 	size_t i = 0;
 	for(i = 0; i < NUM_OF_ELEMENTS; ++i)
 	{
-		if(0 != array_of_elements[i].func_elem->ptr_add(&array_of_elements[i], to_add))
+		if(SUCCESS != array_of_elements[i].func_elem->ptr_add(&array_of_elements[i], to_add))
 		{
-			return -1;
+			return FAIL;
 		}
 	}
-	return 0;
+	return SUCCESS;
 }
 
 static void CleanArray(element_t *array_of_elements)
@@ -194,22 +195,22 @@ static void CleanArray(element_t *array_of_elements)
 	}
 }
 
-static int Events()
+static status_t Events()
 {
 	element_t array_of_elements [NUM_OF_ELEMENTS] = {NULL};
 	if(0 != InitArray(array_of_elements))
 	{
-		return -1;
+		return FAIL;
 	}
 
 	PrintArray(array_of_elements);
 	if(0 != AddToArray(array_of_elements, 10))
 	{
-		return -1;
+		return FAIL;
 	}
 	PrintArray(array_of_elements);
 	CleanArray(array_of_elements);
-	return 0;
+	return SUCCESS;
 }
 
 
