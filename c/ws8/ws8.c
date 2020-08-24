@@ -84,7 +84,6 @@ void TestMemset()
 	test1 = (0 == memcmp(memset(s11 , c1, n1), Memset(s1 , c1, n1), n1));
 	test2 = (0 == memcmp(memset(s22 , c2, n2), Memset(s2 , c2, n2), n2));
 	test3 = (0 == memcmp(memset(s33 , c3, n3), Memset(s3 , c3, n3), n3));
-	printf("%s \n%s \n%s \n%s \n%s \n%s\n",s11 , s1, s22 , s2, s33,s3);
 
 	if (test1 && test2 && test3)
 	{
@@ -156,7 +155,6 @@ void *Memmove(void *dest, void *src, size_t n)
 	size_t *dest_size_t = (size_t *)dest;
 	char * src_char = (char *)src;
 	size_t *src_size_t = (size_t *)src;
-	
 	size_t count_to_start = (size_t)dest % BYTE_SIZE;
 	size_t count_to_end = (n - count_to_start) % BYTE_SIZE;
 	if(src > dest)
@@ -165,22 +163,18 @@ void *Memmove(void *dest, void *src, size_t n)
 	}
 	else
 	{
-		dest_char += n;
-		src_char += n;
-
 		while (count_to_end > 0)
 		{
-			dest_char -= 1;
-			src_char -= 1;
-			*dest_char = *src_char;
-			--n;
+			dest = (char *)dest + 1;
 			count_to_end--;
 		}
 
+		dest_char = (char *)dest + n;
+		src_char += n;
 		dest_size_t = (size_t *)dest_char;
 		src_size_t = (size_t *)src_char;
 
-		while(n > count_to_start)
+		while(n > BYTE_SIZE - 1)
 		{
 			dest_size_t -= 1;
 			src_size_t -= 1;
