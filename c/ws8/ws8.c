@@ -31,7 +31,6 @@ long CreateWord(int c)
 	{
 		res <<= BYTE_SIZE;
 		res = (res | (unsigned char)c);
-
 	}
 	return res;
 }
@@ -40,22 +39,31 @@ void *Memset(void *s, int c, size_t n)
 {
 	void *start = s;	
 	long word = CreateWord(c);
-	while (0 != ((size_t)s % BYTE_SIZE))
+	char * s_char = (char *)s;
+	size_t *s_size_t = NULL;
+
+	while (0 != ((size_t)s_char % BYTE_SIZE))
 	{
-		*(char *)s = c;
-		*(char *)&s += 1;
+		*s_char = c;
+		s_char += 1;
 		--n;
 	}
+
+	s_size_t = (size_t *)s_char;
+
 	while (n > BYTE_SIZE - 1)
 	{
-		*(char *)s = word;
-		*(char *)&s += BYTE_SIZE;
+		*s_size_t = word;
+		s_size_t += 1;
 		n -= BYTE_SIZE;
 	}
+
+	s_char = (char *)s_size_t;
+
 	while (n > 0)
 	{
-		*(char *)s = c;
-		*(char *)&s += 1;
+		*s_char = c;
+		s_char += 1;
 		--n;
 	}
 	return start;
@@ -73,9 +81,10 @@ void TestMemset()
 	int c1 = 'a', c2 = 'c', c3 = ' ';
 	int n1 = 10, n2 = 15, n3 = 20;
 
-	test1 = strcmp(memset(s11 , c1, n1), Memset(s1 , c1, n1));
-	test2 = strcmp(memset(s22 , c2, n2), Memset(s2 , c2, n2));
-	test3 = strcmp(memset(s33 , c3, n3), Memset(s3 , c3, n3));
+	test1 = (0 == memcmp(memset(s11 , c1, n1), Memset(s1 , c1, n1), n1));
+	test2 = (0 == memcmp(memset(s22 , c2, n2), Memset(s2 , c2, n2), n2));
+	test3 = (0 == memcmp(memset(s33 , c3, n3), Memset(s3 , c3, n3), n3));
+	printf("%s \n%s \n%s \n%s \n%s \n%s\n",s11 , s1, s22 , s2, s33,s3);
 
 	if (test1 && test2 && test3)
 	{
@@ -89,22 +98,29 @@ void TestMemset()
 
 void *Memcpy(void *dest, void *src, size_t n)
 {
-	void *start = dest;
+	
+	char * dest_char = (char *)dest;
+	size_t *dest_size_t = (size_t *)dest;
+	char * src_char = (char *)src;
+	size_t *src_size_t = (size_t *)src;
+	
 	while ( n > BYTE_SIZE - 1)
 	{
-		*(size_t *)dest = *(size_t *)src;
-		*(char *)&dest += BYTE_SIZE;
-		*(char *)&src += BYTE_SIZE;
+		*dest_size_t = *src_size_t;
+		dest_size_t += 1;
+		src_size_t += 1;
 		n -= BYTE_SIZE; 
 	}
+	dest_char = (char *)dest_size_t;
+	src_char = (char *)src_size_t;
 	while( n > 0 )
 	{
-		*(char *)dest = *(unsigned char *)src;
-		*(char *)&dest += 1;
-		*(char *)&src += 1;
+		*dest_char = *src_char;
+		dest_char += 1;
+		src_char += 1;
 		--n;
 	}
-	return start;
+	return dest;
 }
 
 void TestMemcpy()
@@ -113,16 +129,16 @@ void TestMemcpy()
 	char s1[] = "hellonkjnads,.m";
 	char s11[30] = {0};
 	char s12[30] = {0};
-	char s2[] = "me nakjbaskjbkjh;ahf";
+	char s2[] = "mesnakjbaskjbkjh;ahf";
 	char s21[30] = {0};
 	char s22[30] = {0};
 	char s3[] = "12334";
 	char s31[30] = {0};
 	char s32[30] = {0};
 	int n1 = 16, n2 = 17, n3 = 4;
-	test1 = (0 == strcmp(memcpy(s11 , s1, n1), Memcpy(s12 , s1, n1)));
-	test2 = (0 == strcmp(memcpy(s21 , s2, n2), Memcpy(s22 , s2, n2)));
-	test3 = (0 == strcmp(memcpy(s31 , s3, n3), Memcpy(s32 , s3, n3)));
+	test1 = (0 == memcmp(memcpy(s11 , s1, n1), Memcpy(s12 , s1, n1), n1));
+	test2 = (0 == memcmp(memcpy(s21 , s2, n2), Memcpy(s22 , s2, n2), n2));
+	test3 = (0 == memcmp(memcpy(s31 , s3, n3), Memcpy(s32 , s3, n3), n3));
 
 	if (test1 && test2 && test3)
 	{
@@ -136,7 +152,10 @@ void TestMemcpy()
 
 void *Memmove(void *dest, void *src, size_t n)
 {
-	void *dest_start = dest ;
+	char * dest_char = (char *)dest;
+	size_t *dest_size_t = (size_t *)dest;
+	char * src_char = (char *)src;
+	size_t *src_size_t = (size_t *)src;
 	
 	size_t count_to_start = (size_t)dest % BYTE_SIZE;
 	size_t count_to_end = (n - count_to_start) % BYTE_SIZE;
@@ -146,34 +165,41 @@ void *Memmove(void *dest, void *src, size_t n)
 	}
 	else
 	{
-		*(char *)&dest += n;
-		*(char *)&src += n;
+		dest_char += n;
+		src_char += n;
 
 		while (count_to_end > 0)
 		{
-			*(char *)&dest -= 1;
-			*(char *)&src -= 1;
-			*(char *)dest = *(char *)src;
+			dest_char -= 1;
+			src_char -= 1;
+			*dest_char = *src_char;
 			--n;
 			count_to_end--;
 		}
+
+		dest_size_t = (size_t *)dest_char;
+		src_size_t = (size_t *)src_char;
+
 		while(n > count_to_start)
 		{
-			*(char *)&dest -= BYTE_SIZE;
-			*(char *)&src -= BYTE_SIZE;
-			*(size_t *)dest = *(size_t *)src;
+			dest_size_t -= 1;
+			src_size_t -= 1;
+			*dest_size_t = *src_size_t;
 			n -= BYTE_SIZE;
 		}
+
+		dest_char = (char *)dest_size_t;
+		src_char = (char *)src_size_t;
+
 		while(n > 0)
 		{		
-			*(char *)&dest -= 1;
-			*(char *)&src -= 1;
-			*(char *)dest = *((char *)src);
+			dest_char -= 1;
+			src_char -= 1;
+			*dest_char = *src_char;
 			--n;
 		}
 	}
-	return dest_start;
-
+	return dest;
 }
 
 void TestMemmove()
@@ -191,25 +217,23 @@ void TestMemmove()
     char *str4 = NULL;
     char *str5 = NULL;
     char *str6 = NULL;
+
     if(NULL == str || NULL == str2 || NULL == str1 ||
        NULL == str7 || NULL == str_dest1 || NULL == str_dest2)
     {
     	return;
     }
-
-    
-
     str_dest1 = Memmove(str_dest1, str, 8);
     str_dest2 = memmove(str_dest2, str2, 8);
+   
     str3 = Memmove(str + 2, str, 5);
     str4 = memmove(str2 +2, str2, 5);
     str5 = Memmove(str1, str1 + 2, 10);
     str6 = memmove(str7, str7 + 2, 10);
-
-
-    test1 = (0 == strcmp(str_dest1 , str_dest2));
-    test2 = (0 == strcmp(str3 , str4));
-    test3 = (0 == strcmp(str5 , str6));
+    
+    test1 = (0 == memcmp(str_dest1 , str_dest2, 8));
+    test2 = (0 == memcmp(str3 , str4, 5));
+    test3 = (0 == memcmp(str5 , str6, 10));
 
 
     if (test1 && test2 && test3)
@@ -220,6 +244,7 @@ void TestMemmove()
     {
         printf("Memmove failed, test1: %d, test2: %d, test3: %d\n", test1, test2, test3);
     }
+
     free(str);
     free(str2);
     free(str1);
