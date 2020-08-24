@@ -3,16 +3,18 @@
 #include <stdlib.h> /* malloc, free */
 
 #define BYTE_SIZE (8)
+
 char *strdup(const char * str);
-long CreateWord(int c);
+
+static long CreateWord(int c);
 
 void *Memset(void *s, int c, size_t n);
 void *Memcpy(void *dest, void *src, size_t n);
 void *Memmove(void *dest, void *src, size_t n);
 
-void TestMemset();
-void TestMemcpy();
-void TestMemmove();
+static void TestMemset();
+static void TestMemcpy();
+static void TestMemmove();
 
 int main()
 {
@@ -27,7 +29,7 @@ long CreateWord(int c)
 	long res = 0;
 	size_t i = 0;
 
-	for( i = 0 ; i < sizeof(size_t); ++i)
+	for (i = 0 ;i < sizeof(size_t); ++i)
 	{
 		res <<= BYTE_SIZE;
 		res = (res | (unsigned char)c);
@@ -36,16 +38,15 @@ long CreateWord(int c)
 }
 
 void *Memset(void *s, int c, size_t n)
-{
-	void *start = s;	
+{	
 	long word = CreateWord(c);
 	char * s_char = (char *)s;
 	size_t *s_size_t = NULL;
 
-	while (0 != ((size_t)s_char % BYTE_SIZE))
+	while (0 != ((size_t)s_char % BYTE_SIZE) && n > 0)
 	{
-		*s_char = c;
-		s_char += 1;
+		*s_char = (unsigned char)c;
+		++s_char;
 		--n;
 	}
 
@@ -62,14 +63,14 @@ void *Memset(void *s, int c, size_t n)
 
 	while (n > 0)
 	{
-		*s_char = c;
+		*s_char = (unsigned char)c;
 		s_char += 1;
 		--n;
 	}
-	return start;
+	return s;
 }
 
-void TestMemset()
+static void TestMemset()
 {
 	int test1 = 0, test2 = 0, test3 = 0;
 	char s1[] = "hello hello hello hello hello hello hel";
@@ -79,7 +80,7 @@ void TestMemset()
 	char s3[] = "hello hello                            ";
 	char s33[] = "hello hello                            ";
 	int c1 = 'a', c2 = 'c', c3 = ' ';
-	int n1 = 10, n2 = 15, n3 = 20;
+	int n1 = 7, n2 = 15, n3 = 20;
 
 	test1 = (0 == memcmp(memset(s11 , c1, n1), Memset(s1 , c1, n1), n1));
 	test2 = (0 == memcmp(memset(s22 , c2, n2), Memset(s2 , c2, n2), n2));
@@ -103,7 +104,7 @@ void *Memcpy(void *dest, void *src, size_t n)
 	char * src_char = (char *)src;
 	size_t *src_size_t = (size_t *)src;
 	
-	while ( n > BYTE_SIZE - 1)
+	while (n >= BYTE_SIZE)
 	{
 		*dest_size_t = *src_size_t;
 		dest_size_t += 1;
@@ -112,7 +113,7 @@ void *Memcpy(void *dest, void *src, size_t n)
 	}
 	dest_char = (char *)dest_size_t;
 	src_char = (char *)src_size_t;
-	while( n > 0 )
+	while (n > 0)
 	{
 		*dest_char = *src_char;
 		dest_char += 1;
@@ -122,7 +123,7 @@ void *Memcpy(void *dest, void *src, size_t n)
 	return dest;
 }
 
-void TestMemcpy()
+static void TestMemcpy()
 {
 	int test1 = 0, test2 = 0, test3 = 0;
 	char s1[] = "hellonkjnads,.m";
@@ -145,7 +146,7 @@ void TestMemcpy()
 	}
 	else
 	{
-		printf("Memcpy failed, test1: %d, test2: %d, test3: %d\n",test1, test2, test3 );
+		printf("Memcpy failed, test1: %d, test2: %d, test3: %d\n",test1, test2, test3);
 	}
 }
 
@@ -155,18 +156,16 @@ void *Memmove(void *dest, void *src, size_t n)
 	size_t *dest_size_t = (size_t *)dest;
 	char * src_char = (char *)src;
 	size_t *src_size_t = (size_t *)src;
-	size_t count_to_start = (size_t)dest % BYTE_SIZE;
-	size_t count_to_end = (n - count_to_start) % BYTE_SIZE;
+
 	if(src > dest)
 	{
-		dest = memcpy(dest, src, n);
+		dest = Memcpy(dest, src, n);
 	}
 	else
 	{
-		while (count_to_end > 0)
+		while (0 != (size_t)dest % BYTE_SIZE )
 		{
 			dest = (char *)dest + 1;
-			count_to_end--;
 		}
 
 		dest_char = (char *)dest + n;
@@ -174,7 +173,7 @@ void *Memmove(void *dest, void *src, size_t n)
 		dest_size_t = (size_t *)dest_char;
 		src_size_t = (size_t *)src_char;
 
-		while(n > BYTE_SIZE - 1)
+		while (n >= BYTE_SIZE)
 		{
 			dest_size_t -= 1;
 			src_size_t -= 1;
@@ -185,7 +184,7 @@ void *Memmove(void *dest, void *src, size_t n)
 		dest_char = (char *)dest_size_t;
 		src_char = (char *)src_size_t;
 
-		while(n > 0)
+		while(0 < n)
 		{		
 			dest_char -= 1;
 			src_char -= 1;
@@ -196,7 +195,7 @@ void *Memmove(void *dest, void *src, size_t n)
 	return dest;
 }
 
-void TestMemmove()
+static void TestMemmove()
 {
 
     int test1 = 0, test2 = 0, test3 = 0;
