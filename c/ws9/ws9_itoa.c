@@ -94,89 +94,59 @@ static void TestItoa()
 	int n1 = 15, n2 = -85, n3 = 0;
 	
 	int test1 = 0, test2 = 0, test3 = 0;
-	int test11 = 0, test22 = 0, test33 = 0;
-	int test111 = 0, test222 = 0, test333 = 0;
+	int test4 = 0, test5 = 0, test6 = 0;
+	int test7 = 0, test8 = 0, test9 = 0;
 
-	char *res1 = (char *)malloc(32);
-	char *res2 = (char *)malloc(32);
-	char *res3 = (char *)malloc(32);
-	
-	char *res11 = (char *)malloc(32);
-	char *res22 = (char *)malloc(32);
-	char *res33 = (char *)malloc(32);
-	
-	char *res111 = (char *)malloc(32);
-	char *res222 = (char *)malloc(32);
-	char *res333 = (char *)malloc(32);
+	char res1[32] = {0};
+	char res2[32] = {0};
+	char res3[32] = {0};
+	char res4[32] = {0};
+	char res5[32] = {0};
+	char res6[32] = {0};	
+	char res7[32] = {0};
+	char res8[32] = {0};
+	char res9[32] = {0};
 	
 	char *str1 = "15" ;
 	char *str2 = "-85";
 	char *str3 = "0";
-
-	char *str11 = "1111" ;
-	char *str22 = "-1010101";
-	char *str33 = "0";
-
-	char *str111 = "F" ;
-	char *str222 = "-55";
-	char *str333 = "0";
-
+	char *str4 = "1111" ;
+	char *str5 = "-1010101";
+	char *str6 = "0";
+	char *str7 = "F" ;
+	char *str8 = "-55";
+	char *str9 = "0";
 	
-
-	if(NULL == res1 || NULL == res2 || NULL == res3
-	|| NULL == res11 || NULL == res22 || NULL == res33
-	|| NULL == res111 || NULL == res222 || NULL == res333 )
-	{
-		return;
-	}
-	
-	res1 = Itoa(n1, res1, 10);
-	res2 = Itoa(n2, res2, 10);
-	res3 = Itoa(n3, res3, 10);
-
-	res11 = Itoa(n1, res11, 2);
-	res22 = Itoa(n2, res22, 2);
-	res33 = Itoa(n3, res33, 2);
-
-	res111 = Itoa(n1, res111, 16);
-	res222 = Itoa(n2, res222, 16);
-	res333 = Itoa(n3, res333, 16);
+	Itoa(n1, res1, 10);
+	Itoa(n2, res2, 10);
+	Itoa(n3, res3, 10);
+	Itoa(n1, res4, 2);
+	Itoa(n2, res5, 2);
+	Itoa(n3, res6, 2);
+	Itoa(n1, res7, 16);
+	Itoa(n2, res8, 16);
+	Itoa(n3, res9, 16);
 
 	test1 = (0 == strcmp(str1, res1));
 	test2 = (0 == strcmp(str2, res2));
 	test3 = (0 == strcmp(str3, res3));
-
-	test11 = (0 == strcmp(str11, res11));
-	test22 = (0 == strcmp(str22, res22));
-	test33 = (0 == strcmp(str33, res33));
-
-	test111 = (0 == strcmp(str111, res111));
-	test222 = (0 == strcmp(str222, res222));
-	test333 = (0 == strcmp(str333, res333));
-
+	test4 = (0 == strcmp(str4, res4));
+	test5 = (0 == strcmp(str5, res5));
+	test6 = (0 == strcmp(str6, res6));
+	test7 = (0 == strcmp(str7, res7));
+	test8 = (0 == strcmp(str8, res8));
+	test9 = (0 == strcmp(str9, res9));
 
 	if(test1 && test2 && test3 &&
-		test11 && test22 && test33 &&
-		test111 && test222 && test333)
+		test4 && test5 && test6 &&
+		test7 && test8 && test9)
 	{
 		printf("Itoa  passed\n");
 	}
 	else
 	{
-		printf("Itoa  failed, test1: %d, test2: %d, test3: %d\ntest11: %d, test22: %d, test33: %d\ntest111: %d, test222: %d, test333: %d\n",test1, test2, test3,test11, test22, test33, test111, test222, test333);
+		printf("Itoa  failed, test1: %d\ntest2: %d\ntest3: %d\ntest4: %d\ntest5: %d\ntest6: %d\ntest7: %d\ntest8: %d\ntest9: %d\n",test1, test2, test3,test4, test5, test6, test7, test8, test9);
 	}
-
-	free(res1);
-	free(res2);
-	free(res3);
-
-	free(res11);
-	free(res22);
-	free(res33);
-
-	free(res111);
-	free(res222);
-	free(res333);
 }
 
 static int ConvertCharToDig(const char *str)
