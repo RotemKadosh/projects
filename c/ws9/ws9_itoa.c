@@ -1,7 +1,7 @@
 #include <stdio.h> /*printf*/
 #include <stdlib.h> /*malloc, free, itoa*/
 #include <string.h> /*strcmp*/
-#include <math.h>/*pow*/
+
 #define NULL_CHAR (1)
 #define ASCII_GAP (48)
 #define FALSE (0)
@@ -69,33 +69,26 @@ char *Itoa(int value, char * str, int base)
 	int digit = 0;
 	char *str_start = str;
 	int num_of_digit = NumOfDigits(value, base);
-	if(0 == value)
-	{
-		*str = '0';
-		++str;
-		*str ='\0';
-	}
-	else if(0 > value)
+	if(0 > value)
 	{
 
 		*str = '-';
 		++str;
 		value *= -1;
 	}
-
 	str = str + num_of_digit ;
 	*str = '\0';
 	--str;
-
-	while (0 < value)
+	do
 	{	
 		digit = value % base;
 		*str = (unsigned char)((digit > 9) ? (digit-10) + 'A' : digit + '0');
 		--str;
 		value /= base;
-	}
+	}while (0 < value);
 	return str_start;
 } 
+
 static void TestItoa()
 {
 	int n1 = 15, n2 = -85, n3 = 0;
@@ -185,9 +178,10 @@ static void TestItoa()
 	free(res222);
 	free(res333);
 }
+
 static int ConvertCharToDig(const char *str)
 {
-	int ascii_gap = (*str >= 'A') ? (int)('A' - 10) : (48);
+	int ascii_gap = (*str >= 'A') ? (int)('A' - 10) : '0';
 	int digit = ((int)*str - ascii_gap);
 	return digit;
 }
@@ -265,11 +259,11 @@ static void TestAtoi()
 		test7 && test8 && test9
 		&& test10 && test11)
 	{
-		printf("Itoa  passed\n");
+		printf("Atoi passed\n");
 	}
 	else
 	{
-		printf("Itoa  failed, test1: %d,\ntest2: %d,\ntest3: %d\ntest4: %d,\ntest5:%d,\ntest6: %d\ntest7: %d,\ntest8: %d,\ntest9: %d,\ntest10: %d\n,test11: %d\n",test1, test2, test3,test4, test5, test6, test7, test8, test9, test10, test11);
+		printf("Atoi failed, test1: %d,\ntest2: %d,\ntest3: %d\ntest4: %d,\ntest5:%d,\ntest6: %d\ntest7: %d,\ntest8: %d,\ntest9: %d,\ntest10: %d\n,test11: %d\n",test1, test2, test3,test4, test5, test6, test7, test8, test9, test10, test11);
 	}
 }
 static void ThreeCharArr(char arr1[], size_t size1, char arr2[], size_t size2, char arr3[], size_t size3)
