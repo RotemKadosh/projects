@@ -6,29 +6,37 @@
 #define ASCII_GAP (48)
 #define FALSE (0)
 #define TRUE (1)
+#define IS_LITTLE_ENDIAN (1 == (char)(int)1)
 
+/*-------help functions -------*/
 static int power(int base ,int exp); 
 static size_t NumOfDigits(int num, int base);
-
 static int ConvertCharToDig(const char *str);
 static int IsDigitLegit(const char *str, int base );
 static const char *MoveToStartAndCalcLen(const char *str, int *len, int base, int *minus_flag);
 
+/*-------functions -------*/
 int Atoi(const char *str , int base);
 char *Itoa(int value, char * str, int base);
-static int TestAtoiBase10(const char *str);
+static void ThreeCharArr(char arr1[], size_t size1, char arr2[], size_t size2, char arr3[], size_t size3);
+int WhichEndian();
+
+/*-------tests -------*/
 static void TestItoa();
 static void TestAtoi();
-static void ThreeCharArr(char arr1[], size_t size1, char arr2[], size_t size2, char arr3[], size_t size3);
 
 
 int main()
 {
-	
+	int a = IS_LITTLE_ENDIAN;
 	char arr1[] = {'a', 'b', 'c', 'd'};
 	char arr2[] = {'a', 'E', 'c', 'd'};
 	char arr3[] = {'a', 'b', 'a', 'f'};
+	TestItoa();
+	TestAtoi();
+	printf("%s\n", a ? " macro: little endian" : "macro: big endian");
 	ThreeCharArr(arr1, sizeof(arr1)/sizeof(arr1[0]), arr2, sizeof(arr2)/sizeof(arr2[0]),arr3, sizeof(arr3)/sizeof(arr3[0]));
+	WhichEndian();
 	return 0;
 }
 static int power(int base ,int exp) 
@@ -56,7 +64,6 @@ static size_t NumOfDigits(int num, int base)
 	
 	return dig;
 }
-
 char *Itoa(int value, char * str, int base)
 {
 	int digit = 0;
@@ -89,7 +96,6 @@ char *Itoa(int value, char * str, int base)
 	}
 	return str_start;
 } 
- 
 static void TestItoa()
 {
 	int n1 = 15, n2 = -85, n3 = 0;
@@ -213,8 +219,7 @@ static const char *MoveToStartAndCalcLen(const char *str, int *len, int base, in
 		++*len;
 		++str;
 	}
-	return str_start;
-		
+	return str_start;		
 }
 int Atoi(const char *str , int base)
 {
@@ -237,14 +242,7 @@ int Atoi(const char *str , int base)
 	}
 	return num * minus_flag;
 }		
-
-static int TestAtoiBase10(const char *str)
-{
-
-    return (atoi(str) == Atoi(str, 10));
-
-}
-static void TestAtoi2()
+static void TestAtoi()
 {
 	int test1 = 0, test2 = 0, test3 = 0, test4 = 0;
 	int test5 = 0, test6 = 0, test7 = 0, test8 = 0;
@@ -254,9 +252,9 @@ static void TestAtoi2()
 	test2 = (478 == Atoi("122201", 3));
 	test3 = (-9873167 == Atoi("-211222130033", 4));
 	test4 = (354163 == Atoi("42313123", 5));
-	test5 = (514232 == Atoi("41132", 6));
-	test6 = (230630 == Atoi("41132", 7));
-	test7 = (120254 == Atoi("41132", 8));
+  	test5 = (-2147483647 == Atoi("  -ZIK0ZJ  123", 36));
+    test6 = (5 == Atoi("101", 2));
+    test7 = (26 == Atoi("101", 5));
 	test8 = (-2000000 == Atoi("-1MLI2", 33));
 	test9 = (12121212 == Atoi("H3SOO", 29));
 	test10 = (-121 == Atoi("-11111", 3));
@@ -273,33 +271,6 @@ static void TestAtoi2()
 	{
 		printf("Itoa  failed, test1: %d,\ntest2: %d,\ntest3: %d\ntest4: %d,\ntest5:%d,\ntest6: %d\ntest7: %d,\ntest8: %d,\ntest9: %d,\ntest10: %d\n,test11: %d\n",test1, test2, test3,test4, test5, test6, test7, test8, test9, test10, test11);
 	}
-}
-static void TestAtoi()
-{
-
-    int test1 = 0, test2 = 0, test3 = 0, test4 = 0, test5 = 0, test6 = 0, test7 = 0, test8 =0;
-
-
-    test1 = (54365 == Atoi("1B98C", 13));
-    test2 = (6574 == Atoi("1212232  7", 4));
-    test3 =    (654 == Atoi("1010001110", 2));
-    test4 = (23 == Atoi("N", 25));
-    test5 = (896 == Atoi("3EB", 15));
-    test6 = (-2147483647 == Atoi("  -ZIK0ZJ  123", 36));
-    test7 = (5 == Atoi("101", 2));
-    test8 = (26 == Atoi("101", 5));
-
-
-
-
-    if (test1 && test2 && test3 && test4 && test5 && test6 && test7 && test8)
-    {
-        printf("TestAtoi passed the test!\n");
-    }
-    else
-    {
-        printf("TestAtoi failed, test1 = %d, test2 = %d, test3 = %d, test4 = %d, test5 = %d, test6 = %d, test7 = %d, test8 = %d\n", test1, test2, test3, test4, test5, test6, test7, test8);
-    }
 }
 static void ThreeCharArr(char arr1[], size_t size1, char arr2[], size_t size2, char arr3[], size_t size3)
 {
@@ -329,4 +300,19 @@ static void ThreeCharArr(char arr1[], size_t size1, char arr2[], size_t size2, c
  	}
  }
  printf("\n");
+}
+int WhichEndian()
+{
+	unsigned int i = 1; 
+   	char *c = (char*)&i; 
+   	if (*c)
+   	{
+   		printf("function: Little endian\n");
+   		return TRUE; 
+   	}     
+   	else
+   	{
+       printf("function: Big endian\n"); 
+   	}
+   	return FALSE; 
 }
