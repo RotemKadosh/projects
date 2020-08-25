@@ -97,25 +97,11 @@ static void TestItoa()
 	int test4 = 0, test5 = 0, test6 = 0;
 	int test7 = 0, test8 = 0, test9 = 0;
 
-	char res1[32] = {0};
-	char res2[32] = {0};
-	char res3[32] = {0};
-	char res4[32] = {0};
-	char res5[32] = {0};
-	char res6[32] = {0};	
-	char res7[32] = {0};
-	char res8[32] = {0};
-	char res9[32] = {0};
-	
-	char *str1 = "15" ;
-	char *str2 = "-85";
-	char *str3 = "0";
-	char *str4 = "1111" ;
-	char *str5 = "-1010101";
-	char *str6 = "0";
-	char *str7 = "F" ;
-	char *str8 = "-55";
-	char *str9 = "0";
+	char res1[32] = {0}, res2[32] = {0}, res3[32] = {0}, res4[32] = {0};
+	char res5[32] = {0}, res6[32] = {0}, res7[32] = {0}, res8[32] = {0}, res9[32] = {0};
+
+	char *str1 = "15" , *str2 = "-85", *str3 = "0", *str4 = "1111", *str5 = "-1010101";
+	char *str6 = "0", *str7 = "F", *str8 = "-55", *str9 = "0";
 	
 	Itoa(n1, res1, 10);
 	Itoa(n2, res2, 10);
@@ -138,14 +124,14 @@ static void TestItoa()
 	test9 = (0 == strcmp(str9, res9));
 
 	if(test1 && test2 && test3 &&
-		test4 && test5 && test6 &&
-		test7 && test8 && test9)
+	   test4 && test5 && test6 &&
+	   test7 && test8 && test9)
 	{
-		printf("Itoa  passed\n");
+		printf("Itoa passed\n");
 	}
 	else
 	{
-		printf("Itoa  failed, test1: %d\ntest2: %d\ntest3: %d\ntest4: %d\ntest5: %d\ntest6: %d\ntest7: %d\ntest8: %d\ntest9: %d\n",test1, test2, test3,test4, test5, test6, test7, test8, test9);
+		printf("Itoa failed, test1: %d\ntest2: %d\ntest3: %d\ntest4: %d\ntest5: %d\ntest6: %d\ntest7: %d\ntest8: %d\ntest9: %d\n",test1, test2, test3,test4, test5, test6, test7, test8, test9);
 	}
 }
 
