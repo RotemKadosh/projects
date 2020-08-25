@@ -24,7 +24,7 @@ int StockProfit(int *prices, int size, int *buy, int *sell)
 	*buy = min_buy;
 	return prices[max_sell] - prices [min_buy];
 }
-
+/*------------------------------GeeksforGeeks Solution-----------------------------*/
 typedef struct interval { 
     int buy; 
     int sell; 
@@ -35,30 +35,23 @@ void stockBuySell(int price[], int size)
 	static int c = 1;
 	int count = 0;
 	int i = 0; 
-
     interval_t sol[15];
-    
-    while (i < size - 1) { 
-
+    while (i < size - 1) 
+    { 
         while ((i < size - 1) && (price[i + 1] <= price[i])) 
         {
             i++; 
         }
- 
         if (i == size - 1) 
         {
             break; 
         }
- 
         sol[count].buy = i++; 
-
         while ((i < size) && (price[i] >= price[i - 1])) 
         {
             i++; 
         }
-
         sol[count].sell = i - 1; 
-
         count++; 
     } 
     printf("for arr%d\n ", c);
@@ -76,6 +69,8 @@ void stockBuySell(int price[], int size)
   
     return; 
 } 
+
+/*------------------------------------------------------------*/
 int main()
 {
 	int arr1 [] = {9 , 100, 0, 1, 2};
