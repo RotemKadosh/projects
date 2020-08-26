@@ -64,7 +64,7 @@ static size_t NumOfDigits(int num, int base)
 	
 	return dig;
 }
-char *Itoa(int value, char * str, int base)
+char *Itoa(int value, char *str, int base)
 {
 	int digit = 0;
 	char *str_start = str;
@@ -150,6 +150,34 @@ static int IsDigitLegit(const char *str, int base )
 	}
 	return TRUE;
 }
+
+
+static const char *MoveToStart(const char *str, int *minus_flag)
+{
+	while ('\0' != *str && (' '== *str))
+	{
+		++str;
+	}
+	
+	if ('-' == *str)
+	{
+		*minus_flag = -1;
+		++str;
+	}
+	return str;
+}
+
+int CalcLen(const char *str, int base)
+{
+	int len = 0;
+	while ('\0' != *str && IsDigitLegit(str, base))
+	{
+		++len;
+		++str;
+	}
+	return len;		
+}
+/*
 static const char *MoveToStartAndCalcLen(const char *str, int *len, int base, int *minus_flag)
 {
 	const char *str_start = NULL;
@@ -157,7 +185,6 @@ static const char *MoveToStartAndCalcLen(const char *str, int *len, int base, in
 	{
 		++str;
 	}
-	
 	if ('-' == *str)
 	{
 		*minus_flag = -1;
@@ -171,14 +198,18 @@ static const char *MoveToStartAndCalcLen(const char *str, int *len, int base, in
 	}
 	return str_start;		
 }
+*/
 int Atoi(const char *str , int base)
 {
 	int num = 0;
 	int len = 0;
 	int minus_flag = 1;
-	const char *str_new = MoveToStartAndCalcLen(str, &len, base, &minus_flag);
 	int digit = 0;
 	int count = 0;
+	
+	const char *str_new = MoveToStart(str, &minus_flag);
+	len = CalcLen (str_new, base);
+	
 	while(count < len)
 	{
 		digit = ConvertCharToDig(str_new);
