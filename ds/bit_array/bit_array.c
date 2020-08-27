@@ -59,11 +59,11 @@ bit_array_t BitsArrResetAll(bit_array_t arr)
 char *BitsArrToString(bit_array_t arr, char *dest)
 {
     size_t i = 0;
-    char *dest_stert = dest;
+    char *dest_stert = NULL;
     int digit = 0;
     
     assert(NULL != dest);
-        
+    dest_stert = dest;
     dest = dest + (sizeof(bit_array_t) * CHAR_BIT);
     *dest = '\0';
     --dest;
@@ -138,13 +138,13 @@ bit_array_t BitsArrMirror(bit_array_t arr)
 }
 bit_array_t BitsArrRotR(bit_array_t arr, size_t steps)
 {
-
+    steps %= (sizeof(bit_array_t) * CHAR_BIT);
 	return (arr >> steps) | (arr << ((sizeof(bit_array_t) * CHAR_BIT) -steps));
 }
 bit_array_t BitsArrRotL(bit_array_t arr, size_t steps)
 {
-
-	return (arr << steps) | (arr >> ((sizeof(bit_array_t) * CHAR_BIT) -steps));
+    steps %= (sizeof(bit_array_t) * CHAR_BIT);
+	return (arr << steps) | (arr >> ((sizeof(bit_array_t) * CHAR_BIT) - steps));
 }
 bit_array_t BitsArrMirrorLut(bit_array_t arr)
 {	
