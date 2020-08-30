@@ -1,6 +1,9 @@
 #include <stdlib.h> /*malloc, free*/
 #include <assert.h> /* assert */
 #include "stack.h"
+
+/*aproved by may*/
+
 struct stack
 {
   int top;
@@ -13,7 +16,6 @@ stack_t *StackCreate(size_t capacity)
 	stack_t *stack = NULL;
 	assert(0 < capacity);
 	stack = (stack_t *)malloc(sizeof(stack_t));
-
 	if(NULL == stack)
 	{
 		return NULL;

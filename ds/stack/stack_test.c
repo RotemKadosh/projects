@@ -2,7 +2,7 @@
 
 #include "stack.h"
 
-
+/*approved - may*/
 void TestStackOpertions();
 
 int main()
@@ -10,9 +10,6 @@ int main()
 	TestStackOpertions();
 	return 0;
 }
-
-
-
 
 void TestStackOpertions()
 {	
