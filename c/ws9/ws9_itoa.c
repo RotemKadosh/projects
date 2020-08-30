@@ -1,19 +1,21 @@
 #include <stdio.h> /*printf*/
-#include <stdlib.h> /*malloc, free, itoa*/
+#include <stdlib.h> /* itoa*/
 #include <string.h> /*strcmp*/
+#include <stdint.h>/*unit16_t*/
 
 #define NULL_CHAR (1)
 #define ASCII_GAP (48)
 #define FALSE (0)
 #define TRUE (1)
-#define IS_LITTLE_ENDIAN (1 == (char)(int)1)
+
+#define IS_LITTLE_ENDIAN (*(uint16_t*) "\0\1" >> 8)
+#define IS_BIG_ENDIAN (*(uint16_t*) "\1\0" >> 8)
 
 /*-------help functions -------*/
 static int power(int base ,int exp); 
 static size_t NumOfDigits(int num, int base);
 static int ConvertCharToDig(const char *str);
 static int IsDigitLegit(const char *str, int base );
-static const char *MoveToStartAndCalcLen(const char *str, int *len, int base, int *minus_flag);
 
 /*-------functions -------*/
 int Atoi(const char *str , int base);
@@ -28,13 +30,13 @@ static void TestAtoi();
 
 int main()
 {
-	int a = IS_LITTLE_ENDIAN;
+	
 	char arr1[] = {'a', 'b', 'c', 'd'};
 	char arr2[] = {'a', 'E', 'c', 'd'};
 	char arr3[] = {'a', 'b', 'a', 'f'};
 	TestItoa();
 	TestAtoi();
-	printf("%s\n", a ? " macro: little endian" : "macro: big endian");
+	printf("%s\n", IS_LITTLE_ENDIAN ? " macro: little endian" : "macro: big endian");
 	ThreeCharArr(arr1, sizeof(arr1)/sizeof(arr1[0]), arr2, sizeof(arr2)/sizeof(arr2[0]),arr3, sizeof(arr3)/sizeof(arr3[0]));
 	WhichEndian();
 	return 0;
@@ -177,28 +179,6 @@ int CalcLen(const char *str, int base)
 	}
 	return len;		
 }
-/*
-static const char *MoveToStartAndCalcLen(const char *str, int *len, int base, int *minus_flag)
-{
-	const char *str_start = NULL;
-	while ('\0' != *str && (' '== *str))
-	{
-		++str;
-	}
-	if ('-' == *str)
-	{
-		*minus_flag = -1;
-		++str;
-	}
-	str_start = str;
-	while ('\0' != *str && IsDigitLegit(str, base))
-	{
-		++*len;
-		++str;
-	}
-	return str_start;		
-}
-*/
 int Atoi(const char *str , int base)
 {
 	int num = 0;
@@ -206,7 +186,7 @@ int Atoi(const char *str , int base)
 	int minus_flag = 1;
 	int digit = 0;
 	int count = 0;
-	
+
 	const char *str_new = MoveToStart(str, &minus_flag);
 	len = CalcLen (str_new, base);
 	
@@ -255,29 +235,29 @@ static void TestAtoi()
 }
 static void ThreeCharArr(char arr1[], size_t size1, char arr2[], size_t size2, char arr3[], size_t size3)
 {
- int arr [255][3]= { 0 };
+ int arr [255]= { 0 };
  size_t idx = 0;
  char ch = 0;
  for (idx = 0; idx < size1 ; ++idx)
  {
  	ch = arr1[idx];
- 	++arr[(int)ch][0];
+ 	++arr[(int)ch];
  }
  for (idx = 0; idx < size2 ; ++idx)
  {
  	ch = arr2[idx];
- 	++arr[(int)ch][1];
+ 	++arr[(int)ch];
  }
  for (idx = 0; idx < size3 ; ++idx)
  {
  	ch = arr3[idx];
- 	++arr[(int)ch][2];
+ 	++arr[(int)ch];
  }
  for (idx = 0; idx < 255; ++idx)
  {
- 	if (1 <= arr[idx][0] && 1 <= arr[idx][1] && 0 == arr[idx][2] )
+ 	if (2 == arr[idx] )
  	{
- 		printf("%c ", (unsigned char)idx);
+ 		printf("%c ",(unsigned char)idx);
  	}
  }
  printf("\n");

@@ -26,10 +26,13 @@ char *CopyToLower(char *dest, const char *src);
 
 size_t CalcLength(char *envp[])
 {	
-	size_t i = 0;
-	for (i = 0 ; NULL != *envp++ ; ++i)
-	{ }
-	return i;  
+	char ** place = envp;
+	while (NULL != *envp++)
+	{
+		++place;
+	}
+	return (size_t)(place - envp);
+	 
 }
 
 char **CreateBuffer( size_t length)
@@ -55,8 +58,11 @@ void to_lower(char *s)
 
 char **EnvDupToLower(char *envp[] ,char *new_env[] )
 {
+
 	char **new_start = new_env;
 	size_t i = 0;
+	assert(NULL != envp);
+
 	for(i = 0 ;NULL != *envp; i++ )
 	{
 		*(new_env) = (char *)malloc(strlen(*envp) + 1);;

@@ -1,6 +1,6 @@
 #include <stdio.h>/*printf, scanf*/
-#define _EXIT (0)
-#define _ESC (27)
+#define EXIT (0)
+#define ESC (27)
 #define IF_ELSE (1)
 #define SWITCH_CASE (2)
 #define LUT (3)
@@ -17,6 +17,7 @@ void Lut();
 
 int main()
 {
+	
 	int choise = 0;
 	while(TRUE)
 	{
@@ -34,16 +35,22 @@ int main()
 		case LUT:
 			Lut();
 			break;
-		case _EXIT:
-			printf("goodbey!\n");
-			return 0;
 		default:
 			printf("not an option\n");
 		}
 	}
+	system('stty -icanon -echo');
 	return 0;
 }
 
+void DisableTerminalBufferAndEcho()
+{
+	system('stty -icanon -echo');
+}
+void EnableTerminalBufferAndEcho()
+{
+	system('stty icanon echo');
+}
 void IfElse()
 {
 	char key = 0;

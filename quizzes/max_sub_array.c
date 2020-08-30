@@ -9,7 +9,7 @@ int MaxSubArray(int arr[], int size, int *start, int *end)
 	{
 		cur_sum += arr[tmp_end];
 
-		if (cur_sum > max_sum)
+		if (cur_sum >= max_sum)
 		{
 			max_sum = cur_sum;
 			*end = tmp_end;
@@ -18,7 +18,7 @@ int MaxSubArray(int arr[], int size, int *start, int *end)
 		if (cur_sum < 0)
 		{
 			cur_sum = 0;
-			tmp_start = tmp_end +1;
+			tmp_start = tmp_end + 1;
 		}
 	}
 	printf("arr%d start = %d, end = %d, sum = %d\n", i++, *start, *end, max_sum);
@@ -29,7 +29,7 @@ int MaxSubArray(int arr[], int size, int *start, int *end)
 
 void TestMaxSubArray()
 {
-	int arr1[] = {1, -1, 1, 2, 3, -6};
+	int arr1[] = {-1, -1, -1, 0, -3, -6};
 	int arr2[] = {-2, 1, -3, 4, -1, 2, 3, -5, 4};
 	int arr3[] = {-2, -1, 100, -6};
 	int start = 0, end = 0;

@@ -290,6 +290,6 @@ void TestCountSetBitsLoop()
 }
 void PrintFloatAnalize()
 {
-	float f = 23.625;
+	float f = 7.5;
 	FloatAnalize(f);
 }

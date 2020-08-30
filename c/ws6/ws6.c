@@ -29,7 +29,7 @@ int IsPowLoop(unsigned int n)
 {
 	if (0 == n)
 	{
-		return FALSE;
+		return TRUE;
 	}
 	while (FIRST_BIT != n)
 	{
@@ -43,7 +43,7 @@ int IsPowLoop(unsigned int n)
 }
 int AddOne(int num)
 {
-	return (- ( ~ num));
+	return (- (~ num));
 }
 int AddOneLoop(int num)
 {
@@ -83,7 +83,7 @@ void Print3BitsOn(unsigned int *arr, size_t size)
 	{
 		if (TRUE == Is3SetBits(arr[i]))
 		{
-			printf("%d, " ,arr[i]);
+			printf("%u, " ,arr[i]);
 		}
 	}
 	printf("\n");
@@ -144,7 +144,7 @@ int CountSetBits(int num)
 	unsigned int count = 0;
 	int set_bits_in_nibble[] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4};
 
-   	count += set_bits_in_nibble[(num & 0x0F)];
+   	count += set_bits_in_nibble[(num & 0x0F)]; 
 	num >>= 4;
 	count += set_bits_in_nibble[(num & 0x0F)];
 	num >>= 4;
