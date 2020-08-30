@@ -150,47 +150,55 @@ static void TestMemcpy()
 	}
 }
 
-void *Memmove(void *dest, void *src, size_t n)
+static void* MemcpyBacwardes(void *dest, void *src, size_t n)
 {
 	char * dest_char = (char *)dest;
 	size_t *dest_size_t = (size_t *)dest;
 	char * src_char = (char *)src;
 	size_t *src_size_t = (size_t *)src;
+	dest_char = (char *)dest + n;
+	src_char += n;
+	
+	while (0 != (size_t)dest % BYTE_SIZE )
+	{
+		*dest_char = *src_char;
+		--dest_char;
+		--src_char;
+		--n;
+	}
+	dest_size_t = (size_t *)dest_char;
+	src_size_t = (size_t *)src_char;
+	
 
+	while (n >= BYTE_SIZE)
+	{
+		dest_size_t -= 1;
+		src_size_t -= 1;
+		*dest_size_t = *src_size_t;
+		n -= BYTE_SIZE;
+	}
+
+	dest_char = (char *)dest_size_t;
+	src_char = (char *)src_size_t;
+
+	while(0 < n)
+	{		
+		dest_char -= 1;
+		src_char -= 1;
+		*dest_char = *src_char;
+		--n;
+	}
+	return dest;
+}
+void *Memmove(void *dest, void *src, size_t n)
+{
 	if(src > dest)
 	{
 		dest = Memcpy(dest, src, n);
 	}
 	else
 	{
-		while (0 != (size_t)dest % BYTE_SIZE )
-		{
-			dest = (char *)dest + 1;
-		}
-
-		dest_char = (char *)dest + n;
-		src_char += n;
-		dest_size_t = (size_t *)dest_char;
-		src_size_t = (size_t *)src_char;
-
-		while (n >= BYTE_SIZE)
-		{
-			dest_size_t -= 1;
-			src_size_t -= 1;
-			*dest_size_t = *src_size_t;
-			n -= BYTE_SIZE;
-		}
-
-		dest_char = (char *)dest_size_t;
-		src_char = (char *)src_size_t;
-
-		while(0 < n)
-		{		
-			dest_char -= 1;
-			src_char -= 1;
-			*dest_char = *src_char;
-			--n;
-		}
+		dest = MemcpyBacwardes(dest, src, n);
 	}
 	return dest;
 }
