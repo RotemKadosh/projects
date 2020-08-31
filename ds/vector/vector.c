@@ -44,6 +44,7 @@ void *VectorGetElement(const Vector_t *vector, size_t index)
 void VectorSetElement(Vector_t *vector, void *element, size_t index)
 {
 	assert(NULL != vector);
+	assert(indx < vector->last);
 	vector->items[index] = element;
 }
 size_t VectorSize(const Vector_t *vector)

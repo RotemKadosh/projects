@@ -11,6 +11,3 @@ stack_all: $(OBJ)
 
 libfoo.ar: $(OBJ)
 	ar rcs libfoo.ar $(OBJ)
-
-clean:
-	rm stack_all $(OBJ)
