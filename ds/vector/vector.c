@@ -3,6 +3,8 @@
 #include "vector.h"
 
 #define GROWTH_FACTOR (2)
+#define FAIL (-1)
+#define SUCCESS (0)
 
 struct vector
 {
@@ -15,16 +17,19 @@ Vector_t *VectorCreate(size_t capacity)
 {
 	Vector_t *vec = NULL;
 	assert(0 < capacity);
+
 	vec = (Vector_t *)malloc(sizeof(Vector_t));
 	if(NULL == vec)
 	{
 		return NULL;
 	}
+
 	vec->items = (void **)malloc(capacity * sizeof(void *));
 	if(NULL == vec->items)
 	{
 		return NULL;
 	}
+
 	vec->capacity = capacity;
 	vec->last = 0;
 	return vec;
@@ -32,6 +37,8 @@ Vector_t *VectorCreate(size_t capacity)
 void VectorDestroy(Vector_t *vector)
 {
 	assert(NULL != vector);
+
+	free(vector->items);
 	vector->items = NULL;
 	free(vector);
 	vector = NULL;
@@ -44,7 +51,6 @@ void *VectorGetElement(const Vector_t *vector, size_t index)
 void VectorSetElement(Vector_t *vector, void *element, size_t index)
 {
 	assert(NULL != vector);
-	assert(indx < vector->last);
 	vector->items[index] = element;
 }
 size_t VectorSize(const Vector_t *vector)
@@ -61,18 +67,17 @@ int VectorPushBack(Vector_t *vector, void *element)
 {
 	size_t new_capacity = 0;
 	assert(NULL != vector);
-	if(vector->last >= vector->capacity)
+	if (vector->last >= vector->capacity)
 	{
 		new_capacity = vector->capacity * GROWTH_FACTOR;
 
-		if(0 != VectorReserve(vector , new_capacity))
+		if (SUCCESS != VectorReserve(vector , new_capacity))
 		{
-			return -1;
+			return FAIL;
 		}
-		vector->capacity = new_capacity;
 	}
 	vector->items[vector->last++] = element;
-	return 0;
+	return SUCCESS;
 
 }
 void VectorPopBack(Vector_t *vector)
@@ -86,19 +91,19 @@ int VectorReserve(Vector_t *vector, size_t new_capacity)
 	vector->items = (void **)realloc( vector->items , new_capacity * sizeof(void *));
 	if(NULL == vector->items)
 	{
-		return -1;
+		return FAIL;
 	}
 	vector->capacity = new_capacity;
-	return 0;
+	return SUCCESS;
 }
 int VectorShrinkToFit(Vector_t *vector)
 {
 	assert(NULL != vector);
-	if(0 != VectorReserve(vector, vector->last))
+	if(SUCCESS != VectorReserve(vector, vector->last))
 	{
-		return -1;
+		return FAIL;
 	}
-	return 0;
+	return SUCCESS;
 	
 }
 
