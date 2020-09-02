@@ -166,6 +166,7 @@ static test_status_t TestSlistForEach()
 	SlistInsert(SlistBegin(slist),(void *)8);
 	SlistInsert(SlistBegin(slist),(void *)8);
 	SlistForEach(SlistBegin(slist), SlistEnd(slist) , PrintIntList, param);
+	SlistDestroy(list);
 	return PASSED;
 
 }
