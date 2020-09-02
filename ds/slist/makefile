@@ -20,5 +20,5 @@ vlg: a.out
 	   valgrind --leak-check=yes --track-origins=yes ./a.out
 
 clean: 
-	rm -f *.o *.out
+	rm -f *.o *.out 
 
