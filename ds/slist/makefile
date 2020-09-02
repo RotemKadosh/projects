@@ -6,8 +6,7 @@ OBJ = slist.o slist_test.o
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS) 
 						
-slist.out: $(OBJ)
+a.out: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS)  
 
-vector_lib_ar: $(OBJ)
-	ar rcs libfoo.ar $(OBJ)
+
