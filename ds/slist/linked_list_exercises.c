@@ -1,17 +1,14 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include "../utils/test.h"
+#include <stdlib.h> /*malloc, free*/
+#include <stdio.h>  /*printf*/
+#include "../utils/test.h" /*RIQUAIRE, RUNTEST*/
+
 typedef struct node
 {
     void *data;
     struct node *next;
 } node_t;
-
-
 node_t *Flip(node_t *head);
-
 int HasLoop(const node_t *head);
-
 node_t *FindIntersection(node_t *head_1, node_t *head_2);
 
 node_t *Flip(node_t *head)
@@ -39,7 +36,6 @@ static void PrintIntList(node_t *head)
 	}
 	printf("%lu\n",(size_t)head->data);
 }	
-	
 int HasLoop(const node_t *head)
 {
 	const node_t *slow_runner = head;
@@ -66,7 +62,6 @@ static size_t CountNodes(node_t *head)
 	} while (head != NULL);
 	return count;
 }
-
 static node_t *MoveForward(node_t *node, size_t steps)
 {
 	while (0 < steps--)
@@ -75,7 +70,6 @@ static node_t *MoveForward(node_t *node, size_t steps)
 	}
 	return node;
 }
-
 node_t *FindIntersection(node_t *head_1, node_t *head_2)
 {
 	size_t c1 = CountNodes(head_1);
@@ -95,7 +89,6 @@ node_t *FindIntersection(node_t *head_1, node_t *head_2)
 	}
 	return head_1;
 }
-
 static test_status_t TestHasLoop()
 {
 	
@@ -203,6 +196,7 @@ static test_status_t TestFindIntersection()
 }
 static test_status_t TestReverseList()
 {
+	node_t *node_dummy = NULL;
 	node_t *node1 = (node_t *)malloc(sizeof(node_t));
 	node_t *node2 = (node_t *)malloc(sizeof(node_t));
 	node_t *node3 = (node_t *)malloc(sizeof(node_t));
@@ -223,20 +217,26 @@ static test_status_t TestReverseList()
 	node4->next = node5;
 	node5->next = node6;
 	node6->next = NULL;
+
+	node_dummy = node1;
+
 	PrintIntList(node1);
 	node1 = Flip(node1);
 	PrintIntList(node1);
+
+	free(node_dummy);
+	free(node2);
+	free(node3);
+	free(node4);
+	free(node5);
+	free(node6);
+
 	return PASSED;
 }
-
-
-
-
 int main()
 {
 	RUNTEST(TestHasLoop);
 	RUNTEST(TestFindIntersection);
 	RUNTEST(TestReverseList);
-
 	return 0;
 }
