@@ -200,7 +200,7 @@ int SlistForEach(Slist_iter_t from, Slist_iter_t to, action_func_t action_func, 
 	return res;
 }
 
-Slist_t *SlistAppend(Slist_t *first, Slist_t *last)
+void SlistAppend(Slist_t *first, Slist_t *last)
 {
 	void *address_of_first_list = first->tail->value;
 	first->tail->next = last->head;
@@ -208,5 +208,4 @@ Slist_t *SlistAppend(Slist_t *first, Slist_t *last)
 	last->tail->value = address_of_first_list;
 	first->tail = last->tail;
 	free(last);
-	return first;
 }

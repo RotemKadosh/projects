@@ -47,6 +47,7 @@ void QDestroy(Queue_t *queue)
 {
 	assert(NULL != queue);
 	SlistDestroy(queue->list);
+	queue->list = NULL;
 	free(queue);
 	queue = NULL;
 }
@@ -67,6 +68,6 @@ void QDequeue(Queue_t *queue)
 }
 void QAppend(Queue_t *dest, Queue_t *src)
 {
-	dest->list = SlistAppend(dest->list, src->list);
+	SlistAppend(dest->list, src->list);
 	free(src);
 }

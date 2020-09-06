@@ -170,6 +170,6 @@ int SlistForEach(Slist_iter_t from, Slist_iter_t to,
 *@return
 *pointer to the new slist, NULL on error
 */
-Slist_t *SlistAppend(Slist_t *first, Slist_t *last);
+void SlistAppend(Slist_t *first, Slist_t *last);
 
 #endif /*__SLIST_H__*/
