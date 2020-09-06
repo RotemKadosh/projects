@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-ansi -pedantic-errors -Wall -Wextra -g
 DEPS = ../slist/slist.h queue.h 
 OBJ = ../slist/slist.o queue.o queue_test.o 
-.PHONY = run cgdb vlg clean
+.PHONY = run cgdb vlg clean ar
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS) 

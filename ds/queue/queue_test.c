@@ -92,11 +92,11 @@ static test_status_t TestQDequeue()
 static test_status_t TestQIsEmpty()
 {
 	Queue_t *queue = QCreate();
-	REQUIRE(1 == QueueIsEmpty(queue));
+	REQUIRE(1 == QIsEmpty(queue));
 	QEnqueue(queue, (void *)10);
-	REQUIRE(0 == QueueIsEmpty(queue));
+	REQUIRE(0 == QIsEmpty(queue));
 	QDequeue(queue);
-	REQUIRE(1 == QueueIsEmpty(queue));
+	REQUIRE(1 == QIsEmpty(queue));
 	QDestroy(queue);
 	return PASSED;
 }

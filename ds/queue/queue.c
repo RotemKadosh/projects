@@ -2,6 +2,8 @@
 #include <assert.h>/* assert*/
 #include "../slist/slist.h"  /*slist functions*/
 #include "queue.h"
+#define FAIL (-1)
+#define SUCCESS (0)
 
 struct queue
 {
@@ -27,12 +29,14 @@ int QEnqueue(Queue_t *queue, void *data)
 {	
 	Slist_iter_t ans = NULL;
 	assert(NULL != queue);
+
 	ans =  SlistInsert(SlistEnd(queue->list),data);
 	if(SlistEnd(queue->list) == ans)
 	{
-		return -1;
+		return FAIL;
 	}
-	return 0;
+
+	return SUCCESS;
 }
 void *QPeek(const Queue_t *queue)
 {
@@ -51,10 +55,10 @@ size_t QSize(const Queue_t *queue)
 	assert(NULL != queue);
 	return SlistCount(queue->list);
 }
-int QueueIsEmpty(const Queue_t *queue)
+int QIsEmpty(const Queue_t *queue)
 {
 	assert(NULL != queue);
-	return (SlistBegin(queue->list) == SlistEnd(queue->list));
+	return SlistIsSameIter(SlistBegin(queue->list), SlistEnd(queue->list));
 }
 void QDequeue(Queue_t *queue)
 {

@@ -43,7 +43,7 @@ size_t QSize(const Queue_t *queue);
 *@return
 *1 if empty, 0 if not
 */
-int QueueIsEmpty(const Queue_t *queue);
+int QIsEmpty(const Queue_t *queue);
 
 /*DESCRIPTION:
 * pushes an element to the end of the queue.
