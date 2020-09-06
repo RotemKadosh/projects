@@ -162,4 +162,14 @@ Slist_iter_t SlistFind(Slist_iter_t from, Slist_iter_t to,
 int SlistForEach(Slist_iter_t from, Slist_iter_t to, 
 									action_func_t action_func, void *param);
 
+/*DESCRIPTION: 
+*append to slist into one
+*@param
+*first - pointer to slist of elements
+*last - pointer to slist of elements
+*@return
+*pointer to the new slist, NULL on error
+*/
+Slist_t *SlistAppend(Slist_t *first, Slist_t *last);
+
 #endif /*__SLIST_H__*/

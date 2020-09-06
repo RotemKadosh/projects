@@ -12,6 +12,7 @@ static test_status_t TestSlistCount();
 static test_status_t TestSlistFind();
 static test_status_t TestSlistGetAndSetData();
 static test_status_t TestSlistForEach();
+static test_status_t TestSlistAppend();
 
 int main()
 {
@@ -23,6 +24,7 @@ int main()
 	RUNTEST(TestSlistFind);
 	RUNTEST(TestSlistGetAndSetData);
 	RUNTEST(TestSlistForEach);
+	RUNTEST(TestSlistAppend);
 	return 0;
 }
 
@@ -52,7 +54,9 @@ static test_status_t TestSlistRemove()
 	where = SlistInsert(where,(void *)8);
 	where = SlistInsert(where,(void *)8);
 	where = SlistInsert(where,(void *)8);
-	where = SlistInsert(where,(void *)8);
+	where = SlistInsert(where,(void *)10);
+
+
 	REQUIRE(4 == SlistCount(slist));
 	where = SlistRemove(where);
 	REQUIRE(3 == SlistCount(slist));
@@ -168,5 +172,25 @@ static test_status_t TestSlistForEach()
 	SlistForEach(SlistBegin(slist), SlistEnd(slist) , PrintIntList, param);
 	SlistDestroy(slist);
 	return PASSED;
+}
+static test_status_t TestSlistAppend()
+{
+	size_t size_before = 0;
+	Slist_t *last = NULL;
+	Slist_t *first = SlistCreate();
+	SlistInsert(SlistBegin(first),(void *)8);
+	SlistInsert(SlistBegin(first),(void *)8);
+	SlistInsert(SlistBegin(first),(void *)8);
+	SlistInsert(SlistBegin(first),(void *)8);
+	last = SlistCreate();
+	SlistInsert(SlistBegin(last),(void *)7);
+	SlistInsert(SlistBegin(last),(void *)7);
+	SlistInsert(SlistBegin(last),(void *)7);
+	SlistInsert(SlistBegin(last),(void *)7);
+	size_before = SlistCount(first) + SlistCount(last);
+	SlistAppened(first, last);
+	REQUIRE(size_before == SlistCount(first));
+	SlistDestroy(first);
 
+	return PASSED;
 }
