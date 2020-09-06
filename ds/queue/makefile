@@ -22,6 +22,9 @@ vlg: a.out
 ar: 
 	ar rcs queue.ar $(OBJ) $(DEPS)
 
+sl:
+	ln -s ~/git/ds/queue/queue.h ~/git/ds/include
+
 clean: 
 	rm -f *.o *.out 
 
