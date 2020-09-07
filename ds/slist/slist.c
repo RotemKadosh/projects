@@ -200,12 +200,23 @@ int SlistForEach(Slist_iter_t from, Slist_iter_t to, action_func_t action_func, 
 	return res;
 }
 
-void SlistAppend(Slist_t *first, Slist_t *last)
+void SlistAppend(Slist_t *dest, Slist_t *src)
 {
-	void *address_of_first_list = first->tail->value;
-	first->tail->next = last->head;
-	SlistRemove(SlistEnd(first));;
-	last->tail->value = address_of_first_list;
-	first->tail = last->tail;
-	free(last);
+    if (0 == SlistCount(src))
+    {
+        return;
+    }
+    /*dest->tail => src->head*/
+    dest->tail->next = src->head->next;
+    dest->tail->value = src->head->value;
+
+    /*dest->tail update*/
+    dest->tail = src->tail;
+    dest->tail->value = (void *)dest;
+
+    /*src update*/
+    src->head->next = NULL;
+    src->head->value = (void *)src;
+    src->tail = src->head;
+
 }

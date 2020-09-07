@@ -110,25 +110,23 @@ static test_status_t TestQAppend()
 
 	QEnqueue(first, (void *)1);
 	QEnqueue(first, (void *)2);
-	QEnqueue(first, (void *)3);
-	QEnqueue(first, (void *)4);
-	QEnqueue(first, (void *)5);
 
 	QEnqueue(last, (void *)1);
 	QEnqueue(last, (void *)2);
-	QEnqueue(last, (void *)3);
-	QEnqueue(last, (void *)4);
-	QEnqueue(last, (void *)5);
 
 	combine = QSize(first) + QSize(last);
 
 	QAppend(first, last);
-
 	REQUIRE(QSize(first) == combine);
-	QDequeue(first);
-	REQUIRE(!(QSize(first) == combine));
+	
+	/*(last is empty now)*/
+	QAppend(first, last);
+	REQUIRE(0 == QEnqueue(first, (void *)1)) ;
+	REQUIRE(0 == QEnqueue(first, (void *)4)) ;
+	REQUIRE(0 == QEnqueue(last, (void *)2)) ;
+	REQUIRE(0 == QEnqueue(last, (void *)3)) ;
 	QDestroy(first);
-
+	QDestroy(last);
 
 	return PASSED;
 }

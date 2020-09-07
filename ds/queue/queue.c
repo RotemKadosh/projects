@@ -21,7 +21,7 @@ Queue_t *QCreate(void)
 	if(NULL == q->list)
 	{
 		free(q);
-		return NULL;
+		q = NULL;
 	}
 	return q;
 }
@@ -29,7 +29,6 @@ int QEnqueue(Queue_t *queue, void *data)
 {	
 	Slist_iter_t ans = NULL;
 	assert(NULL != queue);
-
 	ans =  SlistInsert(SlistEnd(queue->list),data);
 	if(SlistEnd(queue->list) == ans)
 	{
@@ -68,6 +67,7 @@ void QDequeue(Queue_t *queue)
 }
 void QAppend(Queue_t *dest, Queue_t *src)
 {
+	assert(NULL != dest);
+	assert(NULL != src);
 	SlistAppend(dest->list, src->list);
-	free(src);
 }
