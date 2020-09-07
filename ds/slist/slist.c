@@ -199,10 +199,9 @@ int SlistForEach(Slist_iter_t from, Slist_iter_t to, action_func_t action_func, 
 	}
 	return res;
 }
-
 void SlistAppend(Slist_t *dest, Slist_t *src)
 {
-    if (0 == SlistCount(src))
+ 	if (SlistIsSameIter(SlistEnd(src), SlistBegin(src)))
     {
         return;
     }
@@ -214,7 +213,7 @@ void SlistAppend(Slist_t *dest, Slist_t *src)
     dest->tail = src->tail;
     dest->tail->value = (void *)dest;
 
-    /*src update*/
+    /*src update => to empty*/
     src->head->next = NULL;
     src->head->value = (void *)src;
     src->tail = src->head;

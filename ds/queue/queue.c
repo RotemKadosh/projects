@@ -4,6 +4,7 @@
 #include "queue.h"
 #define FAIL (-1)
 #define SUCCESS (0)
+/*approved by may*/
 
 struct queue
 {
