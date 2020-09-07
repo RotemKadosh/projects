@@ -27,6 +27,7 @@ Vector_t *VectorCreate(size_t capacity)
 	vec->items = (void **)malloc(capacity * sizeof(void *));
 	if(NULL == vec->items)
 	{
+		free(vec);
 		return NULL;
 	}
 
@@ -87,12 +88,14 @@ void VectorPopBack(Vector_t *vector)
 }
 int VectorReserve(Vector_t *vector, size_t new_capacity)
 {
+	void ** real = NULL;
 	assert(NULL != vector);
-	vector->items = (void **)realloc( vector->items , new_capacity * sizeof(void *));
-	if(NULL == vector->items)
+	real = (void **)realloc( vector->items , new_capacity * sizeof(void *));
+	if(NULL == real)
 	{
 		return FAIL;
 	}
+	vector->items = real;
 	vector->capacity = new_capacity;
 	return SUCCESS;
 }
