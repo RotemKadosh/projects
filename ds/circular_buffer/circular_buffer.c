@@ -67,9 +67,9 @@ size_t CBufferFreeSpace(const CBuffer_t *cbuffer)
 }
 static size_t IdxUpdate(const size_t idx, const size_t steps, const size_t capacity)
 {
+
 	return (idx + steps) % (capacity + EXTRA_SPACE);
 } 
-
 ssize_t CBufferWrite(CBuffer_t *cbuffer, const void *input, size_t count_bytes)
 {	
 	size_t write = 0;
@@ -91,12 +91,11 @@ ssize_t CBufferWrite(CBuffer_t *cbuffer, const void *input, size_t count_bytes)
 	bytes_to_write -= bytes_until_end;
 	write = IdxUpdate(write,  bytes_until_end , capacity);
 
-	memcpy(cbuffer->bytes_array + write, input, bytes_to_write);
+	memcpy(cbuffer->bytes_array + write, (char *)input + bytes_until_end, bytes_to_write);
 	cbuffer->write = IdxUpdate(write,  bytes_to_write , capacity);
 
 	return bytes_to_write + bytes_until_end;
 }
-
 ssize_t CBufferRead(CBuffer_t *cbuffer, void *output, size_t count_bytes)
 {
 	size_t read = 0;
@@ -119,7 +118,7 @@ ssize_t CBufferRead(CBuffer_t *cbuffer, void *output, size_t count_bytes)
 	bytes_to_read -= bytes_until_end;
 	read = IdxUpdate(read,  bytes_until_end , capacity);
 
-	memcpy(output, cbuffer->bytes_array + read, bytes_to_read);
+	memcpy((char *)output + bytes_until_end, cbuffer->bytes_array + read, bytes_to_read);
 	cbuffer->read = IdxUpdate(read, bytes_to_read, capacity);
 
 	return bytes_to_read + bytes_until_end;
