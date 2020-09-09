@@ -6,9 +6,11 @@
 
 #define MIN(x,y) x > y ? y : x
 #define EXTRA_SPACE (1)
-
+#define OFFSET_OF(struct_t, member) ((size_t)&(((struct_t *)0)->member))
 
 static size_t IdxUpdate(const size_t idx, const size_t steps, const size_t capacity);
+
+/*aproved by may*/
 
 typedef struct CBuffer
 {
@@ -22,15 +24,12 @@ typedef struct CBuffer
 CBuffer_t *CBufferCreate(size_t capacity)
 {
 	CBuffer *cbuf = NULL;
-
 	assert(capacity > 0);
-
-	cbuf = (CBuffer *)malloc(sizeof(CBuffer) + (sizeof(char) * capacity) - (sizeof(size_t) - sizeof(char)));
+	cbuf = (CBuffer_t *)malloc(OFFSET_OF(CBuffer_t, bytes_array) + sizeof(char) * (capacity + EXTRA_SPACE));
 	if(NULL == cbuf)
 	{
 		return NULL;
 	}
-
 	cbuf->write = 0;
 	cbuf->read = 0;
 	cbuf->capacity = capacity;
@@ -58,7 +57,7 @@ size_t CBufferSize(const CBuffer_t *cbuffer)
 int CBufferIsEmpty(const CBuffer_t *cbuffer)
 {
 	assert(NULL != cbuffer);
-	return (cbuffer->write == cbuffer->read); 
+	return (0 == CBufferSize(cbuffer)); 
 }
 size_t CBufferFreeSpace(const CBuffer_t *cbuffer)
 {
