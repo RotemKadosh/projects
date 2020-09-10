@@ -45,14 +45,7 @@ void CBufferDestroy(CBuffer_t *cbuffer)
 size_t CBufferSize(const CBuffer_t *cbuffer)
 {
 	assert(NULL != cbuffer);
-	if(cbuffer->write >= cbuffer->read)
-	{
-		return (cbuffer->write - cbuffer->read);
-	}
-	else
-	{
-		return cbuffer->capacity + EXTRA_SPACE - (cbuffer->read - cbuffer->write) ;
-	}
+	return (cbuffer->write - cbuffer->read + cbuffer->capacity + EXTRA_SPACE) % (cbuffer->capacity + EXTRA_SPACE) ;
 }
 int CBufferIsEmpty(const CBuffer_t *cbuffer)
 {
