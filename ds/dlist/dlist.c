@@ -1,6 +1,7 @@
 #include <stdlib.h>/*malloc, free*/
 #include <assert.h>/*assert*/
 #include "dlist.h"
+/*approved by moshe*/
 
 #define SUCCESS (0)
 #define FAIL (-1)
@@ -244,6 +245,8 @@ Dlist_iter_t DlistSplice(Dlist_iter_t where, Dlist_iter_t src_from, Dlist_iter_t
 }
 static void ConectNodes(dlist_node_t *first, dlist_node_t *second)
 {
+	assert(NULL != first);
+	assert(NULL != second);
 	first->next = second;
 	second->prev = first;
 }

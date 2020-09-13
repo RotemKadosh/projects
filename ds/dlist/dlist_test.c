@@ -50,11 +50,8 @@ int main()
 	RUNTEST(DlistMultiFindTest);
 	RUNTEST(DlistForEachTest);
 	RUNTEST(DlistSpliceTest);
-
-
-return 0; 
+	return 0; 
 }
-
 int UpDataByPram(void *data, void *param)
 {
 	*(int *)data += *(int *)param;
@@ -366,7 +363,6 @@ static test_status_t DlistFindTest()
 	DlistDestroy(list);
 	return PASSED;
 }
-
 static test_status_t DlistMultiFindTest()
 {
 	int a = 1;
@@ -388,9 +384,6 @@ static test_status_t DlistMultiFindTest()
 	DlistDestroy(dest);
 	return PASSED;
 }
-
-
-
 static test_status_t DlistSpliceTest()
 {
 
