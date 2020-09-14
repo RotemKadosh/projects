@@ -1,14 +1,15 @@
 CC=gcc
 CFLAGS=-ansi -pedantic-errors -Wall -Wextra -g
-DEPS = dlist.h
-OBJ = dlist.o dlist_test.o
+DEPS = sorted_list.h
+OBJ = sorted_list.o sorted_list_test.o 
 .PHONY = run cgdb vlg clean
+TAG = ../dlist/dlist.o
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS) 
 						
 a.out: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS)  
+	$(CC) -o $@ $^ $(TAG) $(CFLAGS)  
 
 run: a.out
 	./a.out
@@ -20,10 +21,10 @@ vlg: a.out
 	valgrind --leak-check=yes --track-origins=yes ./a.out
 
 ar: 
-	ar rcs dlist.ar $(OBJ) $(DEPS)
+	ar rcs sorted_list.ar $(OBJ) $(DEPS)
 
 sl:
-	ln -s ~/git/ds/dlist/dlist.h ~/git/ds/include
+	ln -s ~/git/ds/sorted_list/sorted_list.h ~/git/ds/include
 
 clean: 
 	rm -f *.o *.out 

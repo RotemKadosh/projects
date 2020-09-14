@@ -199,7 +199,7 @@ Dlist_iter_t DlistFind(Dlist_iter_t from, Dlist_iter_t to, is_match_func_t is_ma
 	Dlist_iter_t runner = from;
 	assert(NULL != from);
 
-	while (!DlistIsSameIter(runner, to) && !is_match_func(DlistGetData(runner), data_to_compare))
+	while (!DlistIsSameIter(runner, to) &&( 0 >=is_match_func(DlistGetData(runner), data_to_compare)))
 	{
 		runner = DlistNext(runner);
 	}
