@@ -33,7 +33,7 @@ int main()
 	RUNTEST(StageSixTest);
 
 	RUNTEST(StageSevenTest);
-	return PASSED; 
+	return 0; 
 }
 
 int UpDataByPram(void *data, void *param)
@@ -43,7 +43,7 @@ int UpDataByPram(void *data, void *param)
 }
 int compare(const void *data,const void *date_to_compare)
 {
-	return ( *(int *)data - *(int *)date_to_compare);
+	return ( *(int *)date_to_compare - *(int *)data);
 }
 
 
@@ -240,7 +240,7 @@ static test_status_t StageSixTest(void)
 	SortedListInsert(list, (void *)&d);
 	SortedListInsert(list, (void *)&e);
 	SortedListForEach(SortedListBegin(list), SortedListEnd(list), UpDataByPram,(void *)&to_add);
-	REQUIRE(SortedListIsSameIter(iter, SortedListFindIf(list, SortedListBegin(list), SortedListEnd(list), match4, (void *)&to_add )));
+	REQUIRE(SortedListIsSameIter(iter, SortedListFindIf(list, SortedListBegin(list), SortedListEnd(list), compare, (void *)&c )));
 	SortedListDestroy(list);	
 	a = 1;
 	b = 2;
@@ -257,19 +257,9 @@ static test_status_t StageSixTest(void)
 	SortedListForEach(SortedListBegin(list), SortedListEnd(list), UpDataByPram,(void *)&to_add);
 	REQUIRE(SortedListIsSameIter(iter, SortedListFind(list, SortedListBegin(list), SortedListEnd(list),(void *)&c)));
 	SortedListDestroy(list);
-
-
 	return PASSED;
 }
-int match4(const void *data,const void *date_to_compare)
-{
-	(void)date_to_compare;
-	if(*(int *)data == 4)
-	{
-		return 1;
-	}
-	return 0;
-}
+
 static test_status_t StageSevenTest(void)
 {/*create, isSameiter, getData, begin, end, insert*/
 /*destroy prev next isempty*/
@@ -375,7 +365,6 @@ static test_status_t StageSevenTest(void)
 	runner = SortedListNext(runner);
 	REQUIRE(TRUE == SortedListIsSameIter(runner, SortedListEnd(dest)));
 	REQUIRE(TRUE == SortedListIsEmpty(src));
-
 	SortedListDestroy(src);
 	SortedListDestroy(dest);
 	return PASSED;
