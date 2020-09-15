@@ -224,6 +224,22 @@ static test_status_t StageSixTest(void)
 	SortedListForEach(SortedListBegin(list), SortedListEnd(list), UpDataByPram,(void *)&to_add);
 	REQUIRE(SortedListIsSameIter(iter, SortedListFindIf(list, SortedListBegin(list), SortedListEnd(list), match4, (void *)&to_add )));
 	SortedListDestroy(list);	
+	a = 1;
+	b = 2;
+	c = 3;
+	d = 4;
+	e = 5;
+	to_add = 1;
+	list = SortedListCreate(compare);
+	SortedListInsert(list, (void *)&a);
+	SortedListInsert(list, (void *)&b);
+	iter = SortedListInsert(list, (void *)&c);
+	SortedListInsert(list, (void *)&d);
+	SortedListInsert(list, (void *)&e);
+	SortedListForEach(SortedListBegin(list), SortedListEnd(list), UpDataByPram,(void *)&to_add);
+	REQUIRE(SortedListIsSameIter(iter, SortedListFind(list, SortedListBegin(list), SortedListEnd(list),(void *)&c)));
+	SortedListDestroy(list);
+
 
 	return PASSED;
 }

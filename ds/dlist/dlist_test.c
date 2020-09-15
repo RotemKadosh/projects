@@ -357,9 +357,9 @@ static test_status_t DlistFindTest()
 	DlistPushFront(list,(void *)&b);
 	DlistPushFront(list,(void *)&c);
 	DlistPushFront(list,(void *)&d);
-	REQUIRE(4 == *(int *)DlistGetData(DlistFind(DlistBegin(list), DlistEnd(list),MatchInt, &d )));
-	REQUIRE(3 == *(int *)DlistGetData(DlistFind(DlistBegin(list), DlistEnd(list),MatchInt, &c )));
-	REQUIRE(2 == *(int *)DlistGetData(DlistFind(DlistBegin(list), DlistEnd(list),MatchInt, &b )));
+	REQUIRE(d == *(int *)DlistGetData(DlistFind(DlistBegin(list), DlistEnd(list), MatchInt, &d )));
+	REQUIRE(c == *(int *)DlistGetData(DlistFind(DlistBegin(list), DlistEnd(list), MatchInt, &c )));
+	REQUIRE(b == *(int *)DlistGetData(DlistFind(DlistBegin(list), DlistEnd(list), MatchInt, &b )));
 	DlistDestroy(list);
 	return PASSED;
 }

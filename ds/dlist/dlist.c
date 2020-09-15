@@ -5,6 +5,7 @@
 
 #define SUCCESS (0)
 #define FAIL (-1)
+#define FALSE (0)
 
 typedef struct dlist_node dlist_node_t;
 
@@ -193,17 +194,19 @@ int DlistForEach(Dlist_iter_t from, Dlist_iter_t to, action_func_t action_func, 
 	}
 	return action_status;
 }
+
 Dlist_iter_t DlistFind(Dlist_iter_t from, Dlist_iter_t to, is_match_func_t is_match_func, const void *data_to_compare)
 {
 	Dlist_iter_t runner = from;
 	assert(NULL != from);
 
-	while (!DlistIsSameIter(runner, to) && (0 > is_match_func(DlistGetData(runner), data_to_compare)))
+	while (!DlistIsSameIter(runner, to) && (!is_match_func(DlistGetData(runner), data_to_compare)))
 	{
 		runner = DlistNext(runner);
 	}
 	return runner;
 }
+
 int DlistMultiFind(Dlist_t *dest, Dlist_iter_t from, Dlist_iter_t to, is_match_func_t is_match_func, const void *data_to_compare)
 {
 	Dlist_iter_t runner = from;

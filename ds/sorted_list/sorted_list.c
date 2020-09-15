@@ -1,6 +1,5 @@
 #include <stdlib.h>/*malloc, free*/
 #include <assert.h>/*assert*/
-#include <stdio.h>/*for debug - to delete*/
 
 #include "dlist.h" /* Dlist_t and all its functions*/
 #include "sorted_list.h"
@@ -12,8 +11,8 @@
 /*----------FUNCTION DECLERATION---------------------*/
 static sorted_list_iter_t InitSortListIter(const sorted_list_t *list, Dlist_iter_t iter);
 
-static void printlist(sorted_list_t *list);
 
+static int FindPlaceToInsert(const void *data, const void *data_to_compare);
 /*-----------------------STRUCTS--------------------------*/
 
 struct sorted_list
@@ -100,17 +99,33 @@ sorted_list_iter_t SortedListInsert(sorted_list_t *list, void *data)
 {
 	sorted_list_iter_t where;
 	assert(NULL != list);
-	where = SortedListFind(list, SortedListBegin(list), SortedListEnd(list), data);
+	where = SortedListFindIf(list, SortedListBegin(list), SortedListEnd(list), FindPlaceToInsert,data);
 	where.internal_iter = DlistInsert(list->dlist, where.internal_iter, data);
 	return where;
 }
 
+sorted_list_iter_t SortedListFindIf(sorted_list_t *list, sorted_list_iter_t from, sorted_list_iter_t to,
+					compare_func_t search_func, const void *data_to_compare)
+{
+	
+	assert(NULL != list);
+	
+	return InitSortListIter(list, DlistFind(from.internal_iter , to.internal_iter , search_func, data_to_compare));
+}
+
+static int FindPlaceToInsert(const void *data, const void *data_to_compare)
+{
+	return (*(int *)data - *(int *)data_to_compare > 0);
+}
+
 sorted_list_iter_t SortedListFind(sorted_list_t *list, sorted_list_iter_t from, sorted_list_iter_t to, const void *data_to_compare)
 {
-	sorted_list_iter_t where;
 	assert(NULL != list);
-	where = InitSortListIter(list, DlistFind(from.internal_iter, to.internal_iter , list->cmp, data_to_compare));
-	return where;
+	while(!SortedListIsSameIter(from, to) && 0 != list->cmp(SortedListGetData(from), data_to_compare))
+	{
+		from = SortedListNext(from);
+	}
+	return from;
 }
 
 sorted_list_iter_t SortedListRemove(sorted_list_t *list, sorted_list_iter_t iter)
@@ -162,14 +177,6 @@ void *SortedListGetData(const sorted_list_iter_t iter)
 	return DlistGetData(iter.internal_iter);
 }
 
-sorted_list_iter_t SortedListFindIf(sorted_list_t *list, sorted_list_iter_t from, sorted_list_iter_t to,
-					compare_func_t search_func, const void *data_to_compare)
-{
-	
-	assert(NULL != list);
-	
-	return InitSortListIter(list, DlistFind(from.internal_iter , to.internal_iter , search_func, data_to_compare));
-}
 
 
 int SortedListForEach(sorted_list_iter_t from, sorted_list_iter_t to, 
@@ -188,12 +195,14 @@ sorted_list_t *SortedListMerge(sorted_list_t *dest, sorted_list_t *src)
 	assert(NULL != dest);
 	assert(NULL != src);
 	src_from = SortedListBegin(src);
-	where = SortedListFind(dest, SortedListBegin(dest), SortedListEnd(dest), SortedListGetData(src_from));
+
+	where = SortedListFindIf(dest, SortedListBegin(dest), SortedListEnd(dest), FindPlaceToInsert, SortedListGetData(src_from));
+	
 	while (!SortedListIsEmpty(src))
 	{	
-		src_to = SortedListFind(src, src_from, SortedListEnd(src), SortedListGetData(where));
+		src_to = SortedListFindIf(src, src_from, SortedListEnd(src), FindPlaceToInsert, SortedListGetData(where));
 		src_from.internal_iter = DlistSplice(where.internal_iter, src_from.internal_iter, src_to.internal_iter);
-		where = SortedListFind(dest, SortedListBegin(dest), SortedListEnd(dest), SortedListGetData(src_from));
+		where = SortedListFindIf(dest, SortedListBegin(dest), SortedListEnd(dest), FindPlaceToInsert, SortedListGetData(src_from));
 		
 	}
 
