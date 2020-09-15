@@ -1,5 +1,6 @@
 #include <stdlib.h>/*malloc, free*/
 #include <assert.h>/*assert*/
+#include <stdio.h>/*for debug - to delete*/
 
 #include "dlist.h" /* Dlist_t and all its functions*/
 #include "sorted_list.h"
@@ -9,10 +10,9 @@
 
 
 /*----------FUNCTION DECLERATION---------------------*/
+static sorted_list_iter_t InitSortListIter(const sorted_list_t *list, Dlist_iter_t iter);
 
-
-
-/*-----------------------TYPEDEF--------------------------*/
+static void printlist(sorted_list_t *list);
 
 /*-----------------------STRUCTS--------------------------*/
 
@@ -23,17 +23,7 @@ struct sorted_list
 };
 
 /*--------------------------------------------------------*/
-/*
-static Dlist_iter_t GetDlistIter(sorted_list_iter_t iter) 
-{
-	#ifdef NDEBUG
-    	return (Dlist_iter_t)iter;
-    #else
-    	return iter.internal_iter;
-    #endif
 
-}
-*/
 static sorted_list_iter_t InitSortListIter(const sorted_list_t *list, Dlist_iter_t iter)
 {
 	#ifdef NDEBUG
@@ -110,7 +100,7 @@ sorted_list_iter_t SortedListInsert(sorted_list_t *list, void *data)
 {
 	sorted_list_iter_t where;
 	assert(NULL != list);
-	where = SortedListFind(list,SortedListBegin(list),SortedListEnd(list), data);
+	where = SortedListFind(list, SortedListBegin(list), SortedListEnd(list), data);
 	where.internal_iter = DlistInsert(list->dlist, where.internal_iter, data);
 	return where;
 }
@@ -153,12 +143,14 @@ void SortedListPopBack(sorted_list_t *list)
 
 sorted_list_iter_t SortedListNext(sorted_list_iter_t iter)
 {
+
 	iter.internal_iter = DlistNext(iter.internal_iter);
 	return iter;
 }
 
 sorted_list_iter_t SortedListPrev(sorted_list_iter_t iter)
 {
+
 	iter.internal_iter = DlistPrev(iter.internal_iter);
 	return iter;
 }
@@ -166,6 +158,7 @@ sorted_list_iter_t SortedListPrev(sorted_list_iter_t iter)
 
 void *SortedListGetData(const sorted_list_iter_t iter)
 {
+
 	return DlistGetData(iter.internal_iter);
 }
 
@@ -182,8 +175,29 @@ sorted_list_iter_t SortedListFindIf(sorted_list_t *list, sorted_list_iter_t from
 int SortedListForEach(sorted_list_iter_t from, sorted_list_iter_t to, 
 									action_func_t action_func, void *param)
 {
+
 	return DlistForEach(from.internal_iter, to.internal_iter, action_func, param);
 }
 
+
+sorted_list_t *SortedListMerge(sorted_list_t *dest, sorted_list_t *src)
+{
+	sorted_list_iter_t src_from;
+	sorted_list_iter_t src_to;
+	sorted_list_iter_t where;
+	assert(NULL != dest);
+	assert(NULL != src);
+	src_from = SortedListBegin(src);
+	where = SortedListFind(dest, SortedListBegin(dest), SortedListEnd(dest), SortedListGetData(src_from));
+	while (!SortedListIsEmpty(src))
+	{	
+		src_to = SortedListFind(src, src_from, SortedListEnd(src), SortedListGetData(where));
+		src_from.internal_iter = DlistSplice(where.internal_iter, src_from.internal_iter, src_to.internal_iter);
+		where = SortedListFind(dest, SortedListBegin(dest), SortedListEnd(dest), SortedListGetData(src_from));
+		
+	}
+
+	return dest;
+}
 
 

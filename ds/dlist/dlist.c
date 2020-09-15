@@ -115,7 +115,6 @@ int DlistIsEmpty(const Dlist_t *list)
 Dlist_iter_t DlistNext(Dlist_iter_t iter)
 {
 	assert(NULL != iter);
-	assert(NULL != iter->next);
 	return iter->next;
 }
 Dlist_iter_t DlistPrev(Dlist_iter_t iter)
@@ -199,7 +198,7 @@ Dlist_iter_t DlistFind(Dlist_iter_t from, Dlist_iter_t to, is_match_func_t is_ma
 	Dlist_iter_t runner = from;
 	assert(NULL != from);
 
-	while (!DlistIsSameIter(runner, to) &&( 0 >=is_match_func(DlistGetData(runner), data_to_compare)))
+	while (!DlistIsSameIter(runner, to) && (0 > is_match_func(DlistGetData(runner), data_to_compare)))
 	{
 		runner = DlistNext(runner);
 	}
@@ -238,9 +237,6 @@ Dlist_iter_t DlistSplice(Dlist_iter_t where, Dlist_iter_t src_from, Dlist_iter_t
 	ConectNodes(DlistPrev(src_to), where);
 	/*cut out from old list*/
 	ConectNodes(form_prev, src_to);
-
-	
-
 	return	src_to;
 }
 static void ConectNodes(dlist_node_t *first, dlist_node_t *second)
