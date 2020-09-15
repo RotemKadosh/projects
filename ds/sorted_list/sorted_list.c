@@ -1,11 +1,11 @@
 #include <stdlib.h>/*malloc, free*/
 #include <assert.h>/*assert*/
 
-#include "dlist.h" /* Dlist_t and all its functions*/
+#include "dlist.h" /* Dlist functions*/
 #include "sorted_list.h"
 
 /*------------------------MACRO---------------------------*/
-
+#define ZERO (0)
 
 
 /*----------FUNCTION DECLERATION---------------------*/
@@ -115,13 +115,13 @@ sorted_list_iter_t SortedListFindIf(sorted_list_t *list, sorted_list_iter_t from
 
 static int FindPlaceToInsert(const void *data, const void *data_to_compare)
 {
-	return (*(int *)data - *(int *)data_to_compare > 0);
+	return (*(int *)data - *(int *)data_to_compare > ZERO);
 }
 
 sorted_list_iter_t SortedListFind(sorted_list_t *list, sorted_list_iter_t from, sorted_list_iter_t to, const void *data_to_compare)
 {
 	assert(NULL != list);
-	while(!SortedListIsSameIter(from, to) && 0 != list->cmp(SortedListGetData(from), data_to_compare))
+	while(!SortedListIsSameIter(from, to) && ZERO != list->cmp(SortedListGetData(from), data_to_compare))
 	{
 		from = SortedListNext(from);
 	}

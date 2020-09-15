@@ -48,7 +48,7 @@ int compare(const void *data,const void *date_to_compare)
 
 
 static test_status_t StageOneTest(void)
-{
+{/*create, isSameiter, getData, begin, end, insert*/
 	int a = 1;
 	int b = 2;
 
@@ -62,7 +62,8 @@ static test_status_t StageOneTest(void)
 	return PASSED;
 }
 static test_status_t StageTwoTest(void)
-{
+{/*create, isSameiter, getData, begin, end, insert*/
+/*destroy prev next isempty*/
 	int a = 1;
 	int b = 2;
 	sorted_list_iter_t iter;
@@ -81,7 +82,9 @@ static test_status_t StageTwoTest(void)
 	return PASSED;
 }
 static test_status_t StageThreeTest(void)
-{
+{/*create, isSameiter, getData, begin, end, insert*/
+/*destroy prev next isempty*/
+/*popfront popback*/
 	int a = 1;
 	int b = 2;
 	sorted_list_iter_t iter;
@@ -106,7 +109,10 @@ static test_status_t StageThreeTest(void)
 	return PASSED;
 }
 static test_status_t StageFourTest(void)
-{
+{/*create, isSameiter, getData, begin, end, insert*/
+/*destroy prev next isempty*/
+/*popfront popback*/
+/*remove*/
 	int a = 1;
 	int b = 2;
 	int c = 3;
@@ -147,6 +153,11 @@ static test_status_t StageFourTest(void)
 }
 static test_status_t StageFiveTest(void)
 {
+/*create, isSameiter, getData, begin, end, insert*/
+/*destroy prev next isempty*/
+/*popfront popback*/
+/*remove*/
+/*SIZE FOREACH*/
 	int a = 1;
 	int b = 2;
 	int c = 3;
@@ -207,7 +218,14 @@ static test_status_t StageFiveTest(void)
 	return PASSED;
 }
 static test_status_t StageSixTest(void)
-{
+{/*create, isSameiter, getData, begin, end, insert*/
+/*destroy prev next isempty*/
+/*popfront popback*/
+/*remove*/
+/*SIZE FOREACH*/
+/*FIND*/
+
+
 	int a = 1;
 	int b = 2;
 	int c = 3;
@@ -253,7 +271,13 @@ int match4(const void *data,const void *date_to_compare)
 	return 0;
 }
 static test_status_t StageSevenTest(void)
-{
+{/*create, isSameiter, getData, begin, end, insert*/
+/*destroy prev next isempty*/
+/*popfront popback*/
+/*remove*/
+/*SIZE FOREACH*/
+/*FIND*/
+/*MERGE*/
 	int a = 1;
 	int a1 = 1;
 	int b = 2;

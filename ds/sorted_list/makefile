@@ -20,6 +20,9 @@ cgdb: a.out
 vlg: a.out
 	valgrind --leak-check=yes --track-origins=yes ./a.out
 
+gc:
+	gcc -ansi -pedantic-errors -Wall -Wextra -DNDEBUG -O3 $(OBJ) $(DEPS) $(TAG)
+
 ar: 
 	ar rcs sorted_list.ar $(OBJ) $(DEPS)
 
