@@ -30,7 +30,7 @@ static sorted_list_iter_t InitSortListIter(const sorted_list_t *list, Dlist_iter
     	return (sorted_list_iter_t)iter;
     #else
      	sorted_list_iter_t  s_list_iter;
-     	s_list_iter.internal_iter = iter;
+     	s_list_iter.internal_itr = iter;
      	s_list_iter.list = (sorted_list_t *)list;
      	return s_list_iter;
     #endif 	
@@ -100,7 +100,7 @@ sorted_list_iter_t SortedListInsert(sorted_list_t *list, void *data)
 	sorted_list_iter_t where;
 	assert(NULL != list);
 	where = FindPlaceToInsert(list, SortedListBegin(list), SortedListEnd(list), data);
-	where.internal_iter = DlistInsert(list->dlist, where.internal_iter, data);
+	where.internal_itr = DlistInsert(list->dlist, where.internal_itr, data);
 	return where;
 }
 
@@ -142,13 +142,13 @@ sorted_list_iter_t SortedListRemove(sorted_list_t *list, sorted_list_iter_t iter
 {
 	sorted_list_iter_t next;
 	assert(NULL != list);
-	next = InitSortListIter(list, DlistRemove(list->dlist, iter.internal_iter));
+	next = InitSortListIter(list, DlistRemove(list->dlist, iter.internal_itr));
 	return next;
 }
 
 int SortedListIsSameIter(sorted_list_iter_t one, sorted_list_iter_t two)
 {
-	return DlistIsSameIter(one.internal_iter, two.internal_iter);
+	return DlistIsSameIter(one.internal_itr, two.internal_itr);
 }
 
 
@@ -169,14 +169,14 @@ void SortedListPopBack(sorted_list_t *list)
 sorted_list_iter_t SortedListNext(sorted_list_iter_t iter)
 {
 
-	iter.internal_iter = DlistNext(iter.internal_iter);
+	iter.internal_itr = DlistNext(iter.internal_itr);
 	return iter;
 }
 
 sorted_list_iter_t SortedListPrev(sorted_list_iter_t iter)
 {
 
-	iter.internal_iter = DlistPrev(iter.internal_iter);
+	iter.internal_itr = DlistPrev(iter.internal_itr);
 	return iter;
 }
 
@@ -184,7 +184,7 @@ sorted_list_iter_t SortedListPrev(sorted_list_iter_t iter)
 void *SortedListGetData(const sorted_list_iter_t iter)
 {
 
-	return DlistGetData(iter.internal_iter);
+	return DlistGetData(iter.internal_itr);
 }
 
 
@@ -193,7 +193,7 @@ int SortedListForEach(sorted_list_iter_t from, sorted_list_iter_t to,
 									action_func_t action_func, void *param)
 {
 
-	return DlistForEach(from.internal_iter, to.internal_iter, action_func, param);
+	return DlistForEach(from.internal_itr, to.internal_itr, action_func, param);
 }
 
 
@@ -211,12 +211,10 @@ sorted_list_t *SortedListMerge(sorted_list_t *dest, sorted_list_t *src)
 	while (!SortedListIsEmpty(src))
 	{	
 		src_to = FindPlaceToInsert(src, src_from, SortedListEnd(src), SortedListGetData(where));
-		src_from.internal_iter = DlistSplice(where.internal_iter, src_from.internal_iter, src_to.internal_iter);
+		src_from.internal_itr = DlistSplice(where.internal_itr, src_from.internal_itr, src_to.internal_itr);
 		where = FindPlaceToInsert(dest, SortedListBegin(dest), SortedListEnd(dest), SortedListGetData(src_from));
 		
 	}
 
 	return dest;
 }
-
-

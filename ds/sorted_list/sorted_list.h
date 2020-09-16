@@ -16,14 +16,14 @@ typedef struct sorted_list sorted_list_t;
 
 typedef struct 
 {
-    Dlist_iter_t internal_iter;
+    Dlist_iter_t internal_itr;
 } sorted_list_iter_t;
 
 #else
 
 typedef struct 
 {
-    Dlist_iter_t internal_iter;
+    Dlist_iter_t internal_itr;
     sorted_list_t *list;
 } sorted_list_iter_t;
     
