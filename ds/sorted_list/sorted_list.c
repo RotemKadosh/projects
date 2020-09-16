@@ -12,7 +12,7 @@
 static sorted_list_iter_t InitSortListIter(const sorted_list_t *list, Dlist_iter_t iter);
 
 
-static sorted_list_iter_t FindPlaceToInsert(sorted_list_t *list, sorted_list_iter_t begin, sorted_list_iter_t end, void *data);
+static sorted_list_iter_t FindPlaceToInsert(sorted_list_t *list, sorted_list_iter_t from, sorted_list_iter_t to, void *data);
 /*-----------------------STRUCTS--------------------------*/
 
 struct sorted_list
@@ -49,19 +49,21 @@ sorted_list_t *SortedListCreate(compare_func_t sort_func)
 
 	list->dlist = DlistCreate();
 	if(list->dlist == NULL)
-	{
+	{	
+		free(list);
 		return NULL;
 	}
 
 	list->cmp = sort_func;
 	return list;
 }
-/*--------------------------------------------------------*/
+
 
 void SortedListDestroy(sorted_list_t *list)
 {
 	assert(NULL != list);
 	DlistDestroy(list->dlist);
+	list->dlist = NULL;
 	free(list);
 	list = NULL;
 }
@@ -101,7 +103,20 @@ sorted_list_iter_t SortedListInsert(sorted_list_t *list, void *data)
 	assert(NULL != list);
 	where = FindPlaceToInsert(list, SortedListBegin(list), SortedListEnd(list), data);
 	where.internal_itr = DlistInsert(list->dlist, where.internal_itr, data);
+	if(NULL == where.internal_itr)
+	{
+		return SortedListEnd(list);
+	}
 	return where;
+}
+static sorted_list_iter_t FindPlaceToInsert(sorted_list_t *list, sorted_list_iter_t from, sorted_list_iter_t to, void *data)
+{
+	assert(NULL != list);
+	while(!SortedListIsSameIter(from, to) && ZERO <= list->cmp(SortedListGetData(from), data))
+	{
+		from = SortedListNext(from);
+	}
+	return from;
 }
 
 sorted_list_iter_t SortedListFindIf(sorted_list_t *list, sorted_list_iter_t from, sorted_list_iter_t to,
@@ -113,20 +128,10 @@ sorted_list_iter_t SortedListFindIf(sorted_list_t *list, sorted_list_iter_t from
 		from = SortedListNext(from);
 	}
 	return from;
-
 }
 
 
-static sorted_list_iter_t FindPlaceToInsert(sorted_list_t *list, sorted_list_iter_t begin, sorted_list_iter_t end, void *data)
-{
-	assert(NULL != list);
-	while(!SortedListIsSameIter(begin, end) && ZERO <= list->cmp(SortedListGetData(begin), data))
-	{
-		begin = SortedListNext(begin);
-	}
-	return begin;
 
-}
 
 sorted_list_iter_t SortedListFind(sorted_list_t *list, sorted_list_iter_t from, sorted_list_iter_t to, const void *data_to_compare)
 {
@@ -205,16 +210,65 @@ sorted_list_t *SortedListMerge(sorted_list_t *dest, sorted_list_t *src)
 	assert(NULL != dest);
 	assert(NULL != src);
 	src_from = SortedListBegin(src);
-
-	where = FindPlaceToInsert(dest, SortedListBegin(dest), SortedListEnd(dest), SortedListGetData(src_from));
-	
-	while (!SortedListIsEmpty(src))
-	{	
-		src_to = FindPlaceToInsert(src, src_from, SortedListEnd(src), SortedListGetData(where));
-		src_from.internal_itr = DlistSplice(where.internal_itr, src_from.internal_itr, src_to.internal_itr);
-		where = FindPlaceToInsert(dest, SortedListBegin(dest), SortedListEnd(dest), SortedListGetData(src_from));
-		
+	src_to = SortedListBegin(src);
+	where = SortedListBegin(dest);
+	if(SortedListIsEmpty(dest))
+	{
+		src_to =SortedListEnd(src);
+		DlistSplice(where.internal_itr, src_from.internal_itr, src_to.internal_itr);
 	}
-
+	while (!SortedListIsEmpty(src) &&  !SortedListIsSameIter(where,SortedListEnd(dest)))
+	{	
+		where = FindPlaceToInsert(dest, where, SortedListEnd(dest), SortedListGetData(src_from));
+		src_to = FindPlaceToInsert(src, src_from, SortedListEnd(src), SortedListGetData(where));
+		DlistSplice(where.internal_itr, src_from.internal_itr, src_to.internal_itr);
+		src_from = src_to;
+	}
+	if (!SortedListIsEmpty(src))
+    {
+        DlistSplice(where.internal_itr, src_from.internal_itr, 
+            SortedListEnd(src).internal_itr);
+    }
 	return dest;
 }
+
+
+/*
+sorted_list_t *SortedListMerge(sorted_list_t *dest, sorted_list_t *src)
+{
+    sorted_list_iter_t src_from = {0};
+    sorted_list_iter_t src_to = {0};
+    sorted_list_iter_t dest_iter = {0};
+
+    assert(NULL != dest);
+    assert(NULL != src);
+    assert(dest->cmp == src->cmp);
+
+    src_from = SortedListBegin(src);
+    src_to = SortedListBegin(src);
+    dest_iter = SortedListBegin(dest);
+
+    while (!SortedListIsSameIter(src_from, SortedListEnd(src)) &&
+            !SortedListIsSameIter(dest_iter, SortedListEnd(dest)))
+    {
+        while (!SortedListIsSameIter(src_to, SortedListEnd(src)) &&
+            0 <= dest->cmp(SortedListGetData(src_to),
+            SortedListGetData(dest_iter)))
+        {
+            src_to = SortedListNext(src_to);
+        }
+        DlistSplice(dest_iter.internal_itr, src_from.internal_itr, 
+            src_to.internal_itr);
+        src_from = src_to;
+        dest_iter = SortedListNext(dest_iter);
+    }
+
+    if (!SortedListIsEmpty(src))
+    {
+        DlistSplice(dest_iter.internal_itr, src_from.internal_itr, 
+            src_to.internal_itr);
+    }
+
+    return dest;
+}
+*/

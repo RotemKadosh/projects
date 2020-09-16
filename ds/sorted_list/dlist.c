@@ -86,7 +86,6 @@ Dlist_iter_t DlistEnd(const Dlist_t *list)
 }
 int DlistIsSameIter(Dlist_iter_t one, Dlist_iter_t two)
 {
-
 	return (one == two);
 }
 void *DlistGetData(const Dlist_iter_t iter)
@@ -233,14 +232,20 @@ Dlist_iter_t DlistSplice(Dlist_iter_t where, Dlist_iter_t src_from, Dlist_iter_t
 	assert(NULL != src_from);
 	assert(NULL != src_to);
 	assert(NULL != where);
-
-	form_prev = DlistPrev(src_from);
-	/*attaching to new list*/
-	ConectNodes(DlistPrev(where), src_from);
-	ConectNodes(DlistPrev(src_to), where);
-	/*cut out from old list*/
-	ConectNodes(form_prev, src_to);
-	return	src_to;
+	if(!DlistIsSameIter(src_from, src_to))
+	{
+		form_prev = DlistPrev(src_from);
+		/*attaching to new list*/
+		ConectNodes(DlistPrev(where), src_from);
+		ConectNodes(DlistPrev(src_to), where);
+		/*cut out from old list*/
+		ConectNodes(form_prev, src_to);
+		return	DlistPrev(DlistPrev(where));
+	}
+	else
+	{
+		return NULL;
+	}
 }
 static void ConectNodes(dlist_node_t *first, dlist_node_t *second)
 {

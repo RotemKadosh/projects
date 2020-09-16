@@ -309,10 +309,12 @@ static test_status_t StageSevenTest(void)
 	runner = SortedListNext(runner);
 	REQUIRE(11 == *(int *)SortedListGetData(runner));
 	runner = SortedListNext(runner);
+	
 	REQUIRE(12 == *(int *)SortedListGetData(runner));
 	runner = SortedListNext(runner);
 	REQUIRE(TRUE == SortedListIsSameIter(runner, SortedListEnd(dest)));
 	REQUIRE(TRUE == SortedListIsEmpty(src));
+
 	SortedListDestroy(src);
 	SortedListDestroy(dest);
 	
