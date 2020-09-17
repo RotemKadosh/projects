@@ -47,12 +47,8 @@ int PQIsEmpty(const PQueue_t *pqueue)
 
 int PQEnpqueue(PQueue_t *pqueue, void *data)
 {
-	if(SortedListIsSameIter( SortedListEnd(GetList(pqueue)), 
-					SortedListInsert(GetList(pqueue),data)))
-	{
-		return FAIL;
-	}
-	return SUCCESS;
+	assert(NULL != pqueue);
+	return SortedListIsSameIter( SortedListEnd(GetList(pqueue)), SortedListInsert(GetList(pqueue),data));
 }
 void *PQDepqueue(PQueue_t *pqueue)
 {	
