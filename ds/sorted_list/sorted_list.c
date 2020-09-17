@@ -44,9 +44,6 @@ sorted_list_t *SortedListCreate(compare_func_t sort_func)
 	{
 		return NULL;
 	}
-
-	assert(NULL != sort_func);
-
 	list->dlist = DlistCreate();
 	if(list->dlist == NULL)
 	{	
@@ -214,7 +211,7 @@ sorted_list_t *SortedListMerge(sorted_list_t *dest, sorted_list_t *src)
 	where = SortedListBegin(dest);
 	if(SortedListIsEmpty(dest))
 	{
-		src_to =SortedListEnd(src);
+		src_to = SortedListEnd(src);
 		DlistSplice(where.internal_itr, src_from.internal_itr, src_to.internal_itr);
 	}
 	while (!SortedListIsEmpty(src) &&  !SortedListIsSameIter(where,SortedListEnd(dest)))
@@ -233,42 +230,3 @@ sorted_list_t *SortedListMerge(sorted_list_t *dest, sorted_list_t *src)
 }
 
 
-/*
-sorted_list_t *SortedListMerge(sorted_list_t *dest, sorted_list_t *src)
-{
-    sorted_list_iter_t src_from = {0};
-    sorted_list_iter_t src_to = {0};
-    sorted_list_iter_t dest_iter = {0};
-
-    assert(NULL != dest);
-    assert(NULL != src);
-    assert(dest->cmp == src->cmp);
-
-    src_from = SortedListBegin(src);
-    src_to = SortedListBegin(src);
-    dest_iter = SortedListBegin(dest);
-
-    while (!SortedListIsSameIter(src_from, SortedListEnd(src)) &&
-            !SortedListIsSameIter(dest_iter, SortedListEnd(dest)))
-    {
-        while (!SortedListIsSameIter(src_to, SortedListEnd(src)) &&
-            0 <= dest->cmp(SortedListGetData(src_to),
-            SortedListGetData(dest_iter)))
-        {
-            src_to = SortedListNext(src_to);
-        }
-        DlistSplice(dest_iter.internal_itr, src_from.internal_itr, 
-            src_to.internal_itr);
-        src_from = src_to;
-        dest_iter = SortedListNext(dest_iter);
-    }
-
-    if (!SortedListIsEmpty(src))
-    {
-        DlistSplice(dest_iter.internal_itr, src_from.internal_itr, 
-            src_to.internal_itr);
-    }
-
-    return dest;
-}
-*/
