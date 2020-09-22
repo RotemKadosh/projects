@@ -22,7 +22,7 @@ int UIDtest(void)
 	UID_t uid2 = UIDCreate();
 	UID_t uid3 = UIDCreate();
 
-	REQUIRE(time(NULL) == UIDGetTime uid.time_stamp);
+	REQUIRE(time(NULL) == uid.time_stamp);
 	REQUIRE(1 == uid.counter);
 	REQUIRE(getpid() == uid.pid);
 	
