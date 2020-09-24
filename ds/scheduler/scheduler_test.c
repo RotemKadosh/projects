@@ -48,6 +48,7 @@ int action2(void *param)
 	}
 	return RUN_ONCE;
 }
+
 int action3(void *param)
 {
 	(void)param;
@@ -58,7 +59,11 @@ int PauseWraper(void *scheduler)
 	SchedulerPause((Scheduler_t *)scheduler);
 	return RUN_ONCE;
 }
-
+int AddingTask(void *scheduler)
+{
+	SchedulerAdd((Scheduler_t *)scheduler, actionfunc, (void *)5, (size_t)5);
+	return RUN_ONCE;
+}
 static test_status_t StageOneTest(void)
 {
 	Scheduler_t *scheduler = SchedulerCreate();
@@ -89,6 +94,7 @@ static test_status_t StageTwoTest(void)
 	REQUIRE(5 == SchedulerSize(scheduler));
 	REQUIRE(FINISH_ALL_WORK == SchedulerRun(scheduler));
 	SchedulerDestroy(scheduler);
+
 	scheduler = SchedulerCreate();
 	REQUIRE(TRUE == SchedulerIsEmpty(scheduler));
 	REQUIRE(FALSE == UIDIsSame(UIDGetBadUid(),SchedulerAdd(scheduler, action2, (void *)&a, (size_t)1)));
@@ -106,6 +112,7 @@ static test_status_t StageTwoTest(void)
 	SchedulerDestroy(scheduler);		
 	return PASSED;
 }
+
 static test_status_t StageThreeTest(void)
 {
 	int a = 5;
@@ -118,6 +125,7 @@ static test_status_t StageThreeTest(void)
 	UID_t uid3 = {0};
 	UID_t uid4 = {0};
 	UID_t uid5 = {0};
+	UID_t uid6 = {0};
 	Scheduler_t *scheduler = SchedulerCreate();
 	REQUIRE(TRUE == SchedulerIsEmpty(scheduler));
 	uid1 = SchedulerAdd(scheduler, action, (void *)&a, (size_t)1);
@@ -142,10 +150,12 @@ static test_status_t StageThreeTest(void)
 	uid3 = SchedulerAdd(scheduler, PauseWraper,(void *)scheduler, (size_t)10);
 	uid4 = SchedulerAdd(scheduler, action3, (void *)&d, (size_t)6);
 	uid5 = SchedulerAdd(scheduler, action3, (void *)&e, (size_t)6);
+	uid6 = SchedulerAdd(scheduler, AddingTask, scheduler, (size_t)6);
 	REQUIRE(STOPPED == SchedulerRun(scheduler));
 	SchedulerClear(scheduler);
 	REQUIRE(TRUE == SchedulerIsEmpty(scheduler));
 	SchedulerDestroy(scheduler);
-	
+
+
 	return PASSED;
 }

@@ -3,9 +3,9 @@
 #include <assert.h>				/*assert*/
 #include <unistd.h> 			/*sleep*/
 
-#include "pqueue.h" 	/*pqueue_t*/
-#include "uid.h" 		/*UID_t*/
-#include "task.h" 		/*task_t*/
+#include "pqueue.h" 			/*pqueue_t*/
+#include "uid.h" 				/*UID_t*/
+#include "task.h" 				/*task_t*/
 
 #include "scheduler.h"
 
@@ -15,6 +15,7 @@
 
 #define STOP (1)
 #define RUN (0)
+
 typedef struct sched_task
 {
 	task_t *task;
@@ -100,8 +101,7 @@ static void SleepUntilExecTime(sched_task_t *cuurent_task)
 {
 
 	double sleep_time = ((double)SchedulerGetTimeToExec(cuurent_task) - (double)time(NULL)); 
-	sleep_time = sleep_time > 0 ? sleep_time : 0;
-	while(0 != sleep_time)
+	while(0 < sleep_time)
 	{
 		sleep_time = sleep((unsigned int)sleep_time);
 	}
@@ -119,18 +119,16 @@ Scheduler_t *SchedulerCreate(void)
 	Scheduler_t *scheduler = (Scheduler_t *)malloc(sizeof(Scheduler_t));
 	if(NULL == scheduler)
 	{
-		scheduler = NULL;
 		return NULL;
 	}
 	SchedulerSetContainer(scheduler, PQCreate(CompareByTime));
 	if(NULL == SchedulerGetContainer(scheduler))
 	{
-		SchedulerSetContainer(scheduler, NULL);
 		free (scheduler);
 		scheduler = NULL;
 		return NULL;
 	}
-	SchedulerSetStopFlag(scheduler, 0);
+	SchedulerSetStopFlag(scheduler, RUN);
 	return scheduler;
 }
 void SchedulerDestroy(Scheduler_t *scheduler)
@@ -138,6 +136,7 @@ void SchedulerDestroy(Scheduler_t *scheduler)
 	assert(NULL != scheduler);
 	SchedulerClear(scheduler);
 	PQDestroy(SchedulerGetContainer(scheduler));
+	SchedulerSetContainer(scheduler, NULL);
 	free (scheduler);
 	scheduler = NULL;
 }
@@ -153,15 +152,21 @@ size_t SchedulerSize(const Scheduler_t *scheduler)
 }
 UID_t SchedulerAdd(Scheduler_t *scheduler, sched_action_func_t action_func, void *param, size_t interval_in_sec)
 {
+	sched_task_t *schd_task_ptr = NULL;
 
-	sched_task_t *schd_task_ptr = SchedulerCreateSchdTask(action_func ,param, interval_in_sec);
+	assert (NULL != action_func);
 	assert(NULL != scheduler);
+
+	schd_task_ptr = SchedulerCreateSchdTask(action_func ,param, interval_in_sec);
+	
 	if(NULL == schd_task_ptr)
 	{
 		return UIDGetBadUid();
 	}
 	if(SUCCESS != PQEnpqueue(SchedulerGetContainer(scheduler),(void *)schd_task_ptr))
 	{
+		SchedulerDestroySchdTask(schd_task_ptr);
+		schd_task_ptr = NULL;
 		return UIDGetBadUid();
 	}
 	return TaskGetUid(SchedulerGetInnerTask(schd_task_ptr));
@@ -207,16 +212,19 @@ void SchedulerClear(Scheduler_t *scheduler)
 	{
 		task_ptr = (sched_task_t *)PQDepqueue(SchedulerGetContainer(scheduler));
 		SchedulerDestroySchdTask(task_ptr);
+		task_ptr = NULL;
 	}
 }
 int SchedulerRemove(Scheduler_t *scheduler, UID_t uid)
 {
-	 sched_task_t *s_task = PQErase(SchedulerGetContainer(scheduler), matchWraper, &uid);
-	 if(NULL == s_task)
-	 {
+	sched_task_t *s_task = NULL;
+	assert(NULL != scheduler);
+ 	s_task = (sched_task_t *)PQErase(SchedulerGetContainer(scheduler), matchWraper, &uid);
+ 	if(NULL == s_task)
+	{
 	 	return FAIL;
-	 }
-	 SchedulerDestroySchdTask(s_task);
-	 s_task = NULL;
-	 return SUCCESS;
+	}
+ 	SchedulerDestroySchdTask(s_task);
+ 	s_task = NULL;
+ 	return SUCCESS;
 }

@@ -14,8 +14,8 @@ typedef struct slist_node
 
 struct slist
 {
-	Slist_iter_t head;
-	Slist_iter_t tail;
+	slist_node_t *head;
+	slist_node_t *tail;
 };
 
 
