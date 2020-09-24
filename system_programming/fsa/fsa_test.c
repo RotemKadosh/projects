@@ -7,35 +7,13 @@
 #define TRUE (1)
 #define FALSE (0)
 
-static test_status_t Test(void);
+
 static test_status_t StageOneTest(void);
 
 int main()
 {
 	RUNTEST(StageOneTest);
 	return 0; 
-}
-
-static test_status_t Test(void)
-{
-	FSA_t *fsa = NULL;
-	size_t blocks = 4;
-	size_t *mem_block = NULL;
-	void *memory = malloc(FSASuggestSize(10, blocks)); /*4 blocks of 10 -> 4 blocks of 16*/
-
-	fsa = FSAInit(memory,FSASuggestSize(10, blocks), 10);
-	REQUIRE(NULL != fsa);
-	REQUIRE(blocks == FSACountFree(fsa));
-
-	mem_block = (size_t *)FSAAlloc(fsa);
-	REQUIRE(--blocks == FSACountFree(fsa));	
-	FSAFree(fsa, mem_block);
-	REQUIRE(++blocks == FSACountFree(fsa));
-	mem_block = (size_t *)FSAAlloc(fsa);
-	REQUIRE(--blocks == FSACountFree(fsa));
-
-	free(memory);
-	return PASSED;
 }
 
 static test_status_t StageOneTest(void)
