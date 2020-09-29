@@ -54,7 +54,7 @@ void *VSAAlloc(VSA_t *allocator, size_t size_in_bytes);
 void VSAFree(void *block);
 
 /*DESCRIPTION:
-* Returns the ltargest chunk available in allocator's memory.
+* Returns the largest chunk available in allocator's memory.
 *
 *    @param
 *    allocator - pointer to variable size allocator
