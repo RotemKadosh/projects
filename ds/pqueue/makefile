@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-ansi -pedantic-errors -Wall -Wextra -g
 DEPS = pqueue.h dlist.h sorted_list.h
-OBJ = pqueue.o pqueue_test.o ../dlist/dlist.o ../sorted_list/sorted_list.o
+OBJ = pqueue.o pqueue_test.o ../dlist/dlist.o ../sorted_list/sorted_list.o ../dlist/dlist.h ../sorted_list/sorted_list.h
 .PHONY = run cgdb vlg clean
 
 
