@@ -1,49 +1,47 @@
-#include <assert.h>
+#include <assert.h>  /*assert*/
 
 #include "vsa.h"
 
 #define MAGIC_NUM (15)
-#define VSA_SIZE sizeof(VSA_t)
 #define TRUE (1)
 #define FALSE (0)
 #define SWITCH_SIGN (-1)
 
 struct variable_sized_allocator
 {
-	#ifdef NDEBUG
-		long size;
-	#else
-    	long size;
+	long size;
+	#ifndef NDEBUG	
     	long magic_num;
     #endif 	
 };
+
+#define VSA_SIZE sizeof(VSA_t)
+#define DUMMY_SIZE sizeof(VSA_t)
+
 
 VSA_t *VSAInit(void *memory, size_t memory_size)
 {
 	VSA_t *allocator = NULL;
 	VSA_t *end_dummy = NULL;
+
 	assert(NULL != memory);
 
-	if (memory_size < VSA_SIZE)
+	if (memory_size < (VSA_SIZE + DUMMY_SIZE + 1))
 	{
 		return NULL;
 	}
 
 	allocator = (VSA_t *)memory;
-	 
-	#ifdef NDEBUG	
-	#else
-    	allocator->magic_num = MAGIC_NUM;
-    #endif 
-	allocator->size = memory_size - (2 * VSA_SIZE);
-	end_dummy =(VSA_t *)( (char *)memory + memory_size - VSA_SIZE);
-
-    #ifdef NDEBUG	
-	#else
-    	end_dummy->magic_num = MAGIC_NUM;
-	#endif
-
+	allocator->size = memory_size - (VSA_SIZE + DUMMY_SIZE);
+	
+	end_dummy = (VSA_t *)((char *)memory + memory_size - VSA_SIZE);
 	end_dummy->size = 0;
+
+	#ifndef NDEBUG	
+    	allocator->magic_num = MAGIC_NUM;
+    	end_dummy->magic_num = MAGIC_NUM;
+    #endif 
+
     return allocator;	
 }
 
@@ -56,13 +54,12 @@ static VSA_t *NextChunck(VSA_t *allocator)
 
 	if(0 > allocator->size)
 	{
-		return (VSA_t *)(allocator_as_char + VSA_SIZE + allocator->size * SWITCH_SIGN);
+		return (VSA_t *)(allocator_as_char + VSA_SIZE + (allocator->size * SWITCH_SIGN));
 	}
-	else
-	{
-		return (VSA_t *)(allocator_as_char + VSA_SIZE + allocator->size);
-	} 
+
+	return (VSA_t *)(allocator_as_char + VSA_SIZE + allocator->size);	
 }
+
 static int IsChunkBigEnough(VSA_t *allocator, size_t size_in_bytes)
 {
 	assert(NULL != allocator);
@@ -72,8 +69,10 @@ static int IsChunkBigEnough(VSA_t *allocator, size_t size_in_bytes)
 	{
 		return FALSE;
 	}
+
 	return TRUE;
 }
+
 static void *SplitChunck(VSA_t *allocator, size_t size_in_bytes)
 {
 	VSA_t *next_allocator = NULL;
@@ -83,21 +82,20 @@ static void *SplitChunck(VSA_t *allocator, size_t size_in_bytes)
 
 	if (allocator->size > ((long)size_in_bytes + VSA_SIZE))
 	{
-		next_allocator =(VSA_t *)( (char *)allocator + VSA_SIZE + size_in_bytes);
-		#ifdef NDEBUG
-			next_allocator->size = allocator->size - VSA_SIZE - size_in_bytes;
-		#else
-			next_allocator->size = allocator->size - VSA_SIZE - size_in_bytes;
+		next_allocator =(VSA_t *)((char *)allocator + VSA_SIZE + size_in_bytes);
+		next_allocator->size = allocator->size - VSA_SIZE - size_in_bytes;
+		
+		#ifndef NDEBUG
 			next_allocator->magic_num = MAGIC_NUM;
 		#endif
+
 		allocator->size = (long)size_in_bytes * SWITCH_SIGN;
 	}
 	else
 	{
 		allocator->size = allocator->size * SWITCH_SIGN;
 	}
-
-		
+	
 	return (void *)((char *)allocator + VSA_SIZE);
 }
 
@@ -109,20 +107,18 @@ static int IsNextChunckAvailable(VSA_t *allocator)
 	assert(MAGIC_NUM == allocator->magic_num);
 
 	next_chunck = NextChunck(allocator);
-
-	if(0 < next_chunck->size)
-	{
-		return TRUE;
-	}
-
-	return FALSE;
+	
+	return (0 < next_chunck->size);
 }
+
 static int IsChunckAvailable(VSA_t *allocator)
 {
 	assert(NULL != allocator);
 	assert(MAGIC_NUM == allocator->magic_num);
+
 	return (allocator->size > 0);
 }
+
 static void MergeChuncks(VSA_t *allocator)
 {
 	VSA_t *next_chunck = NULL;
@@ -163,9 +159,9 @@ void *VSAAlloc(VSA_t *allocator, size_t size_in_bytes)
 		}
 		allocator = NextChunck(allocator);
 	}
+
 	return NULL;
 }
-
 
 void VSAFree(void *block)
 {
@@ -188,6 +184,7 @@ size_t VSALargestChunkAvailable(VSA_t *allocator)
 	assert(MAGIC_NUM == allocator->magic_num);
 
 	largest_chunk_size = 0;
+
 	while (0 != allocator->size)
 	{
 		if (IsChunckAvailable(allocator))
@@ -203,5 +200,6 @@ size_t VSALargestChunkAvailable(VSA_t *allocator)
 		}
 		allocator = NextChunck(allocator);
 	}
+
 	return largest_chunk_size;
 }
