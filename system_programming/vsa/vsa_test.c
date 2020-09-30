@@ -9,10 +9,12 @@
 
 
 static test_status_t Test(void);
+static test_status_t AdvTest(void);
 
 int main()
 {
     RUNTEST(Test);
+    RUNTEST(AdvTest);
     return 0; 
 }
 
@@ -84,8 +86,27 @@ static test_status_t Test(void)
 
     free(memory);
 
-
-
+   
     return PASSED;
 
+}
+static test_status_t AdvTest(void)
+{
+    VSA_t *vsa = NULL;
+    void *memory = NULL;
+    void *block1 = NULL;
+    size_t memory_size = 200;
+    memory = malloc(sizeof(char) * memory_size);
+    vsa = VSAInit(memory, memory_size);
+    REQUIRE(NULL != vsa);
+    REQUIRE(TRUE == WasAllMemoryFreed(vsa));
+    block1 =  VSAAlloc(vsa, 20);
+    REQUIRE(NULL != block1);
+    REQUIRE(FALSE == WasAllMemoryFreed(vsa)); 
+    REQUIRE(TRUE == IsBlockValidDebugMode(block1));
+    REQUIRE(FALSE == IsBlockValidDebugMode((void *)((char *)block1 + 6)));
+    VSAFree(block1);
+    REQUIRE(TRUE == WasAllMemoryFreed(vsa)); 
+    free(memory);
+    return PASSED; 
 }
