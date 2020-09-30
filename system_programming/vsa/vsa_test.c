@@ -8,15 +8,15 @@
 #define FALSE (0)
 
 
-static test_status_t StageOneTest(void);
+static test_status_t Test(void);
 
 int main()
 {
-    RUNTEST(StageOneTest);
+    RUNTEST(Test);
     return 0; 
 }
 
-static test_status_t StageOneTest(void)
+static test_status_t Test(void)
 {
     VSA_t *vsa = NULL;
     void *memory = NULL;
@@ -27,11 +27,12 @@ static test_status_t StageOneTest(void)
     void *block5 = NULL;
 
     size_t memory_size = 200;
-    memory = calloc(1, sizeof(char) * memory_size);
+    memory = malloc(sizeof(char) * memory_size);
 
     vsa = VSAInit(memory, memory_size);
     REQUIRE(NULL != vsa);
     REQUIRE(150 < VSALargestChunkAvailable(vsa));
+
     block1 =  VSAAlloc(vsa, 20);
     REQUIRE(NULL != block1);
     *(size_t *)block1 = 1;
@@ -62,22 +63,21 @@ static test_status_t StageOneTest(void)
     VSAFree(block2);
     
     REQUIRE(50 < VSALargestChunkAvailable(vsa));
+
     block3 = VSAAlloc(vsa, 40);
     REQUIRE(NULL != block3);
      *(size_t *)block3 = 3;
 
-    block2 =  VSAAlloc(vsa, 1);
+    block2 =  VSAAlloc(vsa, 5);
     REQUIRE(NULL == block2);
    
     REQUIRE(1 == *(size_t *)block1);
     REQUIRE(3 == *(size_t *)block3);
     REQUIRE(4 == *(size_t *)block4);
-
+    
     VSAFree(block4);
-
-    block2 = VSAAlloc(vsa, 40);
-    REQUIRE(NULL == block2);
-
+    
+  
     memory_size = 10;
     vsa = VSAInit(memory, memory_size);
     REQUIRE(NULL == vsa);
