@@ -188,7 +188,7 @@ static test_status_t TestSlistAppend()
 	SlistInsert(SlistBegin(last),(void *)7);
 	SlistInsert(SlistBegin(last),(void *)7);
 	size_before = SlistCount(first) + SlistCount(last);
-	SlistAppened(first, last);
+	SlistAppend(first, last);
 	REQUIRE(size_before == SlistCount(first));
 	SlistDestroy(first);
 

@@ -25,15 +25,13 @@ struct sorted_list
 
 static sorted_list_iter_t InitSortListIter(const sorted_list_t *list, Dlist_iter_t iter)
 {
-	#ifdef NDEBUG
-    	(void)list;
-    	return (sorted_list_iter_t)iter;
-    #else
-     	sorted_list_iter_t  s_list_iter;
-     	s_list_iter.internal_itr = iter;
+	sorted_list_iter_t  s_list_iter;
+	s_list_iter.internal_itr = iter;
+	(void)list;
+	#ifndef NDEBUG
      	s_list_iter.list = (sorted_list_t *)list;
-     	return s_list_iter;
     #endif 	
+	return s_list_iter;
 }
 
 sorted_list_t *SortedListCreate(compare_func_t sort_func)
@@ -124,6 +122,7 @@ sorted_list_iter_t SortedListFindIf(sorted_list_t *list, sorted_list_iter_t from
 	{
 		from = SortedListNext(from);
 	}
+	(void)list;
 	return from;
 }
 
