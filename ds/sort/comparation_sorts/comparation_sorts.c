@@ -171,6 +171,6 @@ void RadixSort(int arr[], size_t size)
     int exp = 1;
     for (exp = 1; max / exp > 0; exp *= 10)
     {
-        CountSortByKey(arr, size,RadixGetKey ,exp);
+        CountSortByKey(arr, size, RadixGetKey ,exp);
     }     
 }
