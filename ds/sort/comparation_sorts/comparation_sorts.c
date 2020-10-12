@@ -1,6 +1,7 @@
 #include <stddef.h> /*size_t*/
+#include <string.h>/*memcpy*/
 #include <ctype.h> /*ssize_t*/
-#include <stdlib.h>/*malloc, free*/
+#include <stdlib.h>/*calloc, free*/
 
 typedef int (*GetKey_t)(int arr[], int runner, int exp);
 static void Swap(int *num1 , int *num2);
@@ -41,15 +42,17 @@ static int GetMin(int *arr , size_t size, GetKey_t getkey, int exp)
 }
 static void InitCount(int *count ,int *arr ,size_t size,GetKey_t getkey, int exp ,int min)
 {
-    size_t runner = 0;
+    size_t runner = 0; 
+
     for (runner = 0; runner < size; ++runner) 
         {
-            count[ getkey(arr, runner, exp) - min ]++; 
+            ++count[getkey(arr, runner, exp) - min]; 
         }
 }
 static void AccumCount(int *count, size_t range)
 {
     size_t runner = 0;
+
     for (runner = 1; runner < range; ++runner)
     { 
         count[runner] += count[runner - 1]; 
@@ -58,6 +61,7 @@ static void AccumCount(int *count, size_t range)
 static void SetOutInOrder(int *arr, size_t size, int min,int *count, int *out, GetKey_t getkey, int exp)
 {
     int runner = 0;
+
     for (runner = size - 1; runner >= 0; --runner) 
     { 
         out[count[getkey(arr, runner, exp) - min] - 1] = arr[runner]; 
@@ -66,11 +70,7 @@ static void SetOutInOrder(int *arr, size_t size, int min,int *count, int *out, G
 }
 static void CopyOutToArr(int *arr, size_t size, int *out)
 {
-    size_t runner = 0;
-    for (runner = 0; runner < size; ++runner)
-    {
-        arr[runner] = out[runner]; 
-    } 
+    memcpy(arr , out, size * sizeof(int));
 }
 static int CountSortGetKey(int *arr, int runner, int exp)
 {
@@ -79,20 +79,28 @@ static int CountSortGetKey(int *arr, int runner, int exp)
 }
 static int RadixGetKey(int *arr, int runner, int exp)
 {
-    return (arr[runner]/exp) % 10;
+    return (arr[runner] / exp) % 10;
 }
 static void CountSortByKey(int *arr , size_t size , GetKey_t getkey, int exp) 
 { 
   
+    int *out = NULL;
+    int *count = NULL;
     int max = GetMax(arr, size, getkey, exp); 
     int min = GetMin(arr, size, getkey, exp); 
     
     size_t range = max - min + 1;
 
-    int *count = calloc(range, sizeof(int) );
-    int *out = calloc(size ,sizeof(int)); 
-    if(count == NULL || out == NULL)
+    count = calloc(range, sizeof(int) );
+    if (count == NULL )
     {
+        return;
+    }
+    out = calloc(size, sizeof(int)); 
+    if (out == NULL)
+    {
+        free(count);
+        count = NULL;
         return;
     }
 
@@ -102,7 +110,9 @@ static void CountSortByKey(int *arr , size_t size , GetKey_t getkey, int exp)
     CopyOutToArr(arr, size, out);
    
     free(count);
+    count = NULL;
     free(out);
+    out = NULL;
 } 
 
 /*---------Sort functions----------*/
@@ -115,7 +125,7 @@ void BubbleSort(int arr[], size_t size)
     {     
         for (runner = 0; runner < size - start - 1; ++runner)  
         {
-            if (arr[runner] > arr[runner+1]) 
+            if ((arr[runner]) > arr[runner + 1]) 
             {
                 Swap(&arr[runner], &arr[runner + 1]); 
             }
