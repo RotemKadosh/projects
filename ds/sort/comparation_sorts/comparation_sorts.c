@@ -49,7 +49,7 @@ static void InitCount(int *count ,int *arr ,size_t size,GetKey_t getkey, int exp
             ++count[getkey(arr, runner, exp) - min]; 
         }
 }
-static void AccumCount(int *count, size_t range)
+static void CumulativeCount(int *count, size_t range)
 {
     size_t runner = 0;
 
@@ -105,7 +105,7 @@ static void CountSortByKey(int *arr , size_t size , GetKey_t getkey, int exp)
     }
 
     InitCount(count, arr, size, getkey, exp, min);
-    AccumCount(count, range);
+    CumulativeCount(count, range);
     SetOutInOrder(arr, size, min, count, out, getkey, exp);
     CopyOutToArr(arr, size, out);
    
@@ -114,7 +114,16 @@ static void CountSortByKey(int *arr , size_t size , GetKey_t getkey, int exp)
     free(out);
     out = NULL;
 } 
-
+static int GetRadMax(int *arr , size_t size, GetKey_t getkey, int exp)
+{
+    int min = GetMin(arr, size, getkey ,exp);
+    int max = GetMax(arr, size, getkey ,exp);
+    if (min < 0)
+    {
+        min *= -1;
+    }
+    return(max > min ? max: min);
+}
 /*---------Sort functions----------*/
 
 void BubbleSort(int arr[], size_t size)
@@ -177,7 +186,7 @@ void CountSort (int *arr , size_t size)
  
 void RadixSort(int arr[], size_t size)
 {
-    int max = GetMax(arr, size, CountSortGetKey, 0);
+    int max = GetRadMax(arr, size, CountSortGetKey, 0);
     int exp = 1;
     for (exp = 1; max / exp > 0; exp *= 10)
     {
