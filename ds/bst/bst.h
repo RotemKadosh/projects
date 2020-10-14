@@ -26,7 +26,7 @@ typedef int(*BST_action_func_ty)(const void *data, void * param);
 /* DESCRIPTION: 
  *  create binary search tree,
  *  tree created by this function should be destroy using BDTDestroy function 
- *
+ *  O(1)
  *		@param
  *		compare - pointer to function to sort the tree by
  *
@@ -36,7 +36,7 @@ typedef int(*BST_action_func_ty)(const void *data, void * param);
 BST_ty *BSTCreate(BST_cmp_func_ty compare, void *params);
 /* DESCRIPTION: 
  * destroy BST and free all allocated memory
- *
+ * O(n)
  *		@param
  *		pointer to BST to be destroyed
  *
@@ -47,7 +47,7 @@ void BSTDestroy(BST_ty *tree);
 /* DESCRIPTION: 
  * find a element wich holds key and return pointer to this element.
  * BSTEnd in case of failure
- *
+ * O(log(n))
  *		@param
  *		tree - pinter to BST to look in
  *      data_to_match - datato look for
@@ -59,7 +59,7 @@ BST_iter_ty BSTSearch(BST_ty *tree, void *data_to_match);
 /* DESCRIPTION: 
  * insert new element to the tree in right location.
  * duplicate values will inserted to larger subtree
- *
+ *  O(log(n))
  *		@param
  *		tree -	tree - pinter to BST to insert to
  *      data - data of new element 
@@ -70,7 +70,7 @@ BST_iter_ty BSTSearch(BST_ty *tree, void *data_to_match);
 BST_iter_ty BSTInsert(BST_ty *tree, void *data);
 /* DESCRIPTION: 
  * deletes element from the tree  
- *
+ * O(n)
  *		@param
  *		iter - iterator to element to delete
  *      
@@ -80,7 +80,7 @@ BST_iter_ty BSTInsert(BST_ty *tree, void *data);
 void *BSTRemove(BST_iter_ty iter);
 /*DESCRIPTION:
 * checks if there are any elements in the tree
-*
+* O(1)
 *	@param
 * 	tree - pointer to the tree
 *
@@ -102,7 +102,8 @@ size_t BSTSize(const BST_ty *tree);
 /*DESCRIPTION:
 * activate operation function on each element in given range [from, to)
 * operation should not change the compare critiria
-*	@param
+*	O(nlogn)/o(n^2)
+    @param
 * 	tree - pointer to the tree
     operation - function to aactivate
     from -iter to element to start
@@ -115,7 +116,7 @@ size_t BSTSize(const BST_ty *tree);
 int BSTForEach(BST_iter_ty from, BST_iter_ty to, BST_action_func_ty operation, void  *param);
 /* DESCRIPTION: 
  * return next iterator in order  
- *  
+ *  O(nlogn)/o(n^2)
  *		@param
  *		iter - iterator to element
  *
@@ -125,7 +126,7 @@ int BSTForEach(BST_iter_ty from, BST_iter_ty to, BST_action_func_ty operation, v
 BST_iter_ty BSTIterNext(BST_iter_ty iter);
 /* DESCRIPTION: 
  * return previous iterator in order  
- *
+ * O(logn)/o(n)
  *		@param
  *		iter - iterator to element
  *
@@ -136,7 +137,7 @@ BST_iter_ty BSTIterPrev(BST_iter_ty iter);
 /* DESCRIPTION: 
  * return iterator first element by order  
  * begin on empty tree is undifined
- *
+ * O(logn)/o(n)
  *		@param
  *		tree -pointer to tree
  *
@@ -145,6 +146,7 @@ BST_iter_ty BSTIterPrev(BST_iter_ty iter);
  */
 BST_iter_ty BSTBegin(const BST_ty *tree);
 /* DESCRIPTION: 
+     O(1)
  * return iterator last element by order  
  * this iterator should not be removed
  *		@param
@@ -156,7 +158,7 @@ BST_iter_ty BSTBegin(const BST_ty *tree);
 BST_iter_ty BSTEnd(const BST_ty *tree);
 /* DESCRIPTION: 
  * return data of element pointed by iter  
- * 
+ *  O(1)
  *		@param
  *		tree -pointer to tree
  *
@@ -167,6 +169,7 @@ BST_iter_ty BSTEnd(const BST_ty *tree);
 void *BSTGetData(BST_iter_ty iter);
 /* DESCRIPTION: 
  * compare two iterators 
+ * O(1)
  * 	@param
  *		iter1
         iter2
