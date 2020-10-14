@@ -288,7 +288,7 @@ BST_iter_ty BSTInsert(BST_ty *tree, void *data)
     new_node = CreateBstNode(data);
     if(NULL == new_node)
     {
-        return NULL;
+        return BSTEnd(tree);
     }
     while(NULL != iter)
     {
@@ -311,14 +311,14 @@ BST_iter_ty BSTInsert(BST_ty *tree, void *data)
 BST_iter_ty BSTSearch(BST_ty *tree, void *data_to_match)
 {
     BST_iter_ty iter = GetRoot(tree);
-    BST_iter_ty end = BSTEnd(tree);
     int cmp_ret = tree->compare(data_to_match, BSTGetData(iter), tree->params);
 
     assert(NULL != tree);
     assert(NULL != data_to_match);
     
-    while(0 != cmp_ret && !BSTIsSameIter(iter,end))
+    while(0 != cmp_ret && NULL != iter)
     {
+        cmp_ret = tree->compare(data_to_match, BSTGetData(iter), tree->params);
         if(cmp_ret > 0)
         {
             iter = iter->relatives[RIGHT];    
@@ -326,8 +326,11 @@ BST_iter_ty BSTSearch(BST_ty *tree, void *data_to_match)
         else if(cmp_ret < 0)
         {   
             iter = iter->relatives[LEFT];  
-        }
-        cmp_ret = tree->compare(data_to_match, BSTGetData(iter), tree->params);
+        }  
+    }
+    if(NULL == iter)
+    {
+        return BSTEnd(tree);
     }
     return iter;
 }

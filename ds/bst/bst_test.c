@@ -60,6 +60,11 @@ static test_status_t TestOne()
   
     iter1 = BSTSearch(bst,(void *)&num4);
     REQUIRE(BSTIsSameIter(iter1,iter2));
+    iter1 = BSTSearch(bst,(void *)&params);
+    REQUIRE(BSTIsSameIter(iter1,BSTEnd(bst)));
+    
+    iter1 = BSTSearch(bst,(void *)&num4);
+    REQUIRE(BSTIsSameIter(iter1,iter2));
     g = (int *)BSTGetData(iter1);
     REQUIRE(*g == num4);
     g = BSTRemove(iter1);
