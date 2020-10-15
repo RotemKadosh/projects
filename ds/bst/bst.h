@@ -47,7 +47,7 @@ void BSTDestroy(BST_ty *tree);
 /* DESCRIPTION: 
  * find a element wich holds key and return pointer to this element.
  * BSTEnd in case of failure
- * O(log(n))
+ * O(log(n))/O(n)
  *		@param
  *		tree - pinter to BST to look in
  *      data_to_match - datato look for
@@ -70,7 +70,7 @@ BST_iter_ty BSTSearch(BST_ty *tree, void *data_to_match);
 BST_iter_ty BSTInsert(BST_ty *tree, void *data);
 /* DESCRIPTION: 
  * deletes element from the tree  
- * O(n)
+ * O(logn)/ o(n)
  *		@param
  *		iter - iterator to element to delete
  *      
@@ -91,7 +91,7 @@ int BSTIsEmpty(const BST_ty *tree);
 
 /*DESCRIPTION:
 * gets the amounts of elements in the tree
-*
+*   O(nlogn)/o(n^2)
 *	@param
 * 	tree - pointer to the tree
 *
@@ -102,7 +102,7 @@ size_t BSTSize(const BST_ty *tree);
 /*DESCRIPTION:
 * activate operation function on each element in given range [from, to)
 * operation should not change the compare critiria
-*	O(nlogn)/o(n^2)
+* O(nlogn)/o(n^2)	
     @param
 * 	tree - pointer to the tree
     operation - function to aactivate
@@ -116,7 +116,7 @@ size_t BSTSize(const BST_ty *tree);
 int BSTForEach(BST_iter_ty from, BST_iter_ty to, BST_action_func_ty operation, void  *param);
 /* DESCRIPTION: 
  * return next iterator in order  
- *  O(nlogn)/o(n^2)
+ * O(logn)/o(n)
  *		@param
  *		iter - iterator to element
  *

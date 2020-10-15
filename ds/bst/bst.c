@@ -5,6 +5,8 @@
 #define TRUE (1)
 #define FALSE (1)
 #define DEFAULT_LEFT_CHILED (-1)
+#define LEFT_C (-1)
+#define RIGHT_C (1)
 
 enum raltives
 {
@@ -24,13 +26,14 @@ struct binary_search_tree
 };
 
 /*----------service ---------------------*/
-
+static int IsIterLeftChiled(BST_iter_ty iter);
 static BST_iter_ty GetRoot(const BST_ty *tree)
 {
+    assert(NULL != tree);
     return tree->dummy_root.relatives[LEFT];
 }
 
-static BST_iter_ty ConnectNodes(BST_iter_ty parent, BST_iter_ty chiled, int cmp_ret)
+static void ConnectNodes(bst_node_ty *parent, bst_node_ty *chiled, int cmp_ret)
 {
     assert(NULL != chiled);
     assert(NULL != parent);
@@ -44,11 +47,11 @@ static BST_iter_ty ConnectNodes(BST_iter_ty parent, BST_iter_ty chiled, int cmp_
     {
         parent->relatives[RIGHT] = chiled;
     }
-    return chiled;
 }
 
-static void InitRelatives (void *relatives[])
+static void InitChildrens(void *relatives[])
 {
+    /* init all childrens - no metter the amount of childrens*/
     int i = 1;
     for(i = 1; i < NUM_OF_RELATIVES; i++)
     {
@@ -59,15 +62,15 @@ static void InitRelatives (void *relatives[])
 static bst_node_ty *CreateBstNode(void *data)
 {
     bst_node_ty *new_node = malloc(sizeof(bst_node_ty));
-    if(NULL == new_node)
+    if(NULL != new_node)
     {
-        return NULL;
+        new_node->data = data;
+        InitChildrens((void **)new_node->relatives);
     }
-    assert(NULL != data);
-    new_node->data = data;
-    InitRelatives((void **)new_node->relatives);
+
     return new_node;
 }
+
 static int CountChildrens(const BST_iter_ty iter)
 {
     int i = 1;
@@ -76,69 +79,48 @@ static int CountChildrens(const BST_iter_ty iter)
     {
         if(NULL != iter->relatives[i])
         {
-            count++;
+            ++count;
         }
     }
     return count;
 }
 
-static void OneChildeConnect(BST_iter_ty iter, int left_chiled_flag)
+static void RemoveOneChildNode(BST_iter_ty iter, int left_chiled_flag)
 {
     if(NULL == iter->relatives[LEFT])
     {
         if(left_chiled_flag)
         {
-            ConnectNodes(iter->relatives[PARENT],iter->relatives[RIGHT], -1);
+            ConnectNodes(iter->relatives[PARENT],iter->relatives[RIGHT], LEFT_C);
         }
         else
         {
-            ConnectNodes(iter->relatives[PARENT],iter->relatives[RIGHT], 1);
+            ConnectNodes(iter->relatives[PARENT],iter->relatives[RIGHT], RIGHT_C);
         }
     }
     else
     {
          if(left_chiled_flag)
         {
-            ConnectNodes(iter->relatives[PARENT],iter->relatives[LEFT], -1);
+            ConnectNodes(iter->relatives[PARENT],iter->relatives[LEFT], LEFT_C);
         }
         else
         {
-            ConnectNodes(iter->relatives[PARENT],iter->relatives[LEFT], 1);
+            ConnectNodes(iter->relatives[PARENT],iter->relatives[LEFT], RIGHT_C);
         }
     }
     
 }
 
-static void TwoChildrensConnect(BST_iter_ty iter, int left_chiled_flag)
+
+static void RemoveTwoChildrenNode(BST_iter_ty iter, int left_chiled_flag)
 {
+    BST_iter_ty next_node = BSTIterNext(iter);
+    int side = (left_chiled_flag) ? LEFT_C : RIGHT_C;
 
-    BST_iter_ty iter_left = iter->relatives[LEFT];
-    BST_iter_ty right_runner = iter->relatives[LEFT];
-    BST_iter_ty left_runner = NULL;
-    BST_iter_ty most_right_node = iter_left;
-    while (NULL != right_runner->relatives[RIGHT])
-    {
-        right_runner = right_runner->relatives[RIGHT];
-    }
-    if(left_chiled_flag)
-    {
-        most_right_node = ConnectNodes(iter->relatives[PARENT], right_runner, -1);
-    }
-    else
-    {
-        most_right_node = ConnectNodes(iter->relatives[PARENT], right_runner, 1);
-    }
-    left_runner = most_right_node;
-    if(NULL != left_runner->relatives[LEFT])
-    {
-        while( NULL != left_runner->relatives[LEFT])
-        {
-            left_runner = left_runner->relatives[LEFT];
-        }
-        ConnectNodes(left_runner, iter_left, -1); 
-    }
+    ConnectNodes(next_node, iter->relatives[LEFT], LEFT_C);
+    ConnectNodes(iter->relatives[PARENT], iter->relatives[RIGHT], side);
 }
-
 static void *DestroyNode(bst_node_ty *node)
 {
     void *data = node->data;
@@ -152,19 +134,26 @@ static int IsIterLeftChiled(BST_iter_ty iter)
     return BSTIsSameIter(iter, iter->relatives[PARENT]->relatives[LEFT]);
 }
 
-
+static BST_iter_ty TraversSide(BST_iter_ty iter, int side)
+{
+    while(NULL != iter->relatives[side])
+    {
+        iter = iter->relatives[side]; 
+    }
+    return iter;
+}
+/*---------------API------------------------------*/
 
 BST_ty *BSTCreate(BST_cmp_func_ty compare, void *params)
 {
     BST_ty *bst = malloc(sizeof(BST_ty));
-    if(NULL == bst)
-    {
-        return NULL;
+    if(NULL != bst)
+    { 
+        bst->compare = compare;
+        bst->params = params;
+        InitChildrens((void **)bst->dummy_root.relatives);
+        bst->dummy_root.relatives[PARENT] = NULL; 
     }
-    bst->compare = compare;
-    bst->params = params;
-    InitRelatives((void **)bst->dummy_root.relatives);
-    bst->dummy_root.relatives[PARENT] = NULL;
     return bst;
 }
 
@@ -175,10 +164,7 @@ BST_iter_ty BSTIterNext(BST_iter_ty iter)
     if(NULL != iter->relatives[RIGHT])
     {
         iter = iter->relatives[RIGHT];
-        while(NULL != iter->relatives[LEFT])
-        {
-            iter = iter->relatives[LEFT];
-        }  
+        iter = TraversSide(iter, LEFT); 
     }
     else
     {
@@ -199,10 +185,7 @@ BST_iter_ty BSTIterPrev(BST_iter_ty iter)
     if(NULL != iter->relatives[LEFT])
     {
         iter = iter->relatives[LEFT];
-        while(NULL != iter->relatives[RIGHT])
-        {
-            iter = iter->relatives[RIGHT];
-        }  
+        iter = TraversSide(iter, RIGHT); 
     }
     else
     {
@@ -225,21 +208,19 @@ BST_iter_ty BSTBegin(const BST_ty *tree)
     BST_iter_ty node_runner = NULL;
     assert(NULL != tree);
     node_runner = BSTEnd(tree);
-    while(NULL != node_runner->relatives[LEFT])
-    {
-        node_runner = node_runner->relatives[LEFT];
-    }
+    node_runner = TraversSide(node_runner, LEFT);
     return node_runner;
 }
 
 int BSTForEach(BST_iter_ty from, BST_iter_ty to, BST_action_func_ty operation, void  *param)
 {
     int res = 0;
+    BST_iter_ty runner = from;
     assert(NULL != from);
-    while(!BSTIsSameIter(from, to) && res == 0)
+    while(!BSTIsSameIter(runner, to) && res == 0)
     {
-        res = operation(BSTGetData(from), param);
-        from = BSTIterNext(from);
+        res = operation(BSTGetData(runner), param);
+        runner = BSTIterNext(runner);
     }
     return res;
 }
@@ -304,19 +285,19 @@ BST_iter_ty BSTInsert(BST_ty *tree, void *data)
             iter = iter->relatives[LEFT];  
         }
     }
-    iter = ConnectNodes(iter_prev, new_node, cmp_ret);
-    return iter;
+    ConnectNodes(iter_prev, new_node, cmp_ret);
+    return (BST_iter_ty)new_node;
 }
 
 BST_iter_ty BSTSearch(BST_ty *tree, void *data_to_match)
 {
     BST_iter_ty iter = GetRoot(tree);
-    int cmp_ret = tree->compare(data_to_match, BSTGetData(iter), tree->params);
+    int cmp_ret = 1;
 
     assert(NULL != tree);
     assert(NULL != data_to_match);
     
-    while(0 != cmp_ret && NULL != iter)
+    while(NULL != iter)
     {
         cmp_ret = tree->compare(data_to_match, BSTGetData(iter), tree->params);
         if(cmp_ret > 0)
@@ -326,18 +307,21 @@ BST_iter_ty BSTSearch(BST_ty *tree, void *data_to_match)
         else if(cmp_ret < 0)
         {   
             iter = iter->relatives[LEFT];  
-        }  
+        } 
+        else if (0 == cmp_ret)
+        {
+            return iter;
+        }
+         
     }
-    if(NULL == iter)
-    {
-        return BSTEnd(tree);
-    }
-    return iter;
+    return BSTEnd(tree);
 }
 
 void *BSTRemove(BST_iter_ty iter)
 {
-    int left_chiled_flag = IsIterLeftChiled(iter);
+    int left_chiled_flag = 0;
+    assert(NULL != iter);
+    left_chiled_flag = IsIterLeftChiled(iter);
 
     switch (CountChildrens(iter))
     {
@@ -352,20 +336,24 @@ void *BSTRemove(BST_iter_ty iter)
         }
         break;
     case 1:
-        OneChildeConnect(iter, left_chiled_flag);
+        RemoveOneChildNode(iter, left_chiled_flag);
         break;
     default:
-        TwoChildrensConnect(iter, left_chiled_flag);
+        RemoveTwoChildrenNode(iter, left_chiled_flag);
         break;
     }
     return DestroyNode(iter);
     
 }
+
 void BSTDestroy(BST_ty *tree)
 {
-    BST_iter_ty root = GetRoot(tree);
+    BST_iter_ty root = NULL;
     BST_iter_ty left = NULL;
     BST_iter_ty right = NULL;
+    assert (NULL != tree);
+    root = GetRoot(tree);
+    
     while(NULL != root)
     {
         left = root->relatives[LEFT];
@@ -388,6 +376,7 @@ void BSTDestroy(BST_ty *tree)
     free(tree);
     tree = NULL;
 }
+
 BST_iter_ty BSTEnd(const BST_ty *tree)
 {
     assert(tree);
