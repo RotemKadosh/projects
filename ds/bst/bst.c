@@ -112,7 +112,6 @@ static void RemoveOneChildNode(BST_iter_ty iter, int left_chiled_flag)
     
 }
 
-
 static void RemoveTwoChildrenNode(BST_iter_ty iter, int left_chiled_flag)
 {
     BST_iter_ty next_node = BSTIterNext(iter);
@@ -121,6 +120,7 @@ static void RemoveTwoChildrenNode(BST_iter_ty iter, int left_chiled_flag)
     ConnectNodes(next_node, iter->relatives[LEFT], LEFT_C);
     ConnectNodes(iter->relatives[PARENT], iter->relatives[RIGHT], side);
 }
+
 static void *DestroyNode(bst_node_ty *node)
 {
     void *data = node->data;
@@ -141,6 +141,18 @@ static BST_iter_ty TraversSide(BST_iter_ty iter, int side)
         iter = iter->relatives[side]; 
     }
     return iter;
+}
+
+static void ConnectNoChildrenNode(BST_iter_ty iter, int left_chiled_flag)
+{
+       if(left_chiled_flag)
+        {
+            iter->relatives[PARENT]->relatives[LEFT] = NULL;
+        }
+        else
+        {
+            iter->relatives[PARENT]->relatives[RIGHT] = NULL;
+        }
 }
 /*---------------API------------------------------*/
 
@@ -326,14 +338,7 @@ void *BSTRemove(BST_iter_ty iter)
     switch (CountChildrens(iter))
     {
     case 0:
-        if(left_chiled_flag)
-        {
-            iter->relatives[PARENT]->relatives[LEFT] = NULL;
-        }
-        else
-        {
-            iter->relatives[PARENT]->relatives[RIGHT] = NULL;
-        }
+        ConnectNoChildrenNode(iter, left_chiled_flag);
         break;
     case 1:
         RemoveOneChildNode(iter, left_chiled_flag);
