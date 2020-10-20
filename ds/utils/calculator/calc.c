@@ -66,7 +66,7 @@ static state_ty ErrorHendler(calculator_ty *calc, const char **math_exp, int *ex
 static double ResaultHendler(calculator_ty *calc, int *exit_status);
 void RightAssocHendler(calculator_ty *calc,  int *exit_status);
 void LeftAssocHendler(calculator_ty *calc,  int *exit_status);
-void ParanthesesHendler(calculator_ty *calc,char op, int *exit_status);
+state_ty ParanthesesHendler(calculator_ty *calc,char op, int *exit_status);
              /*-----service funcs---------*/
 static void CalculateSoFar(calculator_ty *calc, char op, int *exit_status);
 static void MoveElementFromStackToStack(stack_t *old, stack_t *new);
@@ -265,12 +265,11 @@ state_ty WaitForOpHendler(calculator_ty *calc, const char **math_exp, int *exit_
     }
     else if(IsCloseParantheses(op))
     {
-        ParanthesesHendler(calc, op, exit_status);
-        change_to_state = WAIT_FOR_OP;
+        change_to_state =ParanthesesHendler(calc, op, exit_status);
         *math_exp = ptr_end;
         return change_to_state;
     }
-    if(op == '\0')
+    if(op == '\0' && SUCCESS == *exit_status)
     {
         change_to_state = RESAULT;
         return change_to_state;
@@ -375,8 +374,9 @@ void RightAssocHendler(calculator_ty *calc,  int *exit_status)
     }
 }
 
-void ParanthesesHendler(calculator_ty *calc, char op, int *exit_status)
+state_ty ParanthesesHendler(calculator_ty *calc, char op, int *exit_status)
 {
+    state_ty change_to = WAIT_FOR_OP;
     char match_par = GetMatchParantheses(op);
     char current_op = PeekOpFromStack(calc->operations);
     if(current_op != match_par)
@@ -387,7 +387,9 @@ void ParanthesesHendler(calculator_ty *calc, char op, int *exit_status)
     if(current_op != match_par)
     {
         *exit_status = SYNTAX_ERROR;
+        change_to = ERROR;
     }
+    return change_to;
 
 }
 
