@@ -11,6 +11,8 @@
 * different use will resolve as syntax error
 * using iligle operation such as divid a number by zero 
 * will resolve to Math error
+* to avoid undefine behavior regarding pow function should consault the math.h 
+* pow function manual 
 *@param
 * math_exp - a string containing the mathematical expression to calculate
 * exit_status - a pioter to integer that will indicate 
