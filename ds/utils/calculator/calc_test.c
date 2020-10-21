@@ -158,6 +158,8 @@ static test_status_t TestPow(void)
     REQUIRE(exit_status == SUCCESS);
     REQUIRE(0.00001 > Calculate("5^01", &exit_status) - 5);
     REQUIRE(exit_status == SUCCESS);
+    REQUIRE(0.00001 > Calculate("4^3^2", &exit_status) - 262144);
+    REQUIRE(exit_status == SUCCESS);
     REQUIRE(0.00001 > Calculate("1^12", &exit_status) - 1);
     REQUIRE(exit_status == SUCCESS);
     Calculate("9^", &exit_status);
@@ -165,6 +167,9 @@ static test_status_t TestPow(void)
     exit_status = SUCCESS;
     Calculate("^9", &exit_status);
     REQUIRE(exit_status == SYNTAX_ERROR);
+    exit_status = SUCCESS;
+    Calculate("0^(-2)", &exit_status);
+    REQUIRE(exit_status == MATH_ERROR);
     return PASSED;
 }
 
@@ -239,6 +244,8 @@ static test_status_t TestComplex(void)
     REQUIRE(0.00001 > Calculate("4^0.5-(10+20)^2+100/2", &exit_status) - (-848));
     REQUIRE(exit_status == SUCCESS);
     REQUIRE(0.00001 > Calculate("[5*0]+[100-36]*0.6/9", &exit_status) - 4.266666667);
+    REQUIRE(exit_status == SUCCESS);
+    REQUIRE(0.00001 > Calculate("10-1-1-1-4", &exit_status) - 3);
     REQUIRE(exit_status == SUCCESS);
     REQUIRE(0.00001 > Calculate("-18*{[(9+49)/7]-{8*5}}", &exit_status) - 570.8571429);
     REQUIRE(exit_status == SUCCESS);
