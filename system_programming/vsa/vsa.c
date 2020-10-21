@@ -19,6 +19,8 @@ struct variable_sized_allocator
 #define DUMMY_SIZE sizeof(VSA_t)
 
 
+
+
 VSA_t *VSAInit(void *memory, size_t memory_size)
 {
 	VSA_t *allocator = NULL;
@@ -45,6 +47,8 @@ VSA_t *VSAInit(void *memory, size_t memory_size)
     return allocator;	
 }
 
+
+
 static VSA_t *NextChunk(VSA_t *allocator)
 {
 	char *allocator_as_char = (char *)allocator;
@@ -56,7 +60,7 @@ static VSA_t *NextChunk(VSA_t *allocator)
 	{
 		return (VSA_t *)(allocator_as_char + VSA_SIZE + (allocator->size * SWITCH_SIGN));
 	}
-
+	
 	return (VSA_t *)(allocator_as_char + VSA_SIZE + allocator->size);	
 }
 
@@ -108,7 +112,7 @@ static int IsNextChunkAvailable(VSA_t *allocator)
 
 	next_chunk = NextChunk(allocator);
 	
-	return (0 < next_chunk->size);
+	return (0  < next_chunk->size);
 }
 
 static int IsChunkAvailable(VSA_t *allocator)
@@ -220,7 +224,6 @@ int WasAllMemoryFreed(VSA_t* pool)
 	}
 	return TRUE;
 }
-
 
 #ifndef NDEBUG
 	int IsBlockValidDebugMode(void *block)

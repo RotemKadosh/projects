@@ -1,7 +1,7 @@
 CC=gcc
-CFLAGS=-ansi -pedantic-errors -Wall -Wextra -g
-DEPS = fsa.h 
-OBJ = vsa.o vsa_test.o 
+CFLAGS=-ansi -pedantic-errors -Wall -Wextra -g -lm
+DEPS = calc.h parser.h stack.h 
+OBJ = calc.c calc_test.c ../parser/parser.c ../../stack/stack.c 
 .PHONY = run cgdb vlg clean ar sl gc
 
 %.o: %.c $(DEPS)
@@ -23,10 +23,7 @@ gc:
 	gcc -ansi -pedantic-errors -Wall -Wextra -DNDEBUG -O3 $(OBJ) $(DEPS) 
 
 ar: 
-	ar rcs vsa.ar $(OBJ) $(DEPS)
-
-sl:
-	ln -s ~/git/system_programming/vsa/vsa.h ~/git/system_programming/include
+	ar rcs calculator.ar $(OBJ) $(DEPS)
 
 clean: 
 	rm -f *.o *.out *.gch

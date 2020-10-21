@@ -158,7 +158,7 @@ static test_status_t TestPow(void)
     REQUIRE(exit_status == SUCCESS);
     REQUIRE(0.00001 > Calculate("5^01", &exit_status) - 5);
     REQUIRE(exit_status == SUCCESS);
-    REQUIRE( Calculate("4^3^2", &exit_status) == 262144);
+    REQUIRE(0.00001 > Calculate("4^3^2", &exit_status) - 262144);
     REQUIRE(exit_status == SUCCESS);
     REQUIRE(0.00001 > Calculate("1^12", &exit_status) - 1);
     REQUIRE(exit_status == SUCCESS);

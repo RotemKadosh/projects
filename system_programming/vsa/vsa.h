@@ -64,7 +64,7 @@ void VSAFree(void *block);
 */
 size_t VSALargestChunkAvailable(VSA_t *allocator);
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 int IsBlockValidDebugMode(void *block);
 int WasAllMemoryFreed(VSA_t* pool);
 #endif

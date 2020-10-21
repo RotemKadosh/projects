@@ -32,7 +32,7 @@ typedef double(*OperationFunc_ty)(double num1, double num2, int *exit_status);
 
 typedef state_ty(*StageHendlerFunc_ty)(calculator_ty *calc, const char **math_exp, int *exit_status);
 
-typedef void(*assoc_hendler_ty)(calculator_ty *calc, char op ,int *exit_status);
+typedef void(*assoc_hendler_ty)(calculator_ty *calc, int *exit_status);
 
 struct calc
 {
@@ -40,7 +40,6 @@ struct calc
     stack_t *operations;
     StageHendlerFunc_ty states_lut[NUMBER_OF_STATE];
     OperationFunc_ty operations_lut[ASCII_SIZE];
-    assoc_hendler_ty Assoc_lut[ASCII_SIZE];
 };
 
 
@@ -64,17 +63,18 @@ static state_ty WaitForNumHendler(calculator_ty *calc, const char **math_exp, in
 static state_ty WaitForOpHendler(calculator_ty *calc, const char **math_exp, int *exit_status);
 static state_ty ErrorHendler(calculator_ty *calc, const char **math_exp, int *exit_status);
 static double ResaultHendler(calculator_ty *calc, int *exit_status);
-void RightAssocHendler(calculator_ty *calc, char op ,int *exit_status);
-void LeftAssocHendler(calculator_ty *calc, char op ,int *exit_status);
+void RightAssocHendler(calculator_ty *calc,  int *exit_status);
+void LeftAssocHendler(calculator_ty *calc,  int *exit_status);
 state_ty ParanthesesHendler(calculator_ty *calc,char op, int *exit_status);
              /*-----service funcs---------*/
 static void CalculateSoFar(calculator_ty *calc, char op, int *exit_status);
+static void MoveElementFromStackToStack(stack_t *old, stack_t *new);
 static double TakeNumFromStack(stack_t *stack);
 static void PushDoubleToStack(const double num, stack_t *stack);
 static int IsSmallerPriority(const char op1,const char op2);
-static int IsSmallerOrEqualPriority(const char op1,const char op2);
 static int GetPriority(const char op);
 static void DestroyCalc(calculator_ty *calc);
+static void MoveOpFromStackToStack(stack_t *old, stack_t *new);
 static int GetAssoc(char op);
 static char TakeOpFromStack(stack_t *stack);
 static void PushOpToStack(const char op, stack_t *stack);
@@ -82,8 +82,6 @@ static char PeekOpFromStack(stack_t *stack);
 static int IsCloseParantheses(char op);
 static int IsOpenParantheses(char ch);
 static char GetMatchParantheses(char par);
-static void PowCalc(calculator_ty *calc, char op, int *exit_status);
-static void NotPowCalc(calculator_ty *calc, char op, int *exit_status);
 static state_ty CheckGetNumRes(calculator_ty *calc, char parantheses, const char **math_exp,  const char *ptr_end,int *exit_status );
 /*--------------------------Definitions---------------------------*/
 
@@ -120,7 +118,7 @@ static double Multiply(double num1, double num2, int *exit_status)
 static double Power(double base, double power, int *exit_status)
 {
     double ans = pow(base, power);
-    if (__isinf(ans) || __isnan(ans) )
+    if ( __isnan(ans) || abs(__isinf(ans)) )
     {
         *exit_status = MATH_ERROR;
         return 0;
@@ -148,7 +146,6 @@ static calculator_ty *InitCalc(const char *math_exp, int *exit_status)
     }
     InitStatesLut(calc);
     InitOpLut(calc);
-    InitAssocLut(calc);
     return calc;
 
 }
@@ -196,16 +193,7 @@ static void InitOpLut(calculator_ty *calc)
 
 }
 
-static void InitAssocLut(calculator_ty *calc)
-{
-    assert(NULL != calc);
 
-    calc->Assoc_lut['+'] = LeftAssocHendler;
-    calc->Assoc_lut['-'] = LeftAssocHendler;
-    calc->Assoc_lut['*'] = LeftAssocHendler;
-    calc->Assoc_lut['/'] = LeftAssocHendler;
-    calc->Assoc_lut['^'] = RightAssocHendler;
-}
 
     /*----------------------hendlers-----------------=----*/
 
@@ -233,6 +221,7 @@ state_ty WaitForNumHendler(calculator_ty *calc, const char **math_exp, int *exit
     return change_to_state;
 }
 
+
 state_ty WaitForOpHendler(calculator_ty *calc, const char **math_exp, int *exit_status)
 {
     char op ='0';
@@ -249,7 +238,7 @@ state_ty WaitForOpHendler(calculator_ty *calc, const char **math_exp, int *exit_
         *exit_status = SYNTAX_ERROR;
         change_to_state = ERROR;
     }
-    else if(IsSmallerOrEqualPriority(op, peek))
+    else if(IsSmallerPriority(op, peek))
     {
         CalculateSoFar(calc, op, exit_status);
     }
@@ -300,41 +289,20 @@ double ResaultHendler(calculator_ty *calc, int *exit_status)
     return result;
 }
 
-void LeftAssocHendler(calculator_ty *calc, char op , int *exit_status)
+void CalculateOneOperation(calculator_ty *calc,  int *exit_status)
 {
     double num1 = 0;
     double num2 = 0;
     double ans = 0;
-    char current_op = PeekOpFromStack(calc->operations);
- 
-    while(!IsOpenParantheses(current_op) && IsSmallerOrEqualPriority(op, current_op) 
-            && StackSize(calc->numbers) > 1 && SUCCESS == *exit_status)
-    {
-        /*calc from new stacks*/
-        current_op = TakeOpFromStack(calc->operations);
-        num1 = TakeNumFromStack(calc->numbers);
-        num2 = TakeNumFromStack(calc->numbers);
-        ans = calc->operations_lut[(int)current_op](num2, num1, exit_status);
-        PushDoubleToStack(ans, calc->numbers);
-        current_op = PeekOpFromStack(calc->operations);
-    }
-}
+    char current_op = '0';
+    
 
-void RightAssocHendler(calculator_ty *calc, char op, int *exit_status)
-{
-    double num1 = 0;
-    double num2 = 0;
-    double ans = 0;
-    char current_op = PeekOpFromStack(calc->operations);
-    while(IsSmallerPriority(op, current_op) && GetAssoc(current_op) == RIGHT && SUCCESS == *exit_status && StackSize(calc->numbers) > 1)
-    {
-        StackPop(calc->operations);
-        num1 = TakeNumFromStack(calc->numbers); 
-        num2 = TakeNumFromStack(calc->numbers);
-        ans = calc->operations_lut[(int)current_op](num2, num1, exit_status);
-        PushDoubleToStack(ans, calc->numbers);
-        current_op = PeekOpFromStack(calc->operations);
-    }
+    current_op = TakeOpFromStack(calc->operations);
+    num1 = TakeNumFromStack(calc->numbers);
+    num2 = TakeNumFromStack(calc->numbers);
+    ans = calc->operations_lut[(int)current_op](num2, num1, exit_status);
+    PushDoubleToStack(ans, calc->numbers);
+
 }
 
 state_ty ParanthesesHendler(calculator_ty *calc, char op, int *exit_status)
@@ -358,36 +326,20 @@ state_ty ParanthesesHendler(calculator_ty *calc, char op, int *exit_status)
 
     /*-------------------service funcs---------------------*/
 
+static void MoveOpFromStackToStack(stack_t *old, stack_t *new)
+{
+    char op = TakeOpFromStack(old);
+    PushOpToStack(op, new);
+}
+
 static void CalculateSoFar(calculator_ty *calc, char op, int *exit_status)
 {
     char current_op = PeekOpFromStack(calc->operations);
-    if(current_op == '^')
+    while(IsSmallerPriority(op, current_op) && 1 < StackSize(calc->numbers) &&
+                     SUCCESS == *exit_status && !IsOpenParantheses(current_op))
     {
-     PowCalc(calc, op, exit_status);
-    }
-    else
-    {
-      NotPowCalc(calc, op, exit_status);
-    }  
-}
-static void PowCalc(calculator_ty *calc, char op, int *exit_status)
-{
-    char current_op = PeekOpFromStack(calc->operations);
-    while(!IsOpenParantheses(current_op) && IsSmallerPriority(op, current_op) 
-            && 1 < StackSize(calc->numbers) && SUCCESS == *exit_status)
-    {
-        calc->Assoc_lut[(int)current_op](calc, op, exit_status);
-        current_op = PeekOpFromStack(calc->operations);
-    }
-}
-static void NotPowCalc(calculator_ty *calc, char op, int *exit_status)
-{
-    char current_op = PeekOpFromStack(calc->operations);
-    while(!IsOpenParantheses(current_op) && IsSmallerOrEqualPriority(op, current_op) 
-        && 1 < StackSize(calc->numbers) && SUCCESS == *exit_status)
-    {
-        calc->Assoc_lut[(int)current_op](calc, op, exit_status);
-        current_op = PeekOpFromStack(calc->operations);
+       CalculateOneOperation(calc,exit_status);
+       current_op = PeekOpFromStack(calc->operations);
     }
 }
 
@@ -399,6 +351,13 @@ static int GetAssoc(char op)
         assoc = RIGHT;
     }
     return assoc;
+}
+
+static void MoveElementFromStackToStack(stack_t *old, stack_t *new)
+{
+    double num = TakeNumFromStack(old);
+    PushDoubleToStack(num, new);
+        
 }
 
 static double TakeNumFromStack(stack_t *stack)
@@ -445,11 +404,6 @@ static void PushOpToStack(const char op, stack_t *stack)
 }
 
 static int IsSmallerPriority(const char op1,const char op2)
-{
-    return (GetPriority(op1) < GetPriority(op2));
-}
-
-static int IsSmallerOrEqualPriority(const char op1,const char op2)
 {
     return (GetPriority(op1) <= GetPriority(op2));
 }
@@ -503,12 +457,14 @@ static int IsCloseParantheses(char ch)
 
 static int IsOpenParantheses(char ch)
 {
+    {
     int res = FALSE;
     if(ch == '(' || ch =='[' || ch == '{')
     {
         res = TRUE;
     }
     return res;
+}
 }
 
 static char GetMatchParantheses(char par)
