@@ -9,6 +9,9 @@
 #define NON_ZERO (1)
 #define TRUE (1)
 #define FALSE (0)
+#define PREORDER (1)
+#define INORDER (2)
+#define OPERATION_SUCCESS (0)
 /*------------------Structs & typedefs-----------------------------------------------*/
 typedef enum relatives
 {
@@ -74,7 +77,6 @@ AVL_ty *AVLCreate(AVL_cmp_func_ty compare)
     if(NULL != avl)
     { 
         avl->compare = compare;
-
         avl->root = NULL; 
     }
     return avl;
@@ -124,20 +126,13 @@ int AVLInsert(AVL_ty *tree, void *data)
 int AVLInsertBalance(AVL_ty *tree, void *data)
 {
     AVL_node_ty *node_to_insert = NULL;
-    AVL_node_ty *root = NULL;
 
     assert(tree != NULL);
 
-    root = tree->root;
     node_to_insert = CreateNode(data);
     if(NULL == node_to_insert)
     {
        return FAIL; 
-    }
-    if(NULL == root)
-    {
-        tree->root = node_to_insert;
-        return SUCCESS;
     }
     tree->root = AVLInsertBalRec(tree, tree->root, node_to_insert);
     return SUCCESS;
@@ -145,27 +140,16 @@ int AVLInsertBalance(AVL_ty *tree, void *data)
 
 size_t AVLSize(const AVL_ty *tree)
 {
-    int count = 0;
-
     assert(NULL != tree);
 
-    if(NULL != tree->root)
-    {
-        count = AVLSizeRec(tree->root);
-    }
-    return count;
+    return AVLSizeRec(tree->root);
 }
 
 size_t AVLHeight(const AVL_ty *tree)
 {
-    int count = 0;
-
     assert(NULL != tree);
-    if(NULL != tree->root)
-    {
-        count = AVLHightRec(tree->root);
-    }
-    return count;
+
+    return AVLHightRec(tree->root);
 }
 
 int AVLIsEmpty(const AVL_ty *tree)
@@ -180,16 +164,14 @@ int AVLForEach(const AVL_ty *tree, AVL_action_func_ty operation, void *param, in
     assert(NULL !=operation);
     switch (travesal_type)
     {
-    case 1:
-        printf("pre order:\n");
+    case PREORDER:
         return PreOrderForEach(tree->root, operation, param);
-    case 2:
-         printf("in order:\n");
+
+    case INORDER:
         return InOrderForEach(tree->root, operation, param);
+
     default:
-        printf("post order:\n");
         return PostOrderForEach(tree->root, operation, param);
-      
     }
 }
 
@@ -340,76 +322,47 @@ static AVL_node_ty *FindParent(AVL_ty *tree, AVL_node_ty *root, void *key, int *
 
 static int PreOrderForEach(AVL_node_ty *root, AVL_action_func_ty operation, void *param )
 {
-    AVL_node_ty *left = NULL;
-    AVL_node_ty *right = NULL;
-    
-    assert(NULL != root);
-
-    left = root->relatives[LEFT];
-    right = root->relatives[RIGHT];
-    operation(root->data, param);
-
-    if(NULL != left)
+    assert(NULL != operation);
+   
+    if(root == NULL)
     {
-        PreOrderForEach(left, operation, param);
+        return OPERATION_SUCCESS;
     }
-    if(NULL != right)
-    {
-        PreOrderForEach(right, operation, param);
-    }
-    return SUCCESS;
+
+    return (OPERATION_SUCCESS != operation(root->data, param)) ||   
+        (OPERATION_SUCCESS != PreOrderForEach(root->relatives[LEFT], operation, param)) ||
+        (OPERATION_SUCCESS != PreOrderForEach(root->relatives[RIGHT], operation, param));
 
 }
 
 static int InOrderForEach(AVL_node_ty *root, AVL_action_func_ty operation, void *param )
 {
-    AVL_node_ty *left = NULL;
-    AVL_node_ty *right = NULL;
+    assert(NULL != operation);
    
-    assert(NULL != root);
-
-    left = root->relatives[LEFT];
-    right = root->relatives[RIGHT];
-    
-    if(NULL != left)
+    if(root == NULL)
     {
-        InOrderForEach(left, operation, param);
+        return OPERATION_SUCCESS;
     }
-    
-    operation(root->data, param);
 
-    if(NULL != right)
-    {
-        InOrderForEach(right, operation, param);
-    }
-    return SUCCESS;
+    return  (OPERATION_SUCCESS != InOrderForEach(root->relatives[LEFT], operation, param)) ||
+        (OPERATION_SUCCESS != operation(root->data, param)) ||
+        (OPERATION_SUCCESS != InOrderForEach(root->relatives[RIGHT], operation, param));
 
 }
 
 static int PostOrderForEach(AVL_node_ty *root, AVL_action_func_ty operation, void *param )
 {
-    AVL_node_ty *left = NULL;
-    AVL_node_ty *right = NULL;
-    int ans = 0;
-    assert(NULL != root);
+       assert(NULL != operation);
+   
+    if(root == NULL)
+    {
+        return OPERATION_SUCCESS;
+    }
 
-    left = root->relatives[LEFT];
-    right = root->relatives[RIGHT];
-    
-    if (NULL != left)
-    {
-        ans = PostOrderForEach(left, operation, param);
-    }
-    if (NULL != right)
-    {
-        ans = PostOrderForEach(right, operation, param);
-    }
-    if (ans != NON_ZERO)
-    {
-        operation(root->data, param);
-        ans = 0;
-    }
-    return ans;
+    return  (OPERATION_SUCCESS != PostOrderForEach(root->relatives[LEFT], operation, param)) ||
+        (OPERATION_SUCCESS != PostOrderForEach(root->relatives[RIGHT], operation, param))||
+        (OPERATION_SUCCESS != operation(root->data, param));
+
 
 }
 
@@ -422,8 +375,9 @@ static void AVLDestroyRec(AVL_node_ty *root)
     }
     AVLDestroyRec(root->relatives[LEFT]);
     AVLDestroyRec(root->relatives[RIGHT]);
-   
+
     DestroyNode(root);
+    root = NULL;
 }
 
 static void *AVLSearchRecurcive(AVL_ty *tree, AVL_node_ty *root , void *data_to_match)
@@ -480,11 +434,11 @@ static int AVLInsertRecurcive(AVL_ty *tree, AVL_node_ty *root , AVL_node_ty *nod
 static size_t AVLSizeRec(AVL_node_ty *root)
 {
 
-   if(NULL == root)
-   {
+    if(NULL == root)
+    {
        return 0;
-   }
-    return 1 + AVLSizeRec(root->relatives[RIGHT]) + AVLSizeRec(root->relatives[LEFT]);
+    }
+    return 1 + AVLSizeRec(root->relatives[LEFT]) + AVLSizeRec(root->relatives[RIGHT]);
 }
 
 static size_t AVLHightRec(AVL_node_ty *root)
@@ -670,17 +624,16 @@ static AVL_node_ty *AVLRemoveBalRec(AVL_ty *tree, AVL_node_ty *root, void *data)
     }
     else
     {
-      root = RemoveNodeByCopy(tree, root);  
-      if(NULL == root)
-      {
-          return NULL;
-      }
-    }  
+        root = RemoveNodeByCopy(tree, root);  
+        if(NULL == root)
+        {
+            return NULL;
+        }
+    } 
+
     max_height =  MAX(GetNodeH(root->relatives[LEFT]), GetNodeH(root->relatives[RIGHT]));
     root->height = 1 + max_height;
     return BalanceTheTree(root);
-    
-  
 }
 
 static AVL_node_ty *RemoveLeaf(AVL_ty *tree, AVL_node_ty *root)

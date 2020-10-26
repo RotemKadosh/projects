@@ -174,7 +174,7 @@ static test_status_t TestBalancInsert(void)
     AVL_ty *avl = AVLCreate(Comp);
     size_t i = 0;
     REQUIRE(TRUE == AVLIsEmpty(avl));
-    for(i = 0; i < 80000; i += 4)
+    for(i = 0; i < 100000; i += 4)
     {
         REQUIRE(SUCCESS == AVLInsertBalance(avl, (void *)(i - 3)));
         REQUIRE(SUCCESS == AVLInsertBalance(avl, (void *)i));
@@ -182,7 +182,6 @@ static test_status_t TestBalancInsert(void)
     }
     
     AVLDestroy(avl);
-
     return PASSED;
 }
 
