@@ -18,12 +18,12 @@ int Comp(const void *data, const void *data_to_compare);
 
 int main(void)
 {
-    RUNTEST(TestCreate);
 
+    RUNTEST(TestCreate);
     RUNTEST(TestInsertIsEmpty);
     RUNTEST(TestSizeHight); 
     RUNTEST(TestForeach);      
-    RUNTEST(TestRemoveFind);    
+    RUNTEST(TestRemoveFind); 
     RUNTEST(TestBalancInsert);
     RUNTEST(TestBalanceRemove);
     return 0;
@@ -174,7 +174,7 @@ static test_status_t TestBalancInsert(void)
     AVL_ty *avl = AVLCreate(Comp);
     size_t i = 0;
     REQUIRE(TRUE == AVLIsEmpty(avl));
-    for(i = 0; i < 10000; i += 4)
+    for(i = 0; i < 80000; i += 4)
     {
         REQUIRE(SUCCESS == AVLInsertBalance(avl, (void *)(i - 3)));
         REQUIRE(SUCCESS == AVLInsertBalance(avl, (void *)i));
@@ -198,6 +198,7 @@ static test_status_t TestBalanceRemove(void)
     REQUIRE(SUCCESS == AVLInsertBalance(avl, (void *)12));
     REQUIRE(SUCCESS == AVLInsertBalance(avl, (void *)17));
     REQUIRE(SUCCESS == AVLInsertBalance(avl, (void *)11));
+    print2D(avl);
     REQUIRE(8 == AVLSize(avl));
 
     print2D(avl);

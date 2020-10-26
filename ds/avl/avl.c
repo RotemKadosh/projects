@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "avl.h"
 
-#define MAX(a,b) (a >= b) ? a : b
+#define MAX(a,b) ( (a) >= (b)) ? (a) : (b)
 #define FAIL (0)
 #define SUCCESS (1)
 #define NON_ZERO (1)
@@ -28,14 +28,14 @@ struct tree_node
     size_t height; /* not for first phase */
 };
 
-
+typedef AVL_node_ty *(*remove_func_ty)(AVL_ty *tree, AVL_node_ty *root);
 
 /*----------------declerations-------------------------------------------*/
 
 /*--------------------SERVIC---------------------------*/
 static AVL_node_ty *CreateNode(void *data);
-static size_t AVLHightRec(AVL_node_ty *root);
-static size_t AVLSizeRec(AVL_node_ty *root);
+static size_t AVLHightRec(AVL_node_ty *root);                                   /*recusive calc of height*/
+static size_t AVLSizeRec(AVL_node_ty *root);                                    /*recusive calc of size*/
 static int AVLInsertRecurcive(AVL_ty *tree, AVL_node_ty *root , AVL_node_ty *node_to_insert);
 static void *AVLSearchRecurcive(AVL_ty *tree, AVL_node_ty *root , void *data_to_match);
 static void AVLDestroyRec(AVL_node_ty *root);
@@ -50,17 +50,19 @@ static AVL_node_ty *TraversSide(AVL_node_ty *iter, int side);
 static AVL_node_ty *FindParent(AVL_ty *tree, AVL_node_ty *root, void *key, int *side);
 static size_t CountChildren(AVL_node_ty *node);
 static AVL_node_ty *LeftRotate(AVL_node_ty *node);
-static void print2DUtil(AVL_node_ty *root, int space);
 static AVL_node_ty *RightRotate(AVL_node_ty *node);
 void print2D(AVL_ty *tree);
-static AVL_node_ty *InsertBalanceTheTree(AVL_ty *tree, AVL_node_ty *node, void *data);
-static AVL_node_ty *AVLInsertBalRec(AVL_ty *tree, AVL_node_ty *root, AVL_node_ty *new_node);
+static void print2DUtil(AVL_node_ty *root, int space);
+static AVL_node_ty *AVLInsertBalRec(AVL_ty *tree, AVL_node_ty *root, AVL_node_ty *new_node);/*balance insert*/
 static int GetNodeBalance(AVL_node_ty *node);
-static size_t AVLbalHeightRec(const AVL_node_ty *root);
 static void CopyContent(AVL_node_ty *from, AVL_node_ty *to);
-static AVL_node_ty *BalanceTheTreeRemove(AVL_node_ty *node);
+static AVL_node_ty *BalanceTheTree(AVL_node_ty *node);
 static AVL_node_ty *RemoveNodeByCopy(AVL_ty *tree, AVL_node_ty *root);
 static AVL_node_ty *AVLRemoveBalRec(AVL_ty *tree, AVL_node_ty *root, void *data);
+static size_t GetNodeH(AVL_node_ty *node); 
+static AVL_node_ty *RemoveTwoChild(AVL_ty *tree, AVL_node_ty *root);
+static AVL_node_ty *RemoveOneChild(AVL_ty *tree, AVL_node_ty *root);
+static AVL_node_ty *RemoveLeaf(AVL_ty *tree, AVL_node_ty *root);                                      /*non recursive height*/   
 /*------------------definitions-----------------------------------------------*/
 
 /*--------------------API---------------------------*/
@@ -413,28 +415,14 @@ static int PostOrderForEach(AVL_node_ty *root, AVL_action_func_ty operation, voi
 
 static void AVLDestroyRec(AVL_node_ty *root)
 {
-    AVL_node_ty *left = NULL;
-    AVL_node_ty *right = NULL;
     
     if(root == NULL)
     {
         return;
     }
-
-    left = root->relatives[LEFT];
-    right = root->relatives[RIGHT];
-
-    if (NULL != left)
-    {
-        root->relatives[LEFT] = NULL;
-        AVLDestroyRec(left);
-        
-    }
-    if (NULL != right)
-    {
-        root->relatives[RIGHT] = NULL;
-        AVLDestroyRec(right);
-    }
+    AVLDestroyRec(root->relatives[LEFT]);
+    AVLDestroyRec(root->relatives[RIGHT]);
+   
     DestroyNode(root);
 }
 
@@ -491,27 +479,12 @@ static int AVLInsertRecurcive(AVL_ty *tree, AVL_node_ty *root , AVL_node_ty *nod
 
 static size_t AVLSizeRec(AVL_node_ty *root)
 {
-    AVL_node_ty *left = NULL;
-    AVL_node_ty *right = NULL;
-    size_t count = 1;
-    assert(NULL != root);
 
-    left = root->relatives[LEFT];
-    right = root->relatives[RIGHT];
-
-    if(NULL == left && NULL == right)
-    {
-        return count;
-    }
-    else if (NULL == left)
-    {
-        return count + AVLSizeRec(right);
-    }
-    else if (NULL == right)
-    {
-        return count + AVLSizeRec(left);
-    }
-    return count + AVLSizeRec(left) + AVLSizeRec(right);
+   if(NULL == root)
+   {
+       return 0;
+   }
+    return 1 + AVLSizeRec(root->relatives[RIGHT]) + AVLSizeRec(root->relatives[LEFT]);
 }
 
 static size_t AVLHightRec(AVL_node_ty *root)
@@ -549,6 +522,7 @@ static AVL_node_ty *CreateNode(void *data)
         new_node->data = data;
         new_node->relatives[RIGHT] = NULL;
         new_node->relatives[LEFT] = NULL;
+        new_node->height = 1;
     
     }
     return new_node;
@@ -614,71 +588,33 @@ static AVL_node_ty *AVLInsertBalRec(AVL_ty *tree, AVL_node_ty *root, AVL_node_ty
 
     if (0 < compare_return_status)
     {
-        root->relatives[RIGHT] = AVLInsertBalRec(tree, root->relatives[RIGHT], new_node);   
+        root->relatives[RIGHT] = AVLInsertBalRec(tree, root->relatives[RIGHT], new_node);
+          
     }
     else if (0 > compare_return_status)
     {
         root->relatives[LEFT] = AVLInsertBalRec(tree, root->relatives[LEFT], new_node);    
     }
-    max_height =  MAX(AVLHightRec(root->relatives[LEFT]), 
-                                        AVLHightRec(root->relatives[RIGHT]));
+    max_height =  MAX(GetNodeH(root->relatives[LEFT]), GetNodeH(root->relatives[RIGHT]));
     root->height = 1 + max_height;
-    return InsertBalanceTheTree(tree, root, new_node->data);
-}
-
-static AVL_node_ty *InsertBalanceTheTree(AVL_ty *tree, AVL_node_ty *node, void *data)
-{
-    int balance = GetNodeBalance(node);
-    AVL_node_ty *left = node->relatives[LEFT];
-    AVL_node_ty *right = node->relatives[RIGHT];
     
-    if(balance > 1 && 0 < tree->compare(data, left->data))
-    {
-        node->relatives[LEFT] = LeftRotate(node->relatives[LEFT]);
-        return RightRotate(node); 
-    }
-
-    if(balance > 1 && 0 > tree->compare(data, left->data))
-    {
-       return RightRotate(node);
-    }
-    if(balance < -1 && 0 < tree->compare(data, right->data))
-    {
-         return LeftRotate(node);  
-    }
-    if(balance < -1 && 0 > tree->compare(data, right->data))
-    {
-        node->relatives[RIGHT] = RightRotate(node->relatives[RIGHT]);
-        return LeftRotate(node);
-    }
-    return node;
+    return BalanceTheTree(root);
 }
 
 static int GetNodeBalance(AVL_node_ty *node)
 {
-   assert(NULL != node);
-   return AVLbalHeightRec(node->relatives[LEFT]) - AVLbalHeightRec(node->relatives[RIGHT]);
+    assert(NULL != node);
+    return GetNodeH(node->relatives[LEFT]) - GetNodeH(node->relatives[RIGHT]);
 }
 
-static size_t AVLbalHeightRec(const AVL_node_ty *root)
+static size_t GetNodeH(AVL_node_ty *node)
 {
-    size_t right_sub_layer = 1;
-    size_t left_sub_layer = 1;
-    
-   if(NULL == root)
-   {
-       return 0;
-   } 
-    if (NULL != root->relatives[LEFT])
+    size_t h = 0;
+    if(NULL != node)
     {
-        left_sub_layer += AVLbalHeightRec(root->relatives[LEFT]);
+        h = node->height;
     }
-    if (NULL != root->relatives[RIGHT])
-    {
-        right_sub_layer += AVLbalHeightRec(root->relatives[RIGHT]);
-    }
-
-    return right_sub_layer > left_sub_layer ? right_sub_layer : left_sub_layer;
+    return h;
 }
 
 static AVL_node_ty *RightRotate(AVL_node_ty *node)
@@ -689,22 +625,25 @@ static AVL_node_ty *RightRotate(AVL_node_ty *node)
     left->relatives[RIGHT] = node;
     node->relatives[LEFT] = left_sub_right;
     
-    node->height = 1 + MAX(AVLbalHeightRec(node->relatives[LEFT]), AVLbalHeightRec(node->relatives[RIGHT]));
-    left->height = 1 + MAX(AVLbalHeightRec(left->relatives[LEFT]), AVLbalHeightRec(left->relatives[RIGHT]));
+    node->height = 1 + MAX(GetNodeH(node->relatives[LEFT]), GetNodeH(node->relatives[RIGHT]));
+    left->height = 1 + MAX(GetNodeH(left->relatives[LEFT]), GetNodeH(left->relatives[RIGHT]));
 
     return left;
 }
 
 static AVL_node_ty *LeftRotate(AVL_node_ty *node)
 {
+    size_t max_r = 0;
+    size_t max_l = 0;
     AVL_node_ty *right = node->relatives[RIGHT];
     AVL_node_ty *right_sub_left = right->relatives[LEFT];
 
     right->relatives[LEFT] = node;
     node->relatives[RIGHT] = right_sub_left;
-    
-    node->height = 1 + MAX(AVLbalHeightRec(node->relatives[LEFT]), AVLbalHeightRec(node->relatives[RIGHT]));
-    right->height = 1 + MAX(AVLbalHeightRec(right->relatives[LEFT]), AVLbalHeightRec(right->relatives[RIGHT]));
+    max_r = MAX(GetNodeH(node->relatives[LEFT]), GetNodeH(node->relatives[RIGHT]));
+    max_l =  MAX(GetNodeH(right->relatives[LEFT]), GetNodeH(right->relatives[RIGHT]));
+    node->height = 1 + max_r;
+    right->height = 1 + max_l;
 
     return right;
 }
@@ -737,67 +676,86 @@ static AVL_node_ty *AVLRemoveBalRec(AVL_ty *tree, AVL_node_ty *root, void *data)
           return NULL;
       }
     }  
-    max_height =  MAX(AVLHightRec(root->relatives[LEFT]), AVLHightRec(root->relatives[RIGHT]));
-    root->height = 1 + max_height; 
-    return BalanceTheTreeRemove(root);
+    max_height =  MAX(GetNodeH(root->relatives[LEFT]), GetNodeH(root->relatives[RIGHT]));
+    root->height = 1 + max_height;
+    return BalanceTheTree(root);
     
   
 }
 
-static AVL_node_ty *RemoveNodeByCopy(AVL_ty *tree, AVL_node_ty *root)
+static AVL_node_ty *RemoveLeaf(AVL_ty *tree, AVL_node_ty *root)
 {
-    AVL_node_ty *next = NULL;
-    assert(NULL != root);
-    if(NULL == root->relatives[LEFT] && NULL == root->relatives[RIGHT])
-    {
-        DestroyNode(root);
-        root = NULL;
-        return root;
-    }
-    else if(NULL != root->relatives[LEFT] && NULL == root->relatives[RIGHT])
+    (void)tree;
+    DestroyNode(root);
+    root = NULL;
+    return root;
+}
+
+static AVL_node_ty *RemoveOneChild(AVL_ty *tree, AVL_node_ty *root)
+{
+    (void)tree;
+    if(NULL == root->relatives[RIGHT])
     {
         CopyContent(root->relatives[LEFT], root);
         DestroyNode(root->relatives[LEFT]);
         root->relatives[LEFT] = NULL;
     }
-    else if(NULL == root->relatives[LEFT] && NULL != root->relatives[RIGHT])
+    else 
     {
         CopyContent(root->relatives[RIGHT], root);
         DestroyNode(root->relatives[RIGHT]);
         root->relatives[RIGHT] = NULL;
     }
-    else
-    {
-        next = TraversSide(root->relatives[RIGHT], LEFT);
-        CopyContent(next, root);
-        root->relatives[RIGHT] = AVLRemoveBalRec(tree, root->relatives[RIGHT], next->data);
-    }
     return root;
 }
 
-static AVL_node_ty *BalanceTheTreeRemove(AVL_node_ty *node)
+static AVL_node_ty *RemoveTwoChild(AVL_ty *tree, AVL_node_ty *root)
+{
+    AVL_node_ty *next = NULL;
+    next = TraversSide(root->relatives[RIGHT], LEFT);
+    CopyContent(next, root);
+    root->relatives[RIGHT] = AVLRemoveBalRec(tree, root->relatives[RIGHT], next->data);
+    return root;
+
+}
+
+static AVL_node_ty *RemoveNodeByCopy(AVL_ty *tree, AVL_node_ty *root)
+{
+    static remove_func_ty remove_func_lut [3] ={RemoveLeaf, RemoveOneChild, RemoveTwoChild};
+
+    size_t num_of_childrens = CountChildren(root);
+    root = remove_func_lut[num_of_childrens](tree, root);
+    return root;
+
+}
+
+static AVL_node_ty *BalanceTheTree(AVL_node_ty *node)
 {
     int balance = GetNodeBalance(node);
     AVL_node_ty *left = node->relatives[LEFT];
     AVL_node_ty *right = node->relatives[RIGHT];
 
-    if (1 < balance && 0 <= GetNodeBalance(left))
+
+    if (1 < balance)
     {
-        return RightRotate(node);
-    }
-    if (1 < balance && 0 > GetNodeBalance(left))
-    {
+       
+        if(1 <= GetNodeBalance(left))
+        {
+            return RightRotate(node);
+        }
         node->relatives[LEFT] = LeftRotate(node->relatives[LEFT]);
-        return RightRotate(node);
+        return RightRotate(node);  
     }
-    if (-1 > balance && 0 >= GetNodeBalance(right))
+    if (-1 > balance )
     {
+
+        if (-1 >= GetNodeBalance(right))
+        {
+            return LeftRotate(node);
+        }
+        node->relatives[RIGHT] = RightRotate(node->relatives[RIGHT]);
         return LeftRotate(node);
-    }
-    if (-1 > balance && 0 < GetNodeBalance(right))
-    {
-        node->relatives[RIGHT] = LeftRotate(node->relatives[RIGHT]);
-        return LeftRotate(node);
+        
     }
     return node;
 }
@@ -805,9 +763,5 @@ static AVL_node_ty *BalanceTheTreeRemove(AVL_node_ty *node)
 static void CopyContent(AVL_node_ty *from, AVL_node_ty *to)
 {
    to->data = from->data;
-   /*
-   to->relatives[RIGHT] =  from->relatives[RIGHT];
-   to->relatives[LEFT] =  from->relatives[LEFT];
-   */
    to->height = from->height;
 }
