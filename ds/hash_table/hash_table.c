@@ -1,7 +1,7 @@
 #include <stdlib.h> /*malloc, free*/
 #include <assert.h> /*assert*/
 #include <string.h> /*memset*/
-
+#include <math.h>
 
 #include "hash.h"
 #include "../dlist/dlist.h"
@@ -11,6 +11,7 @@
 #define TRUE (1)
 #define INSERT_SUCCESS (0)
 #define INSERT_FAIL (1)
+
 
 
 struct hash_table 
@@ -176,9 +177,33 @@ int HashForEach(hash_table_ty *hash, action_func_ty action_func, void *param)
     return action_status;
 }
 
+double HashLoadFactor(hash_table_ty *hash)
+{
+    assert(NULL != hash);
+    return (HashSize(hash) / hash->capacity);
+}
 
+double HashSD(hash_table_ty *hash) 
+{
+    size_t i = 0;
+    Dlist_t *dlist = NULL; 
+    double mu = 0;
+    double xi = 0;
+    double diff = 0;
+    double ans = 0;
+    assert(NULL != hash);
 
-
+    mu = HashLoadFactor(hash);
+    for(i = 0; i < hash->capacity; ++i)
+    {
+        dlist = hash->hash_arr[i];
+        xi = DlistSize(dlist);
+        diff += ((xi - mu) * (xi - mu)); 
+    }
+    ans = diff / hash->capacity;
+    ans = sqrt(ans);
+    return ans;
+}
 
 
 

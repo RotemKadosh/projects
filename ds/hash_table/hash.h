@@ -143,6 +143,8 @@ void *HashFind(hash_table_ty *hash_table, const void *data);
  * In case user’s action function is not successful, return any value of the user's function.
 */
 int HashForEach(hash_table_ty *hash_table, action_func_ty action_func, void *param);
-
+double HashLoadFactor(hash_table_ty *hash);
+double HashSD(hash_table_ty *hash);
+ 
 #endif /*__HASH_H__*/
 

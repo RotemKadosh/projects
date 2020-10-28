@@ -1,5 +1,7 @@
 #include <stdlib.h> /*malloc, free*/
 #include <string.h> /*strcmp*/
+#include <sys/stat.h> /*stat*/
+#include <sys/mman.h>
 #include "../utils/test.h"
 #include "hash.h"
 
@@ -12,6 +14,11 @@ static test_status_t TestSizeIsEmptyInsert(void);
 static test_status_t TestRemove(void);
 static test_status_t Testfind(void);
 static test_status_t TestForeach(void);
+static test_status_t TestDictionary(void);
+
+static void Load(hash_table_ty *hash);
+static test_status_t testLoadSd(void);
+int fileno(FILE *stream);
 
 typedef struct entry
 {
@@ -28,6 +35,8 @@ int main(void)
     RUNTEST(TestRemove);      
     RUNTEST(Testfind); 
     RUNTEST(TestForeach);
+    RUNTEST(TestDictionary);
+    RUNTEST(testLoadSd);
     return 0;
 }
 
@@ -44,6 +53,28 @@ size_t HashFunc(const void *data)
 {
     return ((const entry_ty *)data)->key;
 }
+
+
+size_t Stringhash(const void *str)
+{
+    size_t hash = 5381;
+    int c = 0;
+
+    while( (*(char *)str != '\0'))
+    {
+        c = *(char *)str;
+        str = (char *)str + 1;
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+    }
+    return hash;
+}
+
+ int StringMatch(const void *data, const void *data_to_compare)
+ {
+     return !strcmp(data, data_to_compare);;
+ }
+
+
 
 typedef struct sentry
 {
@@ -222,3 +253,76 @@ static test_status_t TestForeach(void)
     HashDestroy(hash);    
     return PASSED;
 }
+
+static test_status_t TestDictionary(void)
+{
+    char *word = NULL;
+    hash_table_ty *hash = NULL;
+
+    hash = HashCreate(Stringhash, StringMatch, 26);
+    REQUIRE(NULL != hash);
+    Load(hash);
+    printf("%ld\n", HashSize(hash));
+    word = HashFind(hash, "Baker");
+    REQUIRE(0 == strcmp(word, "Baker"));
+    word = HashFind(hash, "America");
+    REQUIRE(0 == strcmp(word, "America"));
+    word = HashFind(hash, "jjaskjnfa;k");
+    REQUIRE(NULL == word);
+    HashDestroy(hash);
+    return PASSED;
+}
+
+static test_status_t testLoadSd(void)
+{
+    double ans = 0;
+    s_entry_ty en = {"1", "1"};
+    s_entry_ty en1 = {"2", "str2"};
+    s_entry_ty en2 = {"3", "str3"};
+    s_entry_ty en3 = {"4", "str4"};
+    s_entry_ty en4 = {"5", "str5"};
+    s_entry_ty en5 = {"6", "str6"};
+    hash_table_ty *hash = HashCreate(HashFunc, Match, 3);
+    REQUIRE(NULL != hash);
+    REQUIRE(TRUE == HashIsEmpty(hash));
+    REQUIRE(HashSize(hash) == 0);
+    HashInsert(hash, (void *)&en);
+    REQUIRE(HashSize(hash) == 1);
+    HashInsert(hash, (void *)&en1);
+    HashInsert(hash, (void *)&en2);
+    HashInsert(hash, (void *)&en3);
+    HashInsert(hash, (void *)&en4);
+    HashInsert(hash, (void *)&en5);     
+
+    ans = HashLoadFactor(hash);
+    printf("%f\n", ans);
+    REQUIRE(2 == ans);
+    printf("%f\n", HashSD(hash));
+    HashDestroy(hash);    
+    return PASSED;
+}
+
+
+static void Load(hash_table_ty *hash)
+{
+    char *ptr = NULL;
+    char *token = NULL;
+    char *delim = "\n\0";
+    FILE *src_file= NULL;
+    struct stat st = {0};
+    size_t file_length = 0;
+    src_file = fopen("/usr/share/dict/american-english", "r");
+    stat("/usr/share/dict/american-english", &st);
+    file_length = st.st_size;
+    ptr = (char *)mmap(NULL, file_length, PROT_READ | PROT_WRITE, MAP_PRIVATE, fileno(src_file), 0);
+    token = strtok(ptr, delim);
+        
+    while (token != NULL)
+    {
+        HashInsert(hash, token);
+        token = strtok(NULL, delim);
+    }
+}
+
+
+
