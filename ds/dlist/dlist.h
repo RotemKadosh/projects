@@ -322,6 +322,5 @@ int DlistForEach(Dlist_iter_t from, Dlist_iter_t to,
 Dlist_iter_t DlistSplice(Dlist_iter_t where, Dlist_iter_t src_from, 
 														Dlist_iter_t src_to);
 
- 
 #endif /*__DLIST_H__*/
 

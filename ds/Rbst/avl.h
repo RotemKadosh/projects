@@ -7,7 +7,16 @@ typedef struct rec_self_balanced_binary_search_tree AVL_ty;
 typedef struct tree_node AVL_node_ty;
 
 
- 
+typedef enum relatives
+{
+    LEFT, RIGHT, NUM_OF_RELATIVES
+} relatives;
+
+
+
+
+
+
 
 /* DESCRIPTION: 
  *compare two elements data;
@@ -136,18 +145,6 @@ size_t AVLHeight(const AVL_ty *tree);
 */
 int AVLForEach(const AVL_ty *tree, AVL_action_func_ty operation, void *param, 
                                                             int travesal_type);
-void print2D(AVL_ty *tree);
 
-
-
-int AVLInsertBalance(AVL_ty *tree, void *data);
-
-
-
-void AVLRemoveBalanc(AVL_ty *tree, void *data);
-
-
-
-void AVLRemoveMultiple(AVL_ty *tree, AVL_cmp_func_ty cmp, void *data);
 
 #endif /*__AVL_H__*/

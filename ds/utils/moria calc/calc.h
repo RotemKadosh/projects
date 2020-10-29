@@ -7,6 +7,14 @@
 #ifndef __CALC_H__
 #define __CALC_H__
 
+typedef enum  
+{
+    SUCCESS = 0,
+    MATH_ERROR,
+    SYNTAX_ERROR,
+    MALLOC_ERROR,
+    NUM_OF_STATUS
+}calc_status;
 
 /*DESCRIPTION: 
 *calculate the given expretion

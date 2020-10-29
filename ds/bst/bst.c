@@ -18,7 +18,7 @@ struct tree_node
     struct tree_node *relatives [NUM_OF_RELATIVES];
 };
 
-struct binary_search_tree
+struct r_binary_search_tree
 {
     BST_cmp_func_ty compare;
     void *params;

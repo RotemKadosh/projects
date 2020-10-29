@@ -1,7 +1,7 @@
 #include <stdlib.h> /*malloc, free*/
 #include <string.h> /*strcmp*/
 #include <sys/stat.h> /*stat*/
-#include <sys/mman.h>
+#include <sys/mman.h> /*mmap*/
 #include "../utils/test.h"
 #include "hash.h"
 

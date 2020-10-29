@@ -13,8 +13,13 @@ static test_status_t TestForeach(void);
 static test_status_t TestRemoveFind(void);
 static test_status_t TestBalancInsert(void);
 static test_status_t TestBalanceRemove(void);
+static test_status_t TestRemoveMultiple(void);
 
 int Comp(const void *data, const void *data_to_compare);
+int Comp(const void *data, const void *data_to_compare);
+
+
+
 
 int main(void)
 {
@@ -26,6 +31,7 @@ int main(void)
     RUNTEST(TestRemoveFind); 
     RUNTEST(TestBalancInsert);
     RUNTEST(TestBalanceRemove);
+    RUNTEST(TestRemoveMultiple);
     return 0;
 }
 
@@ -36,6 +42,34 @@ int Comp(const void *data, const void *data_to_compare)
 
     return int_data - int_data_to_compare;
 }
+int CompRemoveMultiply(const void *data,  const void *data_to_compare)
+{
+    int int_data = (int)(size_t)data;
+    int int_data_to_compare = (int)(size_t)data_to_compare;
+    return !(int_data > int_data_to_compare);
+}
+
+static test_status_t TestRemoveMultiple(void)
+{
+    AVL_ty *avl = AVLCreate(Comp);
+    REQUIRE(avl != NULL);
+    REQUIRE(SUCCESS == AVLInsertBalance(avl, (void *)10));
+    REQUIRE(SUCCESS == AVLInsertBalance(avl, (void *)6));
+    REQUIRE(SUCCESS == AVLInsertBalance(avl, (void *)15));
+    REQUIRE(SUCCESS == AVLInsertBalance(avl, (void *)8));
+    REQUIRE(SUCCESS == AVLInsertBalance(avl, (void *)4));
+    REQUIRE(SUCCESS == AVLInsertBalance(avl, (void *)12));
+    REQUIRE(SUCCESS == AVLInsertBalance(avl, (void *)17));
+    REQUIRE(SUCCESS == AVLInsertBalance(avl, (void *)11));
+    print2D(avl);
+
+    AVLRemoveMultiple(avl, CompRemoveMultiply, (void *)9);
+    print2D(avl);
+    AVLDestroy(avl);
+    return PASSED;
+}
+
+
 
 int AVLPrintNodeData(const void *data, void *param)
 {

@@ -66,6 +66,8 @@ static size_t GetNodeH(AVL_node_ty *node);
 static AVL_node_ty *RemoveTwoChild(AVL_ty *tree, AVL_node_ty *root);
 static AVL_node_ty *RemoveOneChild(AVL_ty *tree, AVL_node_ty *root);
 static AVL_node_ty *RemoveLeaf(AVL_ty *tree, AVL_node_ty *root);                                      /*non recursive height*/   
+static void AVLRemoveMultipleRec(AVL_ty *tree, AVL_node_ty *node ,AVL_cmp_func_ty cmp, void *data);
+
 /*------------------definitions-----------------------------------------------*/
 
 /*--------------------API---------------------------*/
@@ -197,9 +199,30 @@ void AVLRemoveBalanc(AVL_ty *tree, void *data)
     assert(NULL != tree);
     tree->root = AVLRemoveBalRec(tree, tree->root, data);
 }
-
+void AVLRemoveMultiple(AVL_ty *tree, AVL_cmp_func_ty cmp, void *data)
+{
+    AVLRemoveMultipleRec(tree, tree->root, cmp, data);
+}
 
 /*--------------------SERVIC---------------------------*/
+static void AVLRemoveMultipleRec(AVL_ty *tree, AVL_node_ty *node ,AVL_cmp_func_ty cmp, void *data)
+{
+    if(NULL == node)
+    {
+        return;
+    }
+    if(cmp(data, node->data) == 0)
+    {
+        AVLRemoveBalanc(tree, node->data);
+        print2D(tree);
+        AVLRemoveMultipleRec(tree, tree->root, cmp, data);
+        return;
+    }
+    AVLRemoveMultipleRec(tree,node->relatives[LEFT],cmp, data);
+    AVLRemoveMultipleRec(tree,node->relatives[RIGHT],cmp, data);
+}
+
+
 static void RemoveRoot(AVL_ty *tree)
 {
     AVL_node_ty *root = tree->root;
@@ -650,6 +673,7 @@ static AVL_node_ty *RemoveOneChild(AVL_ty *tree, AVL_node_ty *root)
     if(NULL == root->relatives[RIGHT])
     {
         CopyContent(root->relatives[LEFT], root);
+        
         DestroyNode(root->relatives[LEFT]);
         root->relatives[LEFT] = NULL;
     }

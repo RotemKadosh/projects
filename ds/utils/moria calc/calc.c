@@ -3,8 +3,11 @@
 #include <assert.h>/*assert*/
 #include <stdlib.h>/*malloc,free*/
 
-#include "../parser/parser.h"
-#include "../../../stack/stack.h"
+#include "parser.h"
+#include "stack.h"
+
+#define MAX2(a,b) ((a) < (b) ? (b) : (a))
+#define MAX3(a,b,c) (MAX2(MAX2(a,b),c))
 
 typedef enum  
 {
@@ -53,12 +56,13 @@ typedef struct state
 }State_t;
 
 
-static const int opLUTOriority[NUM_OF_OP][NUM_OF_OP] = {{1, 1, 0, 0, 0},
-                                                        {1, 1, 0, 0, 0},
-                                                        {1, 1, 1, 1, 0},
-                                                        {1, 1, 1, 1, 0},
-                                                        {1, 1, 1, 1, 1},
-                                                        {0, 0, 0, 0, 0}};
+                                                       /*P  MI MU D  PO*/
+static const int opLUTOriority[NUM_OF_OP][NUM_OF_OP] = {{1, 1, 0, 0, 0},   /*plus*/
+                                                        {1, 1, 0, 0, 0},   /*Minus*/
+                                                        {1, 1, 1, 0, 0},   /*Mult*/
+                                                        {1, 1, 1, 1, 0},   /*Div*/
+                                                        {1, 1, 1, 1, 0},   /*Pow*/
+                                                        {0, 0, 0, 0, 0}};  /*par*/
 
 
 /*----------------------------SERVICE FUNCTIONS DECLERATIONS------------------------*/
@@ -66,6 +70,7 @@ static const int opLUTOriority[NUM_OF_OP][NUM_OF_OP] = {{1, 1, 0, 0, 0},
 static calc_status CalcInit(Calc_t **calc, const char *exp, State_t lut[NUM_OF_STATES][NUM_OF_STATUS]);
 static void LUTInit(State_t lut[NUM_OF_STATES][NUM_OF_STATUS]);
 static void CalcDestroy(Calc_t *calc);
+static calc_status DoRestCalc(Calc_t *calc, char op_to_do);
 
 static calc_status DoCalculation(Calc_t *calc, char op);
 static int GetOpNumber(char op);
@@ -76,9 +81,7 @@ static int IsCloseP(char ch);
 static int GetPar(char p);
 static int IsParenthesis(char op);
 static void *ReversePar(char *open_phr);
-
 static char GetDummy();
-static int CheckDivideByZero(Calc_t *calc);
 
 static calc_status HandlerWFN(Calc_t *calc, char **position);
 static calc_status HandlerWFO(Calc_t *calc, char **position);
@@ -86,6 +89,9 @@ static calc_status HandlerOpenP(Calc_t *calc, char **position);
 static calc_status HandlerCloseP(Calc_t *calc, char **position);
 static calc_status HandlerFinalState(Calc_t *calc, char **position);
 static calc_status HandlerError(Calc_t *calc, char **position);
+
+static int CheckDivideByZero(Calc_t *calc);
+static int CheckZeroPowOfMinus(Calc_t *calc);
 
 static double Plus(const double num1, double num2);
 static double Minus(const double num1, const double num2);
@@ -103,6 +109,8 @@ double Calculate(const char *math_exp, int *exit_status)
     void *res = NULL;
     void *op = NULL;
     char *position = (char *)math_exp;
+    int status_res = 0;
+    int error_check = 0;
 
     static State_t handlerLUT[NUM_OF_STATES][NUM_OF_STATUS] = {NULL};
     Calc_t *calc = NULL;
@@ -123,18 +131,22 @@ double Calculate(const char *math_exp, int *exit_status)
     }
 
     op = StackPeek(calc->op_stack);
-    if (GetDummy() != *(char *)&op)
+    status_res = DoRestCalc(calc, *(char *)&op);
+    error_check = HandlerError(calc,(char**)calc);
+    if (SUCCESS != *exit_status || SUCCESS != status_res || error_check )
     {
-        *exit_status = DoCalculation(calc, *(char *)&op);
+    	CalcDestroy(calc);
+    	if (MATH_ERROR == status_res)
+    	{
+    		*exit_status = MATH_ERROR;
+    		return *exit_status;
+    	}
+    	*exit_status = MAX3(*exit_status,status_res,error_check);
+        return *exit_status;
     }
     
     res = StackPeek(calc->nums_stack);
     CalcDestroy(calc);
-
-    if (SUCCESS != *exit_status)
-    {
-        return *exit_status;
-    }
 
     return *(double *)&res;
 }
@@ -197,7 +209,7 @@ static void LUTInit(State_t lut[NUM_OF_STATES][NUM_OF_STATUS])
 
     lut[2][0].func = HandlerOpenP;
     lut[2][0].next_state = WFN;
-    
+
     lut[3][0].func = HandlerCloseP;
     lut[3][0].next_state = WFO;
 }
@@ -217,7 +229,6 @@ static calc_status HandlerWFN(Calc_t *calc, char **position)
 {
     void *num = 0;
     char *current_pos = *position;
-    int status = SUCCESS;
 
     assert(NULL != calc);
     assert(NULL != *position);
@@ -228,7 +239,7 @@ static calc_status HandlerWFN(Calc_t *calc, char **position)
     }
 
     *(double *)&num = ParserGetNum(position);
-    if (*position == current_pos && SUCCESS != status)
+    if (*position == current_pos)
     {
         return SYNTAX_ERROR;
     }
@@ -241,20 +252,20 @@ static calc_status HandlerWFO(Calc_t *calc, char **position)
 {
     void  *op = '\0';
     void *current_op = {0};
-    int status = 0;
 
     assert(NULL != calc);
     assert(NULL != *position);
 
+
     *(char *)&op = ParserGetOp(position);
     current_op = StackPeek(calc->op_stack);
 
-    if (!IsOperation(*(char *)&op) || SUCCESS != status)
+    if (!IsOperation(*(char *)&op))
     {
         return SYNTAX_ERROR;
     }
 
-    if ('\0' != *(char *)&op && GetDummy() != *(char *)&current_op && IsPriority(*(char *)&current_op, *(char *)&op))
+    if (IsPriority(*(char *)&current_op, *(char *)&op))
     {
         DoCalculation(calc, *(char *)&current_op);
     }
@@ -303,11 +314,12 @@ static calc_status HandlerCloseP(Calc_t *calc, char **position)
 
     while (IsCloseP(*(char *)&curr_top) && IsCloseP(*(*position)))
     {
-        if ((*(*position) != *(char *)&curr_top) && !IsOperation(*(*position)))
+        if ((*(*position) != *(char *)&curr_top))
         {
                 return SYNTAX_ERROR;
         }
         StackPop(calc->op_stack);
+        curr_top = StackPeek(calc->op_stack);
         ++(*position);     
     }
 
@@ -316,17 +328,16 @@ static calc_status HandlerCloseP(Calc_t *calc, char **position)
 
 static calc_status HandlerError(Calc_t *calc, char **position)
 {
+	void *top_op = NULL;
+	(void)position;
+    
     assert(NULL != calc);
-    assert(NULL != position);
 
-    if (!IsOperation(*(*position)))
+    top_op = StackPeek(calc->op_stack);
+
+    if (GetDummy() != *(char*)&top_op)
     {
         return SYNTAX_ERROR;
-    }
-
-    if (CheckDivideByZero(calc))
-    {
-        return MATH_ERROR;
     }
 
     return SUCCESS;
@@ -365,13 +376,22 @@ static calc_status DoCalculation(Calc_t *calc, char op)
 
     while (GetDummy() != *(char *)&curr_op && !IsCloseP(*(char *)&curr_op))
     {
-        if (CheckDivideByZero(calc))
+        if (CheckDivideByZero(calc) || CheckZeroPowOfMinus(calc))
         {
             return MATH_ERROR;
         }
 
+        if (StackIsEmpty(calc->nums_stack))
+        {
+        	return SYNTAX_ERROR;
+        }
         num1 = *(double *)&res;
         StackPop(calc->nums_stack);
+        
+        if (StackIsEmpty(calc->nums_stack))
+        {
+        	return SYNTAX_ERROR;
+        }
         res = StackPeek(calc->nums_stack);
         num2 = *(double *)&res;
 
@@ -385,6 +405,20 @@ static calc_status DoCalculation(Calc_t *calc, char op)
     }
 
     return SUCCESS;
+}
+
+static calc_status DoRestCalc(Calc_t *calc, char op_to_do)
+{
+	int status = 0;
+
+	assert(NULL != calc);
+
+	if (GetDummy() != *(char *)&op_to_do)
+    {
+        status = DoCalculation(calc, *(char *)&op_to_do);
+    }
+
+    return status;
 }
 
 static int IsOperation(char op)
@@ -432,6 +466,7 @@ static int GetOpNumber(char op)
 
 static void *ReversePar(char *open_phr)
 {
+	void *return_par = NULL;
     char close_phr = '\0';
 
     assert(NULL != open_phr);
@@ -454,7 +489,9 @@ static void *ReversePar(char *open_phr)
         break;
     }
 
-    return (void*)close_phr;
+    *(char*)&return_par = close_phr;
+
+    return return_par;
 }
 
 static int IsOpenP(char ch)
@@ -494,6 +531,20 @@ static int CheckDivideByZero(Calc_t *calc)
 
     return ('/' == *(char *)&cur_op && 0 == *(double *)&top_num);
 }
+
+static int CheckZeroPowOfMinus(Calc_t *calc)
+{
+    void *cur_op = 0;
+    void *top_num = 0;
+
+    assert(NULL != calc);
+
+    cur_op = StackPeek(calc->op_stack);
+    top_num = StackPeek(calc->nums_stack);
+
+    return ('^' == *(char *)&cur_op && 0 > *(double *)&top_num);
+}
+
 
 
 /*-------------------------------CALC OP----------------------------*/

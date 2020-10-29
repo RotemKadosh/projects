@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-ansi -pedantic-errors -Wall -Wextra -g -lm
 DEPS = calc.h parser.h stack.h 
-OBJ = calc.c calc_test.c ../parser/parser.c ../../stack/stack.c 
+OBJ = calc.c calc_test.c parser.c ../../stack/stack.c 
 .PHONY = run cgdb vlg clean ar sl gc
 
 %.o: %.c $(DEPS)

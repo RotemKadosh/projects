@@ -1,9 +1,9 @@
-#include <stdlib.h> /*malloc, free*/
+
 #include <string.h> /*strcmp*/
 #include <sys/stat.h> /*stat*/
-#include <sys/mman.h>
+#include <sys/mman.h> /*mmap*/
 #include "../utils/test.h"
-#include "hash.h"
+#include "../hash_table/hash.h"
 
 
 #define FALSE (0)
@@ -34,12 +34,12 @@ static void Load(hash_table_ty *hash)
 {
     char *ptr = NULL;
     char *token = NULL;
-    char *delim = "\n\0";
+    char *delim = "\n";
     FILE *src_file= NULL;
     struct stat st = {0};
     size_t file_length = 0;
-    src_file = fopen("/usr/share/dict/american-english", "r");
-    stat("/usr/share/dict/american-english", &st);
+    src_file = fopen("american-english", "r");
+    stat("american-english", &st);
     file_length = st.st_size;
     ptr = (char *)mmap(NULL, file_length, PROT_READ | PROT_WRITE, MAP_PRIVATE, fileno(src_file), 0);
     token = strtok(ptr, delim);
@@ -65,8 +65,13 @@ static int IsWordInDict(hash_table_ty *hash, const char * str)
 
 int main(int argc, char *argv[])
 {
-    char *word = argv[argc - 1];
+    char *word = argv[1];
     hash_table_ty *hash = HashCreate(Stringhash, StringMatch, 26);
+    if(hash == NULL)
+    {
+        printf("failed");
+        return 0;
+    }
     Load(hash);
     if (!IsWordInDict(hash, word))
     {
