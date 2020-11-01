@@ -128,6 +128,13 @@ size_t partition(void *base, size_t low_idx, size_t high_idx, size_t size,int (*
     return (i+1);
 }
 
+static void SwapVoid(void *one, void *two, size_t size)
+{
+    long temp = 0;
+    memcpy(&temp, one, size);
+    one = memcpy(one, two, size);
+    two = memcpy(two, &temp, size);
+}
 
 
 
