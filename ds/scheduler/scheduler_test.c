@@ -11,12 +11,18 @@
 static test_status_t StageOneTest(void);
 static test_status_t StageTwoTest(void);
 static test_status_t StageThreeTest(void);
+static test_status_t StageTthreeTest(void);
+
+int SchedulerPauseWrapper(void *data);
+int multiplyUntil100(void *data);
+int AddOneUntil20(void *data);
 
 int main()
 {
 	RUNTEST(StageOneTest);
 	RUNTEST(StageTwoTest);
 	RUNTEST(StageThreeTest);
+	RUNTEST(StageTthreeTest);
 	return 0; 
 }
 
@@ -158,4 +164,66 @@ static test_status_t StageThreeTest(void)
 
 
 	return PASSED;
+}
+
+static test_status_t StageTthreeTest(void)
+{
+	int param = 18, param2 = 25;
+	size_t interval = 5, interval2 = 10, interval_to_pause = 15;
+	UID_t uid1, uid2;
+
+	Scheduler_t *Scheduler = SchedulerCreate();
+	REQUIRE(NULL != Scheduler);
+	REQUIRE(0 == SchedulerSize(Scheduler));
+	uid1 = SchedulerAdd(Scheduler, AddOneUntil20,(void *)&param, interval);
+	REQUIRE(0 == UIDIsSame(uid1, UIDGetBadUid()));
+	uid2 = SchedulerAdd(Scheduler, multiplyUntil100,(void *)&param2, interval2);
+	REQUIRE(0 == UIDIsSame(uid2, UIDGetBadUid()));
+	REQUIRE(2 == SchedulerSize(Scheduler));
+	REQUIRE(0 == SchedulerRemove(Scheduler ,uid2));
+	REQUIRE(1 == SchedulerSize(Scheduler));
+	REQUIRE(1 == SchedulerRemove(Scheduler ,UIDGetBadUid()));
+	REQUIRE(1 == SchedulerSize(Scheduler));
+	uid2 = SchedulerAdd(Scheduler, multiplyUntil100,(void *)&param2, interval2);
+	SchedulerClear(Scheduler);
+	REQUIRE(0 == SchedulerSize(Scheduler));
+	REQUIRE(FINISH_ALL_WORK == SchedulerRun(Scheduler));
+	uid1 = SchedulerAdd(Scheduler, AddOneUntil20,(void *)&param, interval);
+	uid2 = SchedulerAdd(Scheduler, multiplyUntil100,(void *)&param2, interval2);
+	SchedulerAdd(Scheduler, SchedulerPauseWrapper,(void *)Scheduler, interval_to_pause);
+	REQUIRE(STOPPED == SchedulerRun(Scheduler));
+	REQUIRE(1 == SchedulerSize(Scheduler));
+	REQUIRE(FINISH_ALL_WORK == SchedulerRun(Scheduler));
+
+	SchedulerDestroy(Scheduler);
+
+	return PASSED;
+}
+
+
+int AddOneUntil20(void *data)
+{
+	++*(int *)data;
+	if (*(int *)data < 20)
+	{
+		return 0;	
+	}
+	return 1;
+}
+
+int multiplyUntil100(void *data)
+{
+	*(int *)data *= 2;
+	if (*(int *)data < 100)
+	{
+		return 0;	
+	}
+	return 1;
+}
+
+int SchedulerPauseWrapper(void *data)
+{
+	Scheduler_t *Scheduler = (Scheduler_t *)data;
+	SchedulerPause(Scheduler);
+	return 1;
 }

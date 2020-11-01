@@ -9,7 +9,6 @@ int cmpfunc (const void *data, const void *data_to_compare)
 }
 
 
-
 test_status_t BinarySearchTest()
 {
     int *return1 = NULL;
@@ -70,6 +69,7 @@ test_status_t ItBinarySearchTest()
 
     return PASSED;
 }
+
 int main()
 {
     
