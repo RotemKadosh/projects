@@ -10,6 +10,7 @@
 #define TRUE (1)
 #define LEFT_CHILD(idx) (2 * idx + 1)
 #define RIGHT_CHILD(idx) (2 * idx + 2)
+
 struct heap
 {
     Vector_t *vector;
@@ -30,10 +31,10 @@ Heap_ty *HeapCreate(cmp_func_ty cmp)
     assert(NULL != cmp);
 
     vector = VectorCreate(VECTOR_SIZE_DEF);
-    if(vector != NULL)
+    if(NULL != vector)
     {
-        heap = malloc(sizeof(Heap_ty));
-        if(heap != NULL)
+        heap = (Heap_ty *)malloc(sizeof(Heap_ty));
+        if(NULL != heap)
         {
             heap->vector = vector;
             heap->compare_func = cmp;
@@ -51,6 +52,7 @@ void HeapDestroy(Heap_ty *heap)
     assert(NULL != heap);
 
     VectorDestroy(heap->vector);
+    heap->vector = NULL;
     free(heap);
     heap = NULL;
 }
@@ -60,21 +62,30 @@ void HeapPop(Heap_ty *heap)
     Vector_t *vec = NULL;
 
     assert(NULL != heap);
-
+    
     vec = heap->vector;
-    swap(heap, ROOT_IDX, VectorSize(vec) - 1);
-    VectorPopBack(vec);
-    HeapifyDown(heap, ROOT_IDX);
+    if(1 < HeapSize(heap))
+    {   
+        swap(heap, ROOT_IDX, VectorSize(vec) - 1);
+        VectorPopBack(vec);
+        HeapifyDown(heap, ROOT_IDX);
+    }
+    else
+    {
+        VectorPopBack(vec);
+    }
+    
+  
 }
 
 int HeapPush(Heap_ty *heap, void *data)
 {
     int ans = FAIL;
 
-    assert(heap != NULL);
+    assert(NULL != heap);
 
     ans = VectorPushBack(heap->vector, data);
-    if(ans == SUCCESS)
+    if(SUCCESS == ans)
     {
         HeapifyUp(heap, HeapSize(heap) - 1);
     }
@@ -85,13 +96,15 @@ int HeapPush(Heap_ty *heap, void *data)
 void *HeapPeek(const Heap_ty *heap)
 {
     assert(NULL != heap);
+
     return VectorGetElement(heap->vector, ROOT_IDX);
 }
 
 int HeapIsEmpty(const Heap_ty *heap)
 {
     assert(NULL != heap);
-    return (VectorSize(heap->vector) == 0);
+
+    return (0 == VectorSize(heap->vector));
 }
 
 size_t HeapSize(const Heap_ty *heap)
@@ -122,7 +135,7 @@ static void *FindAndRemoveRecursive(Heap_ty *heap, size_t idx, is_match_func_ty 
         return NULL;
     }
     data_to_ret = VectorGetElement(vec, idx);
-    if(match_func(data_to_ret, param) == TRUE)
+    if(TRUE == match_func(data_to_ret, param))
     {
         swap(heap, idx, ROOT_IDX);
         HeapPop(heap);
@@ -137,9 +150,7 @@ static void *FindAndRemoveRecursive(Heap_ty *heap, size_t idx, is_match_func_ty 
 static void HeapifyDown(Heap_ty *heap, size_t root_idx) 
 { 
     Vector_t *vec = NULL;
-    void *right = NULL;
     void *largest = NULL;
-    void *left = NULL;
     size_t largest_idx = 0;
     size_t left_idx = 0;
     size_t right_idx = 0;
@@ -153,35 +164,24 @@ static void HeapifyDown(Heap_ty *heap, size_t root_idx)
     right_idx = RIGHT_CHILD(root_idx);
     size = VectorSize(vec); 
     largest = VectorGetElement(vec, root_idx);
-    if(size == 1)
-    {
-        return;
-    }
-    if(left_idx < size)
-    {
-        left = VectorGetElement(vec, left_idx);
-        if (heap->compare_func(left, largest) > 0)
-        {
-            largest_idx = left_idx; 
-            largest = left;
-        }
-    }
-    if(right_idx < size)
-    {
-        right = VectorGetElement(vec, right_idx);
-        if (heap->compare_func(right, largest) > 0) 
-        {
-            largest_idx = right_idx; 
-            largest = right;
-        }
-    }
 
-   
-    
+    if(left_idx < size && heap->compare_func(VectorGetElement(vec, left_idx), largest) > 0)
+    {
+        
+        largest_idx = left_idx; 
+        largest = VectorGetElement(vec, left_idx);
+        
+    }
+    if(right_idx < size && heap->compare_func(VectorGetElement(vec, right_idx), largest) > 0)
+    {
+        
+        largest_idx = right_idx; 
+        
+    }
     if (largest_idx != root_idx) 
     { 
         swap(heap, root_idx, largest_idx);
-        HeapifyDown(heap,largest_idx); 
+        HeapifyDown(heap, largest_idx); 
     } 
 } 
 
@@ -199,16 +199,16 @@ static void HeapifyUp(Heap_ty *heap, size_t child_idx)
     size = VectorSize(vec); 
     child = VectorGetElement(heap->vector, child_idx);
     parent_idx = (child_idx - 1) / 2 ;
-    if ( parent_idx >= size)
+    if (parent_idx < size)
     {
-        return;
+        parent = VectorGetElement(heap->vector, parent_idx);
+        if(heap->compare_func(child, parent) > 0 )
+        {
+            swap(heap, child_idx, parent_idx);
+            HeapifyUp(heap, parent_idx);
+        }  
     }
-    parent = VectorGetElement(heap->vector, parent_idx);
-    if(heap->compare_func(child, parent) > 0 )
-    {
-        swap(heap, child_idx, parent_idx);
-        HeapifyUp(heap, parent_idx);
-    } 
+  
 
 }
 
