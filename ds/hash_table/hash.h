@@ -49,7 +49,7 @@ typedef int (*action_func_ty)(void *data, void *param);
 /* DESCRIPTION: 
  * Creates a new hash table
  * Created hash table should be destroyed with HashDestroy() function
- *
+ * O()
  *		@param
  *  	hash_func - hashing function to generate keys for user's value
  *      is_match_func - function pointer to function that compares element's data

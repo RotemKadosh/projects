@@ -3,8 +3,9 @@
 #include <assert.h> /*assert*/
 #include <stdio.h>/*sprintf*/
 #include <string.h>/*strlen*/
-#include <math.h>/*pow*/
+#include <limits.h>/*char bit)*/
 
+#define IP_OCCUPIED (10);
 #define ALL_1S (0Xffffffff)
 #define ALL_0S (0x00000000)
 
@@ -42,7 +43,7 @@ static DHCP_status SmallestIpAvailable(Dhcp_node_ty *sub_root, ip_ty *allocated_
                                  unsigned int num_of_bit_for_comp);
 static int IsRequestedInSubnet(Dhcp_ty *dhcp, ip_ty ip );
 
-
+static void UpdateFull(Dhcp_node_ty *sub_root);
 
 /*-------------------------service-----------------------*/
 static void DeleteAllNodes(Dhcp_node_ty *root)
@@ -74,9 +75,7 @@ static DHCP_status createInitalPaths(Dhcp_ty *dhcp)
         dhcp = NULL;
         return MALLOC_FAILURE;
     }
-    return ansb;
-  
-    
+    return ansb;   
 }
 
 static Dhcp_node_ty *CreateDhcpNode()
@@ -115,7 +114,7 @@ static DHCP_status AllocateRequestedIp(Dhcp_node_ty *sub_root, ip_ty *allocated_
     }
     if(sub_root->relatives[side]->is_full)
     {
-        return DOUBLE_FREE;
+        return IP_OCCUPIED;
     }
     else
     {
@@ -127,18 +126,29 @@ static DHCP_status AllocateRequestedIp(Dhcp_node_ty *sub_root, ip_ty *allocated_
             return status;
         }
     }
-    if(sub_root->relatives[side]->is_full && sub_root->relatives[!side] != NULL && 
-                                         sub_root->relatives[!side]->is_full)
+    UpdateFull(sub_root);
+    return status;
+}
+
+static void UpdateFull(Dhcp_node_ty *sub_root)
+{
+    if(sub_root->relatives[ZERO] != NULL && sub_root->relatives[ZERO]->is_full && sub_root->relatives[ONE] != NULL && 
+                                         sub_root->relatives[ONE]->is_full)
     {
         sub_root->is_full = TRUE;
     }
-    return status;
+    else
+    {
+        sub_root->is_full = FALSE;
+    }
+    
 }
 
 static DHCP_status SmallestIpAvailable(Dhcp_node_ty *sub_root, ip_ty *allocated_ip,
                                              unsigned int num_of_bit)
 {
     int status = SUCCESS;
+    /*create node if dosent exist*/
     if(NULL == sub_root->relatives[ZERO])
     {
         sub_root->relatives[ZERO] = CreateDhcpNode();
@@ -147,6 +157,7 @@ static DHCP_status SmallestIpAvailable(Dhcp_node_ty *sub_root, ip_ty *allocated_
             return MALLOC_FAILURE;
         }
     }
+    /*if left track is available keep on track to leaf*/
     if(!sub_root->relatives[ZERO]->is_full)
     {
         if(num_of_bit == 1)
@@ -163,7 +174,7 @@ static DHCP_status SmallestIpAvailable(Dhcp_node_ty *sub_root, ip_ty *allocated_
         }
     }
     else
-    {
+    {   
         if(NULL == sub_root->relatives[ONE])
         {
             sub_root->relatives[ONE] = CreateDhcpNode();
@@ -194,10 +205,7 @@ static DHCP_status SmallestIpAvailable(Dhcp_node_ty *sub_root, ip_ty *allocated_
         }  
     }
 
-    if(sub_root->relatives[ZERO]->is_full && sub_root->relatives[ONE] != NULL && sub_root->relatives[ONE]->is_full)
-    {
-        sub_root->is_full = TRUE;
-    }
+    UpdateFull(sub_root);
     return status;
 }
 
@@ -205,11 +213,7 @@ static int IsRequestedInSubnet(Dhcp_ty *dhcp, ip_ty ip )
 {
     ip_ty o = (ip >> NUM_OF_BIT_FOR_COMP(dhcp->num_of_bits_for_network));
     ip_ty t = (dhcp->sub_net >> NUM_OF_BIT_FOR_COMP(dhcp->num_of_bits_for_network));
-    if( o == t)
-    {
-        return TRUE;
-    }
-    return FALSE;
+    return ( o == t);
 }
 
 static int FreeRequestedIp(Dhcp_node_ty *sub_root, ip_ty ip, unsigned int num_of_bits)
@@ -234,7 +238,7 @@ static int FreeRequestedIp(Dhcp_node_ty *sub_root, ip_ty ip, unsigned int num_of
     }
     if(NULL == sub_root->relatives[side])
     {
-        status = DOUBLE_FREE;
+        status = FREE_FAILURE;
         return status;
     }
     else
@@ -242,10 +246,7 @@ static int FreeRequestedIp(Dhcp_node_ty *sub_root, ip_ty ip, unsigned int num_of
         status = FreeRequestedIp(sub_root->relatives[side], ip, num_of_bits -1);
     }
 
-    if(!sub_root->relatives[side]->is_full || (sub_root->relatives[!side] != NULL && !sub_root->relatives[!side]->is_full))
-    {
-        sub_root->is_full = FALSE;
-    }
+    UpdateFull(sub_root);
     return status;
     
 }
@@ -267,6 +268,8 @@ static size_t CountFullIp(Dhcp_node_ty *sub_root)
 
 void DhcpDestroy(Dhcp_ty *dhcp)
 {
+    assert(NULL != dhcp);
+
     DeleteAllNodes(dhcp->root);
     dhcp->root = NULL;
     free(dhcp);
@@ -276,11 +279,11 @@ void DhcpDestroy(Dhcp_ty *dhcp)
 Dhcp_ty *DhcpCreate(ip_ty sub_net, size_t num_of_bits_for_network)
 {
     Dhcp_ty *dhcp = NULL;
-    int ans = SUCCESS;
+    int ststus = SUCCESS;
   
-    assert(0 != num_of_bits_for_network);
+    assert(31 >= num_of_bits_for_network);
 
-    dhcp = malloc(sizeof(dhcp));
+    dhcp = (Dhcp_ty *)malloc(sizeof(Dhcp_ty));
     if(NULL != dhcp)
     {   
         dhcp->num_of_bits_for_network = num_of_bits_for_network;
@@ -288,8 +291,8 @@ Dhcp_ty *DhcpCreate(ip_ty sub_net, size_t num_of_bits_for_network)
         dhcp->root = CreateDhcpNode();
         if(dhcp->root != NULL)
         {
-            ans = createInitalPaths(dhcp);
-            if(ans != SUCCESS)
+            ststus = createInitalPaths(dhcp);
+            if(ststus != SUCCESS)
             {
                 free(dhcp);
                 dhcp = NULL;
@@ -306,19 +309,11 @@ char *IPToString(char *str_ip, ip_ty ip)
 
     /*right to left*/
     int byte1 = ip & mask;
-    int byte2 = ((ip & (mask << 8) )>> 8);
-    int byte3 = ((ip & (mask << 16)) >> 16);
-    int byte4 = ((ip & (mask << 24)) >> 24);
+    int byte2 = ((ip >> 8) & mask);
+    int byte3 = ((ip >> 16) & mask);
+    int byte4 = ((ip >> 24) & mask);
 
-    sprintf(str_ip, "%d.", byte4);
-    str_ip += strlen(str_ip);
-    sprintf(str_ip, "%d.", byte3);
-    str_ip += strlen(str_ip);
-    sprintf(str_ip, "%d.", byte2); 
-    str_ip += strlen(str_ip);
-    sprintf(str_ip, "%d", byte1); 
-    str_ip += strlen(str_ip); 
-
+    sprintf(str_ip, "%d.%d.%d.%d", byte4, byte3, byte2,byte1);
     return str_ip_start; 
 }
 
@@ -349,37 +344,37 @@ ip_ty StringToIp(char *ip)
 
 DHCP_status DhcpAllocateIp(Dhcp_ty *dhcp, ip_ty *allocated_ip, ip_ty requested_ip)
 {
-    int status = SUCCESS;
     *allocated_ip = dhcp->sub_net;
 
-    if(requested_ip != 0)
+ 
+    if(requested_ip != 0 && 
+        IsRequestedInSubnet(dhcp, requested_ip) && SUCCESS == 
+                    AllocateRequestedIp(dhcp->root, allocated_ip,
+                requested_ip, NUM_OF_BIT_FOR_COMP(dhcp->num_of_bits_for_network)))
     {
-        if(IsRequestedInSubnet(dhcp, requested_ip))
-        {
-            status = AllocateRequestedIp(dhcp->root, allocated_ip, requested_ip, NUM_OF_BIT_FOR_COMP(dhcp->num_of_bits_for_network));
-            if(status == SUCCESS)
-            {
-                return status;
-            }
-        }
-
+        
+        return SUCCESS;
+        
     }
+
+   
     *allocated_ip = dhcp->sub_net;
-    status = SmallestIpAvailable(dhcp->root,allocated_ip ,NUM_OF_BIT_FOR_COMP(dhcp->num_of_bits_for_network));
-    return status;
+    return  SmallestIpAvailable(dhcp->root,allocated_ip ,NUM_OF_BIT_FOR_COMP(dhcp->num_of_bits_for_network));;
 }
 
 DHCP_status DhcpRFreeIp(Dhcp_ty *Dhcp, ip_ty ip)
 {
-    int status = 0;
-    status = FreeRequestedIp(Dhcp->root, ip, NUM_OF_BIT_FOR_COMP(Dhcp->num_of_bits_for_network));
-    return status;
+    
+    assert(NULL != Dhcp);
+    
+    return FreeRequestedIp(Dhcp->root, ip, NUM_OF_BIT_FOR_COMP(Dhcp->num_of_bits_for_network));
 }
 
 size_t DhcpCountFree(const Dhcp_ty *Dhcp)
 {
     assert(NULL != Dhcp);
-    return pow(2,NUM_OF_BIT_FOR_COMP(Dhcp->num_of_bits_for_network)) - CountFullIp(Dhcp->root); 
+
+    return (1 << NUM_OF_BIT_FOR_COMP(Dhcp->num_of_bits_for_network)) - CountFullIp(Dhcp->root); 
 }
 
 

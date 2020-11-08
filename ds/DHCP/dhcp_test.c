@@ -6,7 +6,7 @@
 static test_status_t CreateDestroyTest(void);
 static test_status_t IpToStrTest(void);
 static test_status_t StringToIpTest(void);
-static test_status_t AllocateTest(void);
+static test_status_t AllocateFreeTest(void);
 
 int main()
 {
@@ -14,7 +14,7 @@ int main()
     RUNTEST(IpToStrTest);
     RUNTEST(StringToIpTest);
     RUNTEST(CreateDestroyTest);
-    RUNTEST(AllocateTest);
+    RUNTEST(AllocateFreeTest);
     return 0;
 }
 
@@ -65,10 +65,7 @@ static test_status_t AllocateFreeTest(void)
     REQUIRE(DhcpCountFree(dhpc) == 5);
 
 
-    ans2 = 3254525365;
-    status = DhcpRFreeIp(dhpc, ans2);
-    REQUIRE(status == DOUBLE_FREE);
-    REQUIRE(DhcpCountFree(dhpc) == 5);
+
     
     /*"196.0.63.1"*/
     ans2 = 0;
@@ -121,7 +118,7 @@ static test_status_t AllocateFreeTest(void)
     REQUIRE(status == SUCCESS);
     REQUIRE(DhcpCountFree(dhpc) == 1);
 
-    
+    DhcpDestroy(dhpc);
     return PASSED;
 }
 
@@ -154,3 +151,4 @@ static test_status_t StringToIpTest(void)
     REQUIRE(3288350719 == ip);
     return PASSED;
 }
+

@@ -172,6 +172,7 @@ void *HashFind(hash_table_ty *hash_table, const void *data)
     Dlist_iter_t end = NULL;
 
     assert(NULL != hash_table);
+    
     idx = hash_table->hash_func(data);
     dlist = hash_table->hash_arr[idx % hash_table->capacity];
     end = DlistEnd(dlist);

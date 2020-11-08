@@ -24,7 +24,8 @@ typedef enum DHCP_status
 *       sub_net - string represents the network ip
 *       sub_net_mask - number represents the occupied bits by network ip
 *   @return
-* pointer to the new Dhcp or NULL if failed         
+* pointer to the new Dhcp or NULL if failed
+*          O(1)/O(m)-> m = number of bits reserved to computer/
 */
 Dhcp_ty *DhcpCreate(ip_ty sub_net, size_t num_of_bits_for_network);
 

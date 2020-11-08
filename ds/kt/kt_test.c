@@ -23,7 +23,7 @@ static test_status_t TestAlgorithm(void)
     size_t pos = 1;
     size_t sol[64] = {0};
     int ans = -1;
-    ans = KTHeuristicSolve(pos, board, sol);
+    ans = KTSolve(pos, board, sol);
     PrintSol(sol, 64);
     printf("%s",ans == 1 ? "SUCCESS": "FAIL");
     return PASSED;

@@ -137,8 +137,11 @@ static void *FindAndRemoveRecursive(Heap_ty *heap, size_t idx, is_match_func_ty 
     data_to_ret = VectorGetElement(vec, idx);
     if(TRUE == match_func(data_to_ret, param))
     {
-        swap(heap, idx, ROOT_IDX);
-        HeapPop(heap);
+        swap(heap, idx, VectorSize(vec) - 1);
+        VectorPopBack(vec);
+        HeapifyUp(heap, idx);
+        HeapifyDown(heap, idx);
+    
         return data_to_ret;
     }
     return FindAndRemoveRecursive(heap, idx + 1, match_func, param);
@@ -199,7 +202,7 @@ static void HeapifyUp(Heap_ty *heap, size_t child_idx)
     size = VectorSize(vec); 
     child = VectorGetElement(heap->vector, child_idx);
     parent_idx = (child_idx - 1) / 2 ;
-    if (parent_idx < size)
+    if (parent_idx < size && child_idx < size)
     {
         parent = VectorGetElement(heap->vector, parent_idx);
         if(heap->compare_func(child, parent) > 0 )

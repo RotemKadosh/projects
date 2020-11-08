@@ -50,7 +50,7 @@ int KTSolve(size_t pos, bit_array_t board, size_t *solution)
     int status = FAIL;
     InitPossibleMoves(possible_moves_lut);
     current_step = BitsArrCountOn(board);
-    if(64 == current_step  )
+    if(64 == current_step)
     {
         return SUCCESS;
     }
@@ -83,6 +83,7 @@ int KTHeuristicSolve(size_t pos, bit_array_t board, size_t *solution)
     int status = FAIL;
     InitPossibleMoves(possible_moves_lut);
     current_step = BitsArrCountOn(board);
+  
     if(64 == current_step  )
     {
         return SUCCESS;
@@ -91,6 +92,7 @@ int KTHeuristicSolve(size_t pos, bit_array_t board, size_t *solution)
     {
         return FAIL;
     }
+
     *solution = pos;
     board = BitsArrSetBit(board, pos, 1);
 
@@ -105,6 +107,7 @@ int KTHeuristicSolve(size_t pos, bit_array_t board, size_t *solution)
         *solution = 0;
         ReInitPosMoves(pos);
     }
+    
     return status;
 }
 /*-----------------------service functions------------------*/
