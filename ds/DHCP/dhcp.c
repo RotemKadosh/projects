@@ -5,7 +5,7 @@
 #include <string.h>/*strlen*/
 #include <limits.h>/*char bit)*/
 
-#define IP_OCCUPIED (10);
+#define IP_OCCUPIED (10)
 #define ALL_1S (0Xffffffff)
 #define ALL_0S (0x00000000)
 
@@ -58,24 +58,21 @@ static void DeleteAllNodes(Dhcp_node_ty *root)
     root = NULL;
 }
 
-static DHCP_status createInitalPaths(Dhcp_ty *dhcp)
+static DHCP_status CreateInitalPaths(Dhcp_ty *dhcp)
 {
-    ip_ty broadcast = (dhcp->sub_net) | (ALL_1S >> dhcp->num_of_bits_for_network) ;
+    ip_ty all_1s = 0Xffffffff;
+    ip_ty broadcast = (dhcp->sub_net) | (all_1s >> dhcp->num_of_bits_for_network) ;
     ip_ty brod_ret = 0;
     ip_ty net = dhcp->sub_net;
     ip_ty net_ret = 0;
-    int ansb = 0;
-    int ansn = 0;
-    
-    ansb = DhcpAllocateIp(dhcp, &brod_ret, broadcast);
-    ansn = DhcpAllocateIp(dhcp, &net_ret, net);
-    if(ansb != SUCCESS || ansn != SUCCESS)
+
+    if(SUCCESS != DhcpAllocateIp(dhcp, &brod_ret, broadcast) || SUCCESS != DhcpAllocateIp(dhcp, &net_ret, net))
     {
         DhcpDestroy(dhcp);
         dhcp = NULL;
         return MALLOC_FAILURE;
     }
-    return ansb;   
+    return SUCCESS;   
 }
 
 static Dhcp_node_ty *CreateDhcpNode()
@@ -291,10 +288,8 @@ Dhcp_ty *DhcpCreate(ip_ty sub_net, size_t num_of_bits_for_network)
         dhcp->root = CreateDhcpNode();
         if(dhcp->root != NULL)
         {
-            ststus = createInitalPaths(dhcp);
-            if(ststus != SUCCESS)
+            if(SUCCESS != CreateInitalPaths(dhcp)) /*if not working than call destroy*/
             {
-                free(dhcp);
                 dhcp = NULL;
             }
         }
@@ -345,19 +340,17 @@ ip_ty StringToIp(char *ip)
 DHCP_status DhcpAllocateIp(Dhcp_ty *dhcp, ip_ty *allocated_ip, ip_ty requested_ip)
 {
     *allocated_ip = dhcp->sub_net;
-
- 
-    if(requested_ip != 0 && 
-        IsRequestedInSubnet(dhcp, requested_ip) && SUCCESS == 
-                    AllocateRequestedIp(dhcp->root, allocated_ip,
-                requested_ip, NUM_OF_BIT_FOR_COMP(dhcp->num_of_bits_for_network)))
-    {
-        
+    DHCP_status status = SUCCESS;
+    if(requested_ip != 0 && IsRequestedInSubnet(dhcp, requested_ip))
+    {   
+        status = AllocateRequestedIp(dhcp->root, allocated_ip, requested_ip, NUM_OF_BIT_FOR_COMP(dhcp->num_of_bits_for_network));
+        if(IP_OCCUPIED == status)
+        {
+            return MALLOC_FAILURE;
+        }
         return SUCCESS;
-        
     }
 
-   
     *allocated_ip = dhcp->sub_net;
     return  SmallestIpAvailable(dhcp->root,allocated_ip ,NUM_OF_BIT_FOR_COMP(dhcp->num_of_bits_for_network));;
 }
