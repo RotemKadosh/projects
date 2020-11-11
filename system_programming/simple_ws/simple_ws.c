@@ -6,8 +6,8 @@
 
 int main(int argc, char *argv[])
 {
-    pid_t cpid, w;
-    int wstatus;
+    pid_t cpid = 0, w = 0;
+    int wstatus = 0;
 
     while(1)
     {
@@ -27,11 +27,13 @@ int main(int argc, char *argv[])
         else 
         {                    /* Code executed by parent */
             w = wait(&wstatus);
-            if (-1 == w) {
+            if (-1 == w) 
+            {
                 printf("wait error\n");
                 exit(EXIT_FAILURE);
             }
-            if (WIFEXITED(wstatus)) {
+            if (WIFEXITED(wstatus))
+            {
                 printf("exited, status=%d\n", WEXITSTATUS(wstatus));
             } 
         }

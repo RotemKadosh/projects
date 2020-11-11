@@ -5,11 +5,11 @@
 
 int main(int argc, char *argv[])
 {
-    int status;
-
-    while(1)
-    {
-        status = system("./dummy.out");
+    int status = 0;
+   
+   /* while(1)
+    {*/
+        status = system("ps");
         if (-1 == status ) 
         {
             printf("child creation error");
@@ -20,6 +20,6 @@ int main(int argc, char *argv[])
             printf("child could not exec error\n");
             exit(EXIT_FAILURE);
         } 
-    } 
+     
     exit(EXIT_SUCCESS);
 }
