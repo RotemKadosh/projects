@@ -128,15 +128,18 @@ static int GetRadMax(int *arr , size_t size, GetKey_t getkey, int exp)
 
 void BubbleSort(int arr[], size_t size)
 {
+    int sorted = 0;
     size_t start = 0;
     size_t runner = 0;
-    for (start = 0; start < size - 1; ++start)  
+    for (start = 1; start < size  && sorted != 1 ; ++start)  
     {     
-        for (runner = 0; runner < size - start - 1; ++runner)  
+        sorted = 1;
+        for (runner = 0; runner < size - start ; ++runner)  
         {
             if ((arr[runner]) > arr[runner + 1]) 
             {
-                Swap(&arr[runner], &arr[runner + 1]); 
+                Swap(&arr[runner], &arr[runner + 1]);
+                sorted = 0; 
             }
         }
     }
@@ -151,7 +154,7 @@ void SelectionSort(int arr[], size_t size)
     for(idx_of_next_min = 0; idx_of_next_min < size; ++idx_of_next_min)
     { 
         current_min_idx = idx_of_next_min;
-        for(runner = idx_of_next_min; runner < size; ++runner)
+        for(runner = idx_of_next_min ; runner < size; ++runner)
         {
             if(arr[runner] < arr[current_min_idx])
             {

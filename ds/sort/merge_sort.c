@@ -11,7 +11,6 @@ size_t partition(void *base, size_t low_idx, size_t high_idx, size_t size,int (*
 
 int MergeSort(int *arr_to_sort, size_t size)
 {
-
     return MergeSortRec(arr_to_sort, 0, size - 1);
 }
 
@@ -79,7 +78,7 @@ static int Merge(int *arr_to_sort, size_t left, size_t pivot, size_t right)
         ++left_arr_idx;
         ++merge_idx;
     }
-      while (right_arr_idx < right_arr_size)
+    while(right_arr_idx < right_arr_size)
     {
         arr_to_sort[merge_idx] = right_arr[right_arr_idx];
         ++right_arr_idx;

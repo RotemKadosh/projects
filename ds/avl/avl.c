@@ -716,11 +716,10 @@ static AVL_node_ty *BalanceTheTree(AVL_node_ty *node)
     if (1 < balance)
     {
        
-        if(1 <= GetNodeBalance(left))
+        if(0 >= GetNodeBalance(left))
         {
-            return RightRotate(node);
+            node->relatives[LEFT] = LeftRotate(node->relatives[LEFT]);
         }
-        node->relatives[LEFT] = LeftRotate(node->relatives[LEFT]);
         return RightRotate(node);  
     }
     if (-1 > balance )

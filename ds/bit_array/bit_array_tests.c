@@ -26,6 +26,7 @@ bit_array_t BitsArrMirrorLut(bit_array_t arr);
 
 int main()
 {
+    /*
 	TestBitsArrToString();
 	TestBitsArrSetAll();
 	TestBitsArrResetAll();
@@ -41,6 +42,13 @@ int main()
     TestBitsArrRotL();
     TestBitsArrMirrorLut();
     TestBitsArrCountOnLut();
+    */
+    char *p = "lalala";
+    char arr[10] = "lalala";
+    ++p;
+
+    memset()
+ 
 	return 0;
 }
 
