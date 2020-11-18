@@ -52,16 +52,19 @@ int CBufferIsEmpty(const CBuffer_t *cbuffer)
 	assert(NULL != cbuffer);
 	return (0 == CBufferSize(cbuffer)); 
 }
+
 size_t CBufferFreeSpace(const CBuffer_t *cbuffer)
 {
 	assert(NULL != cbuffer);
 	return (cbuffer->capacity - CBufferSize(cbuffer));
 }
+
 static size_t IdxUpdate(const size_t idx, const size_t steps, const size_t capacity)
 {
 
 	return (idx + steps) % (capacity + EXTRA_SPACE);
 } 
+
 ssize_t CBufferWrite(CBuffer_t *cbuffer, const void *input, size_t count_bytes)
 {	
 	size_t write = 0;
@@ -88,6 +91,7 @@ ssize_t CBufferWrite(CBuffer_t *cbuffer, const void *input, size_t count_bytes)
 
 	return bytes_to_write + bytes_until_end;
 }
+
 ssize_t CBufferRead(CBuffer_t *cbuffer, void *output, size_t count_bytes)
 {
 	size_t read = 0;

@@ -26,6 +26,7 @@ Queue_t *QCreate(void)
 	}
 	return q;
 }
+
 int QEnqueue(Queue_t *queue, void *data)
 {	
 	Slist_iter_t ans = NULL;
@@ -38,11 +39,13 @@ int QEnqueue(Queue_t *queue, void *data)
 
 	return SUCCESS;
 }
+
 void *QPeek(const Queue_t *queue)
 {
 	assert(NULL != queue);
 	return SlistGetData(SlistBegin(queue->list));;
 }
+
 void QDestroy(Queue_t *queue)
 {
 	assert(NULL != queue);
@@ -51,21 +54,25 @@ void QDestroy(Queue_t *queue)
 	free(queue);
 	queue = NULL;
 }
+
 size_t QSize(const Queue_t *queue)
 {
 	assert(NULL != queue);
 	return SlistCount(queue->list);
 }
+
 int QIsEmpty(const Queue_t *queue)
 {
 	assert(NULL != queue);
 	return SlistIsSameIter(SlistBegin(queue->list), SlistEnd(queue->list));
 }
+
 void QDequeue(Queue_t *queue)
 {
 	assert(NULL != queue);
 	SlistRemove(SlistBegin(queue->list));
 }
+
 void QAppend(Queue_t *dest, Queue_t *src)
 {
 	assert(NULL != dest);

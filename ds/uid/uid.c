@@ -1,5 +1,6 @@
 #include <unistd.h> /*getpid*/
 #include <limits.h> /*SHRT_MAX*/
+#include <stdatomic.h>/*fetch_and_add*/
 #include "uid.h"
 
 #define TIME_FAIL ((time_t)-1)
@@ -19,18 +20,20 @@ static int UIDIsEqualTimes(UID_t uid_one, UID_t uid_two);
 
 UID_t UIDCreate(void)
 {
-	static size_t counter = 0;
+	static size_t counter = 1;
 	UID_t uid = {0};
 	time_t stamp = time(NULL);
 	if(TIME_FAIL ==  stamp)
 	{
 		return UIDGetBadUid();
 	}
-	UIDSetTime(&uid, stamp);
-	UIDSetPid(&uid,getpid());
-	UIDSetCounter(&uid, ++counter);
+	uid.time_stamp = stamp;
+	uid.pid = getpid();
+	uid.counter = atomic_fetch_add(&counter, 1);
 	return uid;
 }
+
+
 static pid_t UIDGetPid(UID_t uid)
 {
 	return uid.pid;
@@ -59,11 +62,12 @@ static int UIDIsEqualTimes(UID_t uid_one, UID_t uid_two)
 {
 	return (UIDGetTime(uid_one) == UIDGetTime(uid_two));
 }
+
 int UIDIsSame(UID_t one, UID_t two)
 {
-
-	return ((UIDGetPid(one) == UIDGetPid(two)) && UIDIsEqualTimes(one, two) && (UIDGetCounter(one) == UIDGetCounter(two)));
+	return ((one.pid == two.pid) && UIDIsEqualTimes(one, two) && (one.counter == two.counter));
 }
+
 UID_t UIDGetBadUid(void)
 {
 	UID_t uid = {0};
