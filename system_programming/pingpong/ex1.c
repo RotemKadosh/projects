@@ -55,8 +55,7 @@ int main(int argc, char *argv[])
                 printf("kill fail\n");
                 exit(FAIL);
             }
-    
-      }
+        }
     }
     else
     {

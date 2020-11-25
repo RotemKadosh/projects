@@ -28,10 +28,10 @@ union semun
 
 
 /*----------Declerations------------------------*/
-static int CreateSemaphore(char *proj_id);
+int CreateSemaphore(char *proj_id);
 static int GetSemVal(int sid, int number, int undo);
-static int DecreaseSemVal(int sid, int number, int undo);
-static int IncreaseSemVal(int sid, int number ,int undo);
+int DecreaseSemVal(int sid, int number, int undo);
+int IncreaseSemVal(int sid, int number ,int undo);
 static void GetArgs(char *c, int *number, int *undo_flag);
 static int BinarySemInit(int semid);
 static int InvalidInput(int sid, int number, int undo);
@@ -39,7 +39,7 @@ static void InitOpLut(SemOperation *operation_lut);
 static int Exit(int sid, int number ,int undo);
 /*---------------------definition-----------------------------*/
 
-static int CreateSemaphore(char *proj_id)
+int CreateSemaphore(char *proj_id)
 {
     int semid = 0;
     key_t key = 0;
@@ -169,30 +169,6 @@ static void InitOpLut(SemOperation *operation_lut)
     operation_lut['X'] = Exit;
 }
 
-int main(int argc, char **argv)
-{
-    int sem_id = 0;
-    int status = SUCCESS;
-    char c = 0;
-    int number = 0;
-    int undo_flag = 0;
-    SemOperation operation_lut[256];   
 
-    assert(1 < argc);
-
-    InitOpLut(operation_lut);
-    
-    if(FAIL == (sem_id = CreateSemaphore(argv[argc -1])))
-    {
-        printf("create fail\n");
-        return FAIL;
-    }
-    while (status != FAIL)
-    {
-        GetArgs(&c, &number, &undo_flag);
-        status = operation_lut[(int)c](sem_id, number, undo_flag);
-    }
-    return status;
-}
 
 

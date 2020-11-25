@@ -7,14 +7,10 @@
 #define MAX_PID SHRT_MAX
  /*reviewed by daher*/
 
-static pid_t UIDGetPid(UID_t uid);
-static void UIDSetPid(UID_t *uid, pid_t pid);
 
 static time_t UIDGetTime(UID_t uid);
-static void UIDSetTime(UID_t *uid, time_t timestamp);
 
-static size_t UIDGetCounter(UID_t uid);
-static void UIDSetCounter(UID_t *uid, size_t counter);
+
 
 static int UIDIsEqualTimes(UID_t uid_one, UID_t uid_two);
 
@@ -34,30 +30,13 @@ UID_t UIDCreate(void)
 }
 
 
-static pid_t UIDGetPid(UID_t uid)
-{
-	return uid.pid;
-}
-static void UIDSetPid(UID_t *uid, pid_t pid)
-{
-	uid->pid = pid;
-}
+
 static time_t UIDGetTime(UID_t uid)
 {
 	return uid.time_stamp;
 }
-static void UIDSetTime(UID_t *uid, time_t timestamp)
-{
-	uid->time_stamp = timestamp;
-}
-static size_t UIDGetCounter(UID_t uid)
-{
-	return uid.counter;
-}
-static void UIDSetCounter(UID_t *uid, size_t counter)
-{
-	uid->counter = counter;
-}
+
+
 static int UIDIsEqualTimes(UID_t uid_one, UID_t uid_two)
 {
 	return (UIDGetTime(uid_one) == UIDGetTime(uid_two));

@@ -199,6 +199,7 @@ int SchedulerRun(Scheduler_t *scheduler)
 	}
 	return STOPPED;
 }
+
 void SchedulerPause(Scheduler_t *scheduler)
 {
 	assert(NULL != scheduler);

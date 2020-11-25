@@ -31,10 +31,8 @@ int main(int argc, char **argv)
 
     int sleep_time = 15;
     size_t num = 9999999999;
-    UnlinkAllSem1();
-    printf("I Am the Main Process, I am alive, id : %d\n", getpid());
     StartWd(argv);
-
+    printf("I Am the Main Process, I am alive, id : %d\n", getpid());
     while(sleep_time > 0)
     {
         sleep_time = sleep(sleep_time);

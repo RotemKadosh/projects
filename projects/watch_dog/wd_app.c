@@ -25,15 +25,15 @@
 #define RUN (0)
 #define STOP (1)
 
-volatile sig_atomic_t stop_flag;
-volatile sig_atomic_t counter;
+static volatile sig_atomic_t stop_flag;
+static volatile sig_atomic_t counter;
 
 typedef struct context
 {
     pid_t send_to_pid;
     Scheduler_t *sched;
     char *const *argv;
-    char *path;
+    char *path;   
 } context_ty;
 
 int kill(pid_t pid, int sig);
@@ -51,6 +51,9 @@ int SetTasksInSched(context_ty *context);
 int UpdateSemaphoresValue();
 void UpdateEnv();
 int CreateMainProcess(char *const *argv);
+int ContextSetUp(context_ty *context , char **argv);
+int WatchDogAppSetUp(context_ty *context , char **argv );
+void StopApp(context_ty *context);
 
 /*-------- TASKS--------*/
 
@@ -118,8 +121,8 @@ void Usr2SigHand(int sig)
 int SetSignalHandlers()
 {
     int status = SUCCESS;
-    struct sigaction usr1hand;
-    struct sigaction usr2hand;
+    struct sigaction usr1hand = {0};
+    struct sigaction usr2hand = {0};
     
     usr1hand.sa_handler = Usr1SigHand;
     
@@ -166,7 +169,7 @@ int UpdateSemaphoresValue()
     {
       return FAIL;  
     }
-    while (FAIL == sem_wait(wd_process_sem)){}
+    while (FAIL == sem_wait(wd_process_sem));
     sem_close(wd_thread_sem);
     sem_close(wd_process_sem);
     return SUCCESS;
@@ -198,6 +201,35 @@ int CreateMainProcess(char *const *argv)
     return pid;
 }
 
+int ContextSetUp(context_ty *context , char **argv)
+{
+    counter = 0;
+    stop_flag = RUN;
+    context->argv = argv;
+    context->send_to_pid = getppid();
+    context->sched = SchedulerCreate();
+    if(NULL == context->sched)
+    {
+        return FAIL;
+    }
+    return SUCCESS;
+}
+
+int WatchDogAppSetUp(context_ty *context , char **argv )
+{
+    int status = 0;
+    status = ContextSetUp(context, argv);
+    if(SUCCESS == status)
+    {
+        status = SetSignalHandlers();
+        if(SUCCESS == status)
+        {
+            status = SetTasksInSched(context);
+        }
+    }
+    return status;
+}
+
 /*--------cleanup functions--------*/
 
 void CleanUp(context_ty *context)
@@ -219,55 +251,42 @@ int CloseAllSem()
     sem_close(wd_thread_sem);
     sem_close(wd_process_sem);
 
+    sem_unlink("/wd_thread_sem");
+    sem_unlink("/wd_process_sem");
     return SUCCESS;
 }
 
+void StopApp(context_ty *context)
+{
+    while(FAIL == kill(context->send_to_pid, SIGUSR2));
+    CleanUp(context);
+}
 /*--------Main--------*/
 
 int main(int argc, char **argv)
 {
-    size_t i = 0;
-    context_ty context ={0};
+    int status = SUCCESS;
+    context_ty context = {0};
     (void)argc;
-    counter = 0;
-    stop_flag = RUN;
-    context.argv = argv;
-    context.send_to_pid = getppid();
-    context.sched = SchedulerCreate();
-    if(NULL == context.sched)
+    status = WatchDogAppSetUp(&context, argv);
+    if(SUCCESS == status)
     {
-        printf("sched create fail\n");
-        return FAIL;
+        status = UpdateSemaphoresValue();
     }
-    if(SUCCESS != SetSignalHandlers())
-    {
-        CleanUp(&context);
-        return FAIL;
-    }
-    if(SUCCESS != SetTasksInSched(&context))
-    {
-        CleanUp(&context);
-        return FAIL;
-    }
-    if(SUCCESS != UpdateSemaphoresValue())
+    if(SUCCESS != status)
     {
         CleanUp(&context);
         return FAIL;
     }
     printf("I am WD APP, ID: %d\n", getpid());
-    while(STOPPED == SchedulerRun(context.sched))
+    if(STOPPED == SchedulerRun(context.sched))
     {
         if(STOP == stop_flag)
         {
-            for(i = 0; i< 5; i++)
-            {
-                kill(context.send_to_pid, SIGUSR2);
-            } 
-            CleanUp(&context);
+            StopApp(&context);
             return SUCCESS;
         }
     }
-
+    exit(0);
     return SUCCESS;
-
 }
