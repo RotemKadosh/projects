@@ -4,7 +4,7 @@
 #include <sys/stat.h> /*stat*/
 #include <pthread.h> /*create, mutex, join*/
 #include <assert.h> /*assert*/
-
+#include <stdatomic.h> /*atomic fetch add*/
 
 #define NUM_OF_COPIES (1000)
 #define NUM_OF_THREAD (8)
@@ -75,12 +75,11 @@ void *CountSortThread(void *arg)
         ++t_char_counter[(int)*read_ptr];
         ++read_ptr;
     }
-    pthread_mutex_lock(&count_lock);
     for(i = 0; i < 256; i++)
     {
-        char_counters[i] = char_counters[i] + t_char_counter[i];
+        atomic_fetch_add(&char_counters[i], t_char_counter[i]) ;
     }
-    pthread_mutex_unlock(&count_lock);
+    
     return NULL;
 }
 
