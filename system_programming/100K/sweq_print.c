@@ -1,6 +1,6 @@
 #include <stdio.h> /*printf*/
 #include <pthread.h>/*pthread_create*/
-
+#include <unistd.h>
 #include <assert.h>
 
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
@@ -30,17 +30,21 @@ char *GetNextWord()
     word[i] = '\0';
     return word;
 }
+
 void *ThreadFunc(void* arg)
 {
     char *word;
+    printf("2\n");
     while(*runner != '\0')
     {
+        printf("3\n");
         pthread_mutex_lock(&lock);
         pthread_cond_wait(&((conds *)arg)->mine, &lock);
-
+        printf("4\n");
         word = GetNextWord();
         printf("%s", word);
         pthread_cond_broadcast(&((conds *)arg)->next);
+        printf("5\n");
     }
     return NULL;
 }
@@ -56,10 +60,12 @@ int main(int argc, char **argv)
     pthread_t tid[3] = {0};
     size_t i = 0;
     runner = paragraph;
+    printf("1\n");
     for(i = 0; i< 3; i++)
     {   
         pthread_create(&tid[i], NULL, ThreadFunc,(void *)&cond[i]);
     }
+    pthread_cond_broadcast(&cond1);
     for(i = 0; i < 3; i++)
     {
         pthread_join(tid[i], NULL);
