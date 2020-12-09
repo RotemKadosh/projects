@@ -12,7 +12,7 @@ typedef struct stack stack_t;
 *@return
 * pointer to the new stack or NULL if failed         
 */
-stack_t *StackCreate(size_t capacity);
+extern "C" stack_t *StackCreate(size_t capacity);
 
 /*DESCRIPTION: 
 *delete given stack -free all alocated memory

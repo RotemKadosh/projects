@@ -706,13 +706,15 @@ static AVL_node_ty *RemoveNodeByCopy(AVL_ty *tree, AVL_node_ty *root)
 
 }
 
+
+
 static AVL_node_ty *BalanceTheTree(AVL_node_ty *node)
 {
     int balance = GetNodeBalance(node);
     AVL_node_ty *left = node->relatives[LEFT];
     AVL_node_ty *right = node->relatives[RIGHT];
 
-
+    
     if (1 < balance)
     {
        

@@ -14,8 +14,8 @@ char word[10];
 
 typedef struct conds
 {
-    pthread_cond_t mine;
-    pthread_cond_t next;
+    pthread_cond_t *mine;
+    pthread_cond_t *next;
 } conds;
 
 char *GetNextWord()
@@ -31,44 +31,63 @@ char *GetNextWord()
     return word;
 }
 
-void *ThreadFunc(void* arg)
+void *Thread1Func(void* arg)
 {
     char *word;
-    printf("2\n");
+    printf("thread1\n");
     while(*runner != '\0')
     {
-        printf("3\n");
+        printf("1\n");
         pthread_mutex_lock(&lock);
-        pthread_cond_wait(&((conds *)arg)->mine, &lock);
-        printf("4\n");
+        pthread_cond_wait(&cond1, &lock);
+        printf("2\n");
         word = GetNextWord();
-        printf("%s", word);
-        pthread_cond_broadcast(&((conds *)arg)->next);
-        printf("5\n");
+        printf("%s\n", word);
+        pthread_mutex_unlock(&lock);
+        pthread_cond_broadcast(&cond2);
+        printf("3\n");
+    }
+    return NULL;
+}
+void *Thread2Func(void* arg)
+{
+    char *word;
+    printf("thread2\n");
+    while(*runner != '\0')
+    {
+        printf("1\n");
+        pthread_mutex_lock(&lock);
+        pthread_cond_wait(&cond2, &lock);
+        printf("2\n");
+        word = GetNextWord();
+        printf("%s\n", word);
+        pthread_mutex_unlock(&lock);
+        pthread_cond_broadcast(&cond3);
+        printf("3\n");
+    }
+    return NULL;
+}
+void *Thread3Func(void* arg)
+{
+    char *word;
+    printf("thread3\n");
+    while(*runner != '\0')
+    {
+        printf("1\n");
+        pthread_mutex_lock(&lock);
+        pthread_cond_wait(&cond3, &lock);
+        printf("2\n");
+        word = GetNextWord();
+        printf("%s\n", word);
+        pthread_mutex_unlock(&lock);
+        pthread_cond_broadcast(&cond1);
+        printf("3\n");
     }
     return NULL;
 }
 
 
-
 int main(int argc, char **argv)
 {
-    conds c1 = {cond1, cond2};
-    conds c2 = {cond2, cond3};
-    conds c3 = {cond3, cond1};
-    conds cond[3] = {c1, c2, c3};
-    pthread_t tid[3] = {0};
-    size_t i = 0;
-    runner = paragraph;
-    printf("1\n");
-    for(i = 0; i< 3; i++)
-    {   
-        pthread_create(&tid[i], NULL, ThreadFunc,(void *)&cond[i]);
-    }
-    pthread_cond_broadcast(&cond1);
-    for(i = 0; i < 3; i++)
-    {
-        pthread_join(tid[i], NULL);
-    }
-    return 0;
+    
 }
