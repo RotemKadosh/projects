@@ -2,6 +2,8 @@
 !/**/
 !*.c
 !*.h
+!*.cpp
+!*.hpp
 !*.md
 !*makefile
 !*.gitignore
