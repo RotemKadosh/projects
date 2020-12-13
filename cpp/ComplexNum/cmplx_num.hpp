@@ -11,18 +11,18 @@ namespace ilrd
 class Complex
 {
 public:
-    inline Complex(const double real_, const double imaginary_ = 0);    
+    inline Complex(double real_, double imaginary_ = 0);    
 
     inline Complex& operator+=(const Complex& other_);
     inline Complex& operator-=(const Complex& other_);
     inline Complex& operator*=(const Complex& other_);
     inline Complex& operator/=(const Complex& other_);
     
-    inline const double GetReal() const;          
-    const double GetImaginary() const;         
+    inline double GetReal() const;          
+    inline double GetImaginary() const;         
 
-    inline void SetReal(const double val);
-    inline void SetImaginary(const double val);
+    inline void SetReal(double val);
+    inline void SetImaginary(double val);
 
 private:
     double m_real;

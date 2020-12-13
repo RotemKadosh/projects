@@ -19,6 +19,7 @@ public:
 
 private:
     static const size_t NULL_BYTE = 1; 
+    String& StrDuplicate(const String& other_);
     char *m_cstr;
 };
 

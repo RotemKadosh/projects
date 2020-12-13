@@ -18,6 +18,7 @@ public:
     const char* CStr() const;       // get raw string  
 
 private:
+    char *StrDuplicate(const char *str_);
     static const size_t NULL_BYTE = 1; 
     char *m_cstr;
 };
