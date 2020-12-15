@@ -2,9 +2,6 @@
 #define ILRD_94_COMPLEX_IMPL_HPP
 
 #include <iostream> // std :: ostream, istream
-#include <cstring> // memset
-#include <cstdlib> // atof;
-#include <iomanip> // setw
 #include "cmplx_num.hpp"
 
 namespace ilrd
