@@ -171,7 +171,7 @@ test_status_t IOTest()
 test_status_t AdvanceTest()
 {
     Complex c1(10, 2);
-    c1 *=c1;
+    c1 *= c1;
     REQUIRE(c1 == Complex(96, 40));
 
     c1 *= 12;

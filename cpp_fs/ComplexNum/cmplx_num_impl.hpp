@@ -36,29 +36,38 @@ inline void Complex::SetImaginary(double value)
 
 inline Complex& Complex::operator+=(const Complex& other_)
 {
-    Complex tmp(*this + other_);
-    *this = tmp;
+    m_real += other_.GetReal();
+    m_imaginary += other_.GetImaginary();
     return *this;
 }
 
 inline Complex& Complex::operator-=(const Complex& other_)
 {
-    Complex tmp(*this - other_);
-    *this = tmp;
+     m_real -= other_.GetReal();
+    m_imaginary -= other_.GetImaginary();
     return *this;
 }
 
 inline Complex& Complex::operator*=(const Complex& other_)
 {
-    Complex tmp(*this * other_);
-    *this = tmp;
+    double real = m_real;
+    double imaginary = m_imaginary;
+    double o_real = other_.GetReal();
+    double o_imaginary = other_.GetImaginary();
+    m_real = (real * o_real) - (imaginary * o_imaginary);
+    m_imaginary = ((real * o_imaginary) + (o_real * imaginary));
+    
     return *this;
 }
-
 inline Complex& Complex::operator/=(const Complex& other_)
 {
-    Complex tmp( *this  / other_);
-    *this = tmp;
+    double a = m_real;
+    double b = m_imaginary;
+    double c = other_.GetReal();
+    double d = other_.GetImaginary();
+    double mult = (1 / ((c * c) + (d * d)));
+    m_real = mult*((a * c) + (d * b));
+    m_imaginary = mult * ((b * c) - (a * d));
     return *this;
 }
 
@@ -70,10 +79,12 @@ inline std::ostream& operator<<(std::ostream& os_, const Complex& cmplx_)
 
 inline std::istream& operator>>(std::istream& is, Complex& cmplx_)
 {
-
     double real = 0.0, imaginary = 0.0;
+    std::cout<<"enter number to real\n";
     is >> real;
+    std::cout<<"enter number to imaginary\n";
     is >> imaginary;
+
     cmplx_.SetReal(real);
     cmplx_.SetImaginary(imaginary);
     return is;
@@ -98,26 +109,28 @@ inline Complex operator+(const Complex& cmplx_, const Complex& other_)
 
 inline Complex operator-(const Complex& cmplx_, const Complex& other_)
 {
-        return Complex(cmplx_.GetReal() - other_.GetReal(),
-                    cmplx_.GetImaginary() - other_.GetImaginary());
+    Complex result(cmplx_.GetReal(), cmplx_.GetImaginary());
+    result -= other_;
+       
+       
+    return result;
 }
 
 inline Complex operator*(const Complex& cmplx_, const Complex& other_)
 {
-    return Complex(((cmplx_.GetReal() * other_.GetReal()) - 
-                    (cmplx_.GetImaginary() * other_.GetImaginary())),
-                    ((cmplx_.GetReal() * other_.GetImaginary()) + 
-                    (other_.GetReal() * cmplx_.GetImaginary())));
+    Complex result(cmplx_.GetReal(), cmplx_.GetImaginary());
+    result *= other_;
+    
+    return result;
+
 }
 
 inline Complex operator/(const Complex& cmplx_, const Complex& other_)
 {
-    double a = cmplx_.GetReal();
-    double b = cmplx_.GetImaginary();
-    double c = other_.GetReal();
-    double d = other_.GetImaginary();
-    double mult = (1 / ((c * c) + (d * d)));
-    return Complex(mult*((a * c) + (d * b)), mult * ((b * c) - (a * d)));
+    Complex result(cmplx_.GetReal(), cmplx_.GetImaginary());
+    result /= other_;
+       
+    return result;
 }
 
 }
